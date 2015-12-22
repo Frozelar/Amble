@@ -1,0 +1,145 @@
+﻿  LuaBridge.cpp
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(36): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(38): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(40): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(42): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(44): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(46): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(48): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(50): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(52): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(54): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(59): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(61): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(63): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(65): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(91): warning C4244: 'argument': conversion from 'lua_Integer' to 'unsigned int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(137): warning C4244: '=': conversion from 'lua_Integer' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(168): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(200): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(224): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(344): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(357): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(370): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+c:\users\alex\documents\programming_junk\game\luabridge.cpp(383): warning C4244: '=': conversion from 'lua_Number' to 'int', possible loss of data
+d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(655): error C2664: 'std::vector<std::string,std::allocator<_Ty>>::vector(const std::vector<_Ty,std::allocator<_Ty>> &)': cannot convert argument 1 from 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' to 'const std::allocator<_Ty> &'
+          with
+          [
+              _Ty=std::string
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(655): note: Reason: cannot convert from 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' to 'const std::allocator<_Ty>'
+          with
+          [
+              _Ty=std::string
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(655): note: No user-defined-conversion operator available that can perform this conversion, or the operator cannot be called
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(773): note: see reference to function template instantiation 'void std::allocator<_Ty>::construct<_Objty,std::basic_string<char,std::char_traits<char>,std::allocator<char>>&>(_Objty *,std::basic_string<char,std::char_traits<char>,std::allocator<char>> &)' being compiled
+          with
+          [
+              _Ty=std::vector<std::string,std::allocator<std::string>>,
+              _Objty=std::vector<std::string,std::allocator<std::string>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(773): note: see reference to function template instantiation 'void std::allocator<_Ty>::construct<_Objty,std::basic_string<char,std::char_traits<char>,std::allocator<char>>&>(_Objty *,std::basic_string<char,std::char_traits<char>,std::allocator<char>> &)' being compiled
+          with
+          [
+              _Ty=std::vector<std::string,std::allocator<std::string>>,
+              _Objty=std::vector<std::string,std::allocator<std::string>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(918): note: see reference to function template instantiation 'void std::allocator_traits<_Alloc>::construct<_Ty,std::basic_string<char,std::char_traits<char>,std::allocator<char>>&>(std::allocator<_Ty> &,_Objty *,std::basic_string<char,std::char_traits<char>,std::allocator<char>> &)' being compiled
+          with
+          [
+              _Alloc=std::allocator<std::vector<std::string,std::allocator<std::string>>>,
+              _Ty=std::vector<std::string,std::allocator<std::string>>,
+              _Objty=std::vector<std::string,std::allocator<std::string>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory0(917): note: see reference to function template instantiation 'void std::allocator_traits<_Alloc>::construct<_Ty,std::basic_string<char,std::char_traits<char>,std::allocator<char>>&>(std::allocator<_Ty> &,_Objty *,std::basic_string<char,std::char_traits<char>,std::allocator<char>> &)' being compiled
+          with
+          [
+              _Alloc=std::allocator<std::vector<std::string,std::allocator<std::string>>>,
+              _Ty=std::vector<std::string,std::allocator<std::string>>,
+              _Objty=std::vector<std::string,std::allocator<std::string>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory(379): note: see reference to function template instantiation 'void std::_Wrap_alloc<std::allocator<_Ty>>::construct<std::vector<std::string,std::allocator<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>,std::basic_string<char,std::char_traits<char>,std::allocator<char>>&>(_Ty *,std::basic_string<char,std::char_traits<char>,std::allocator<char>> &)' being compiled
+          with
+          [
+              _Ty=std::vector<std::string,std::allocator<std::string>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory(379): note: see reference to function template instantiation 'void std::_Wrap_alloc<std::allocator<_Ty>>::construct<std::vector<std::string,std::allocator<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>,std::basic_string<char,std::char_traits<char>,std::allocator<char>>&>(_Ty *,std::basic_string<char,std::char_traits<char>,std::allocator<char>> &)' being compiled
+          with
+          [
+              _Ty=std::vector<std::string,std::allocator<std::string>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory(416): note: see reference to function template instantiation '_FwdIt std::_Uninit_copy<_InIt,_FwdIt,std::allocator<_Ty>>(_InIt,_InIt,_FwdIt,std::_Wrap_alloc<std::allocator<_Ty>> &,std::_Nonscalar_ptr_iterator_tag)' being compiled
+          with
+          [
+              _FwdIt=std::vector<std::string,std::allocator<std::string>> ,
+              _InIt=std::basic_string<char,std::char_traits<char>,std::allocator<char>> *,
+              _Ty=std::vector<std::string,std::allocator<std::string>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\xmemory(427): note: see reference to function template instantiation '_FwdIt std::_Uninit_copy<std::basic_string<char,std::char_traits<char>,std::allocator<char>>*,_Iter,_Alloc>(_InIt,_InIt,_FwdIt,_Alloc &)' being compiled
+          with
+          [
+              _FwdIt=std::vector<std::string,std::allocator<std::string>> ,
+              _Iter=std::vector<std::string,std::allocator<std::string>> ,
+              _Alloc=std::_Wrap_alloc<std::allocator<std::vector<std::string,std::allocator<std::string>>>>,
+              _InIt=std::basic_string<char,std::char_traits<char>,std::allocator<char>> *
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\vector(1672): note: see reference to function template instantiation '_FwdIt std::_Uninitialized_copy<_Iter,std::vector<std::string,std::allocator<_Ty>>,std::_Wrap_alloc<std::allocator<std::vector<_Ty,std::allocator<_Ty>>>>>(_InIt,_InIt,_FwdIt,_Alloc &)' being compiled
+          with
+          [
+              _FwdIt=std::vector<std::string,std::allocator<std::string>> ,
+              _Iter=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>>,
+              _Ty=std::string,
+              _InIt=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>>,
+              _Alloc=std::_Wrap_alloc<std::allocator<std::vector<std::string,std::allocator<std::string>>>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\vector(1436): note: see reference to function template instantiation 'std::vector<std::string,std::allocator<_Ty>> *std::vector<std::vector<_Ty,std::allocator<_Ty>>,std::allocator<std::vector<_Ty,std::allocator<_Ty>>>>::_Ucopy<_Iter>(_Iter,_Iter,std::vector<_Ty,std::allocator<_Ty>> *)' being compiled
+          with
+          [
+              _Ty=std::string,
+              _Iter=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\vector(1436): note: see reference to function template instantiation 'std::vector<std::string,std::allocator<_Ty>> *std::vector<std::vector<_Ty,std::allocator<_Ty>>,std::allocator<std::vector<_Ty,std::allocator<_Ty>>>>::_Ucopy<_Iter>(_Iter,_Iter,std::vector<_Ty,std::allocator<_Ty>> *)' being compiled
+          with
+          [
+              _Ty=std::string,
+              _Iter=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\vector(1373): note: see reference to function template instantiation 'void std::vector<std::vector<std::string,std::allocator<_Ty>>,std::allocator<std::vector<_Ty,std::allocator<_Ty>>>>::_Insert<_Iter>(std::_Vector_const_iterator<std::_Vector_val<std::_Simple_types<std::vector<_Ty,std::allocator<_Ty>>>>>,_Iter,_Iter,std::forward_iterator_tag)' being compiled
+          with
+          [
+              _Ty=std::string,
+              _Iter=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>>
+          ]
+  d:\program files (x86)\microsoft visual studio 14.0\vc\include\vector(1373): note: see reference to function template instantiation 'void std::vector<std::vector<std::string,std::allocator<_Ty>>,std::allocator<std::vector<_Ty,std::allocator<_Ty>>>>::_Insert<_Iter>(std::_Vector_const_iterator<std::_Vector_val<std::_Simple_types<std::vector<_Ty,std::allocator<_Ty>>>>>,_Iter,_Iter,std::forward_iterator_tag)' being compiled
+          with
+          [
+              _Ty=std::string,
+              _Iter=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>>
+          ]
+  c:\users\alex\documents\programming_junk\game\luabridge.cpp(98): note: see reference to function template instantiation 'std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::vector<std::string,std::allocator<_Ty>>>>> std::vector<std::vector<_Ty,std::allocator<_Ty>>,std::allocator<std::vector<_Ty,std::allocator<_Ty>>>>::insert<std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>>>(std::_Vector_const_iterator<std::_Vector_val<std::_Simple_types<std::vector<_Ty,std::allocator<_Ty>>>>>,_Iter,_Iter)' being compiled
+          with
+          [
+              _Ty=std::string,
+              _Iter=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>>
+          ]
+  c:\users\alex\documents\programming_junk\game\luabridge.cpp(98): note: see reference to function template instantiation 'std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::vector<std::string,std::allocator<_Ty>>>>> std::vector<std::vector<_Ty,std::allocator<_Ty>>,std::allocator<std::vector<_Ty,std::allocator<_Ty>>>>::insert<std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>>>(std::_Vector_const_iterator<std::_Vector_val<std::_Simple_types<std::vector<_Ty,std::allocator<_Ty>>>>>,_Iter,_Iter)' being compiled
+          with
+          [
+              _Ty=std::string,
+              _Iter=std::_Vector_iterator<std::_Vector_val<std::_Simple_types<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>>>
+          ]
+  Graphics.cpp
+c:\users\alex\documents\programming_junk\game\graphics.cpp(75): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(77): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(81): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(83): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(87): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(89): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(93): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(95): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(99): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(101): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(105): warning C4018: '<': signed/unsigned mismatch
+c:\users\alex\documents\programming_junk\game\graphics.cpp(107): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
