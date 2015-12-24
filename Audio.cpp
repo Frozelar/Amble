@@ -4,6 +4,8 @@ Audio Game::gAudio;
 
 std::vector<Mix_Music*> Audio::music(TOTAL_MUSIC_TYPES);
 std::vector<Mix_Chunk*> Audio::sfx(TOTAL_SFX_TYPES);
+std::vector<std::string> Audio::musicIdentifiers;
+std::vector<std::string> Audio::sfxIdentifiers;
 
 /*
 std::string Audio::musicIdentifiers[TOTAL_MUSIC_TYPES] = { "Underground" };

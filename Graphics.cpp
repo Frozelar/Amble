@@ -1,8 +1,8 @@
 #include "Graphics.h"
 
 std::vector< std::vector<Texture> > Graphics::backgroundTextures(TOTAL_BACKGROUND_TYPES);
-int bgState = 0;
-int bgFrame = 0;
+int Graphics::bgState = 0;
+int Graphics::bgFrame = 0;
 // Texture Graphics::tileTextures[TOTAL_TILE_TYPES][TOTAL_OBJECT_FRAME_TYPES];
 std::vector< std::vector<Texture> > Graphics::tileTextures(TOTAL_TILE_TYPES);
 std::vector< std::vector<Texture> > Graphics::playerTextures(TOTAL_ENTITY_FRAME_TYPES);
@@ -10,6 +10,7 @@ std::vector< std::vector<Texture> > Graphics::collectibleTextures(TOTAL_COLLECTI
 std::vector< std::vector<Texture> > Graphics::enemyTextures(TOTAL_ENEMY_TYPES);
 std::vector< std::vector<Texture> > Graphics::particleTextures(TOTAL_PARTICLE_TYPES);
 std::vector< std::vector<std::string> > Graphics::backgroundIdentifiers(TOTAL_BACKGROUND_TYPES);
+std::vector< std::vector<std::string> > Graphics::playerIdentifiers;
 std::vector< std::vector<std::string> > Graphics::enemyIdentifiers(TOTAL_ENEMY_TYPES);
 std::vector< std::vector<std::string> > Graphics::tileIdentifiers(TOTAL_TILE_TYPES);
 std::vector<std::string> Graphics::tileSubIdentifiers(TOTAL_TILE_SUBTYPES);

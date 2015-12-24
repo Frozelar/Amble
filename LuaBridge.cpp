@@ -1,4 +1,5 @@
 #include "LuaBridge.h"
+#include <sstream>
 
 // const int LuaBridge::MAX_ARGS = 64;
 // void* LuaBridge::labStack[MAX_ARGS];
@@ -23,8 +24,8 @@ void LuaBridge::labInitValues(void)
 	int max = 0;
 	int framenum = 0;
 	std::string identifier;
-	std::vector<std::string> frames;
-	std::vector<std::string> subframes;
+	// std::vector<std::string> frames;
+	std::stringstream frame;
 
 	luaL_openlibs(L);
 	int error = luaL_dofile(L, "luacode.lua");
@@ -88,20 +89,25 @@ void LuaBridge::labInitValues(void)
 			}
 			else if (lua_isstring(L, -2) == 1 && lua_isinteger(L, -1) == 1)
 			{
-				frames.resize(lua_tointeger(L, -1));
+				// frames.resize(lua_tointeger(L, -1));
 				for (int k = 0; k < lua_tointeger(L, -1); k++)
-					frames[k] = lua_tostring(L, -2) + (char)(k + 1);
-				if (j == ENTITIES)
 				{
-					Graphics::entityFrameTypeIdentifiers.resize(j + 1);
-					Graphics::entityFrameTypeIdentifiers[j].resize(frames.size());
-					Graphics::entityFrameTypeIdentifiers.insert(Graphics::entityFrameTypeIdentifiers.end(), frames.begin(), frames.end());
-				}
-				else if (j == OBJECTS)
-				{
-					Graphics::objectFrameTypeIdentifiers.resize(j + 1);
-					Graphics::objectFrameTypeIdentifiers.resize(frames.size());
-					Graphics::objectFrameTypeIdentifiers.insert(Graphics::objectFrameTypeIdentifiers.end(), frames.begin(), frames.end());
+					// frames[k] = lua_tostring(L, -2) + (char)(k + 1);
+					frame << lua_tostring(L, -2) << (k + 1);
+					if (j == ENTITIES)
+					{
+						Graphics::entityFrameTypeIdentifiers.resize(j + 1);
+						Graphics::entityFrameTypeIdentifiers[j].resize(k + 1);
+						Graphics::entityFrameTypeIdentifiers[j][k] = frame.str();
+					}
+					else if (j == OBJECTS)
+					{
+						Graphics::objectFrameTypeIdentifiers.resize(j + 1);
+						Graphics::objectFrameTypeIdentifiers.resize(k + 1);
+						Graphics::objectFrameTypeIdentifiers[j][k] = frame.str();
+					}
+					// frames[k] = frame.str();
+					frame.str(std::string());
 				}
 				lua_pop(L, 3);															// frameIdentifiers[], frameSet[]
 			}
@@ -119,7 +125,7 @@ void LuaBridge::labInitValues(void)
 		lua_pop(L, 1);																	// tileSubIdentifiers[]
 	}
 	lua_pop(L, 1);																		// 
-
+	
 	lua_getglobal(L, "graphicsIdentifiers");											// graphicsIdentifiers[]
 	for (int i = 0; i < TOTAL_GRAPHIC_IDS; i++)
 	{
@@ -147,119 +153,173 @@ void LuaBridge::labInitValues(void)
 				// frames.resize(lua_tointeger(L, -1));
 				// for (int k = 0; k < lua_tointeger(L, -1); k++)
 				// 	frames[k] = lua_tostring(L, -2) + (char)(k + 1);
-				if (j == BACKGROUNDS)
+				if (i == BACKGROUNDS)
 				{
-					frames.resize(framenum);
-					if (framenum > 1)
-						for (int k = 0; k < framenum; k++)
-							frames[k] = identifier + (char)(k + 1);
-					else
-						frames[0] = identifier;
 					Graphics::backgroundTextures.resize(j + 1);
-					Graphics::backgroundTextures[j].resize(frames.size() /* framenum */);
+					Graphics::backgroundTextures[j].resize(framenum);
 					Graphics::backgroundIdentifiers.resize(j + 1);
-					Graphics::backgroundIdentifiers[j].resize(frames.size());
-					Graphics::backgroundIdentifiers.insert(Graphics::backgroundIdentifiers.end() /* - 1 */ , frames.begin(), frames.end());
+					Graphics::backgroundIdentifiers[j].resize(framenum);
+					// frames.resize(framenum);
+					if (framenum > 1)
+					{
+						for (int k = 0; k < framenum; k++)
+						{
+							// frames[k] = identifier + (char)(k + 1);
+							frame << identifier << (k + 1);
+							Graphics::backgroundIdentifiers[j][k] = frame.str();
+							// frames[k] = frame.str();
+							frame.str(std::string());
+						}
+					}
+					else
+					{
+						// frames[0] = identifier;
+						Graphics::backgroundIdentifiers[j][0] = frame.str();
+					}
 					// Graphics::backgroundIdentifiers[j] = frames[j];
 				}
-				else if (j == TILES)
+				else if (i == TILES)
 				{
 					int m = 0;
+					Graphics::tileTextures.resize(j + 1);
+					Graphics::tileTextures[j].resize(framenum * Graphics::tileSubIdentifiers.size());
+					Graphics::tileIdentifiers.resize(j + 1);
+					Graphics::tileIdentifiers[j].resize(framenum * Graphics::tileSubIdentifiers.size());
 					for (int k = 0; k < Graphics::tileSubIdentifiers.size(); k++)
 					{
 						// for (int l = 0; l < framenum; l++)
 						// {
-							if (framenum > 1)
+						if (framenum > 1)
+						{
+							for (int l = 0; l < framenum; l++, m++)
 							{
-								for (int l = 0; l < framenum; l++, m++)
-								{
-									frames.resize(k + m + 1);
-									frames[k + m] = identifier + Graphics::tileSubIdentifiers[k] + (char)(l + 1);
-								}
+								// frames.resize(k + m + 1);
+								// frames[k + m] = identifier + Graphics::tileSubIdentifiers[k] + (char)(l + 1);
+								frame << identifier << Graphics::tileSubIdentifiers[k] << (l + 1);
+								Graphics::tileIdentifiers[j][k + m] = frame.str();
+								// frames[k] = frame.str();
+								frame.str(std::string());
 							}
-							else
-							{
-								frames.resize(k + 1);
-								frames[k] = identifier + Graphics::tileSubIdentifiers[k] /* + (char)(l + 1) */;
-							}
+						}
+						else
+						{
+							// frames.resize(k + 1);
+							// frames[k] = identifier + Graphics::tileSubIdentifiers[k] /* + (char)(l + 1) */;
+							frame << identifier << Graphics::tileSubIdentifiers[k];
+							Graphics::tileIdentifiers[j][k] = frame.str();
+							// frames[k] = frame.str();
+							frame.str(std::string());
+						}
 						// }
-							std::cout << frames[k] << std::endl;
 					}
-					Graphics::tileTextures.resize(j + 1);
-					Graphics::tileTextures[j].resize(frames.size() /* framenum */);
-					Graphics::tileIdentifiers.resize(j + 1);
-					Graphics::tileIdentifiers[j].resize(frames.size());
-					Graphics::tileIdentifiers.insert(Graphics::tileIdentifiers.end(), frames.begin(), frames.end());
 				}
-				else if (j == PLAYERS)
+				else if (i == PLAYERS)
 				{
-					for (int k = 0; k < framenum; k++)
-					{
-						if (framenum > 1)
-						{
-							for (int l = 0; l < Graphics::entityFrameTypeIdentifiers[k].size() /* m < framenum */; l++)
-							{
-								frames.resize(k + l + 1);
-								frames[k + l] = identifier + Graphics::entityFrameTypeIdentifiers[k][l] /* + (char)(m + 1) */;
-							}
-						}
-						else
-						{
-							frames.resize(k + 1);
-							frames[k] = identifier /* + (char)(k + 1) */;
-						}
-					}
+					int m = 0;
 					Graphics::playerTextures.resize(j + 1);
-					Graphics::playerTextures[j].resize(frames.size() /* framenum */);
+					// Graphics::playerTextures[j].resize(Graphics::entityFrameTypeIdentifiers[j].size());
 					Graphics::playerIdentifiers.resize(j + 1);
-					Graphics::particleIdentifiers[j].resize(frames.size());
-					Graphics::playerIdentifiers.insert(Graphics::playerIdentifiers.end(), frames.begin(), frames.end());
-				}
-				else if (j == ENEMIES)
-				{
+					// Graphics::playerIdentifiers[j].resize(Graphics::entityFrameTypeIdentifiers[j].size());
 					for (int k = 0; k < framenum; k++)
 					{
 						if (framenum > 1)
 						{
-							for (int l = 0; l < Graphics::entityFrameTypeIdentifiers[k].size() /* m < framenum */; l++)
+							for (int l = 0; l < Graphics::entityFrameTypeIdentifiers[k].size() /* m < framenum */; l++, m++)
 							{
-								frames.resize(k + l + 1);
-								frames[k + l] = identifier + Graphics::entityFrameTypeIdentifiers[k][l] /* + (char)(m + 1) */;
+								Graphics::playerTextures[j].resize(k + m + 1);
+								Graphics::playerIdentifiers[j].resize(k + m + 1);
+								// frames.resize(k + l + 1);
+								// frames[k + l] = identifier + Graphics::entityFrameTypeIdentifiers[k][l] /* + (char)(m + 1) */;
+								frame << identifier << Graphics::entityFrameTypeIdentifiers[k][l];
+								Graphics::playerIdentifiers[j][k + m] = frame.str();
+								// frames[k] = frame.str();
+								frame.str(std::string());
 							}
 						}
 						else
 						{
-							frames.resize(k + 1);
-							frames[k] = identifier /* + (char)(k + 1) */;
+							Graphics::playerTextures[j].resize(k + 1);
+							Graphics::playerIdentifiers[j].resize(k + 1);
+							// frames.resize(k + 1);
+							// frames[k] = identifier;
+							Graphics::playerIdentifiers[j][k] = identifier;
 						}
 					}
+				}
+				else if (i == ENEMIES)
+				{
+					int m = 0;
 					Graphics::enemyTextures.resize(j + 1);
-					Graphics::enemyTextures[j].resize(frames.size() /* framenum */);
+					// Graphics::enemyTextures[j].resize(Graphics::entityFrameTypeIdentifiers[j].size());
 					Graphics::enemyIdentifiers.resize(j + 1);
-					Graphics::enemyIdentifiers[j].resize(frames.size());
-					Graphics::enemyIdentifiers.insert(Graphics::enemyIdentifiers.end(), frames.begin(), frames.end());
-				}
-				else if (j == COLLECTIBLES)
-				{
-					frames.resize(framenum);
+					// Graphics::enemyIdentifiers[j].resize(Graphics::entityFrameTypeIdentifiers[j].size());
 					for (int k = 0; k < framenum; k++)
-						frames[k] = identifier + (char)(k + 1);
+					{
+						if (framenum > 1)
+						{
+							for (int l = 0; l < Graphics::entityFrameTypeIdentifiers[k].size() /* m < framenum */; l++, m++)
+							{
+								Graphics::enemyTextures[j].resize(k + m + 1);
+								Graphics::enemyIdentifiers[j].resize(k + m + 1);
+								// frames.resize(k + l + 1);
+								// frames[k + l] = identifier + Graphics::entityFrameTypeIdentifiers[k][l] /* + (char)(m + 1) */;
+								frame << identifier << Graphics::entityFrameTypeIdentifiers[k][l];
+								Graphics::enemyIdentifiers[j][k + m] = frame.str();
+								// frames[k] = frame.str();
+								frame.str(std::string());
+							}
+						}
+						else
+						{
+							Graphics::enemyTextures[j].resize(k + 1);
+							Graphics::enemyIdentifiers[j].resize(k + 1);
+							// frames.resize(k + 1);
+							// frames[k] = identifier;
+							Graphics::enemyIdentifiers[j][k] = identifier;
+						}
+					}
+				}
+				else if (i == COLLECTIBLES)
+				{
 					Graphics::collectibleTextures.resize(j + 1);
-					Graphics::collectibleTextures[j].resize(frames.size() /* framenum */);
+					Graphics::collectibleTextures[j].resize(framenum);
 					Graphics::collectibleIdentifiers.resize(j + 1);
-					Graphics::collectibleIdentifiers[j].resize(frames.size());
-					Graphics::collectibleIdentifiers.insert(Graphics::collectibleIdentifiers.end(), frames.begin(), frames.end());
+					Graphics::collectibleIdentifiers[j].resize(framenum);
+					// frames.resize(framenum);
+					if (framenum > 1)
+					{
+						for (int k = 0; k < framenum; k++)
+						{
+							// frames[k] = identifier + (char)(k + 1);
+							frame << identifier << (k + 1);
+							Graphics::collectibleIdentifiers[j][k] = frame.str();
+							// frames[k] = frame.str();
+							frame.str(std::string());
+						}
+					}
+					else
+						Graphics::collectibleIdentifiers[j][0] = identifier;
 				}
-				else if (j == PARTICLES)
+				else if (i == PARTICLES)
 				{
-					frames.resize(framenum);
-					for (int k = 0; k < framenum; k++)
-						frames[k] = identifier + (char)(k + 1);
 					Graphics::particleTextures.resize(j + 1);
-					Graphics::particleTextures[j].resize(frames.size() /* framenum */);
+					Graphics::particleTextures[j].resize(framenum);
 					Graphics::particleIdentifiers.resize(j + 1);
-					Graphics::particleIdentifiers[j].resize(frames.size());
-					Graphics::particleIdentifiers.insert(Graphics::particleIdentifiers.end(), frames.begin(), frames.end());
+					Graphics::particleIdentifiers[j].resize(framenum);
+					// frames.resize(framenum);
+					if (framenum > 1)
+					{
+						for (int k = 0; k < framenum; k++)
+						{
+							// frames[k] = identifier + (char)(k + 1);
+							frame << identifier << (k + 1);
+							Graphics::particleIdentifiers[j][k] = frame.str();
+							// frames[k] = frame.str();
+							frame.str(std::string());
+						}
+					}
+					else
+						Graphics::particleIdentifiers[j][0] = identifier;
 				}
 				lua_pop(L, 3);															// graphicsIdentifiers[], graphicSet[]
 			}
