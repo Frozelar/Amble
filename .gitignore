@@ -26,3 +26,15 @@
 *.exe
 *.out
 *.app
+
+# Others
+.zip
+.tar.gz
+lua-5.3.1
+game/.vs
+game/Debug
+game/game.sdf
+game/game.sln
+game/game.vcxproj
+game/game.vcxproj.filters
+game/game.vcxproj.user
