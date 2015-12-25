@@ -252,29 +252,30 @@ void Player::tgRender(void)
 	++tgFrameWaitCounter;
 	if (((tgSpeed != 0 || tgVerticals != 0) && tgFrameWaitCounter % 4 == 0) ||
 		(tgFrame == IDLE_1 && tgFrameWaitCounter % 64 == 0) ||
-		(tgFrame > IDLE_1 && tgFrame <= IDLE_5 && tgFrameWaitCounter % 16 == 0))
+		(tgFrame > IDLE_1 && tgFrame <= IDLE_4 && tgFrameWaitCounter % 16 == 0))
 	{
 		tgFrame++;
 		tgFrameWaitCounter = 0;
 	}
 
-	if (tgVerticals < 0 && (tgFrame < JUMP_1 || tgFrame > JUMP_5))
+	if (tgVerticals < 0 && (tgFrame < JUMP_1 || tgFrame > JUMP_2))
 		tgFrame = JUMP_1;
-	else if (tgVerticals > 0 && (tgFrame < FALL_1 || tgFrame > FALL_5))
+	else if (tgVerticals > 0 && (tgFrame < FALL_1 || tgFrame > FALL_2))
 		tgFrame = FALL_1;
-	else if (tgSpeed < 0 && tgVerticals == 0 && (tgFrame < WALK_LEFT_1 || tgFrame > WALK_LEFT_5))
+	else if (tgSpeed < 0 && tgVerticals == 0 && (tgFrame < WALK_LEFT_1 || tgFrame > WALK_LEFT_4))
 		tgFrame = WALK_LEFT_1;
-	else if (tgSpeed > 0 && tgVerticals == 0 && (tgFrame < WALK_RIGHT_1 || tgFrame > WALK_RIGHT_5))
+	else if (tgSpeed > 0 && tgVerticals == 0 && (tgFrame < WALK_RIGHT_1 || tgFrame > WALK_RIGHT_4))
 		tgFrame = WALK_RIGHT_1;
-	else if (tgSpeed == 0 && tgVerticals == 0 && (tgFrame < IDLE_1 || tgFrame > IDLE_5))
+	else if (tgSpeed == 0 && tgVerticals == 0 && (tgFrame < IDLE_1 || tgFrame > IDLE_4))
 		tgFrame = IDLE_1;
 
+	std::cout << "PLAYERTEXTURES SIZE:   " << Graphics::playerTextures[0].size();
 	if ((plJumps < 3 && (tgVerticals < -((int)Game::jumpArray.size() - 4) || (tgVerticals >= 1 && tgVerticals <= 8))) || 
 		(plDashing == 1 || plDashing == -1))
-		Game::gGraphics.playerTextures[plState][tgFrame].txColor(210, 180, 90);
+		Graphics::playerTextures[plState][tgFrame].txColor(210, 180, 90);
 	else
-		Game::gGraphics.playerTextures[plState][tgFrame].txColor(255, 255, 255);
+		Graphics::playerTextures[plState][tgFrame].txColor(255, 255, 255);
 
-	Game::gGraphics.playerTextures[plState][tgFrame].txRect = tgGFXrect; // ????
-	Game::gGraphics.playerTextures[plState][tgFrame].txRender();
+	Graphics::playerTextures[plState][tgFrame].txRect = tgGFXrect; // ????
+	Graphics::playerTextures[plState][tgFrame].txRender();
 }

@@ -130,8 +130,8 @@ void Tile::tgRender(void)
 		tgFrame = 0;
 	}
 
-	Game::gGraphics.tileTextures[tiType - TILE_TYPE_OFFSET][tgFrame].txRect = tgGFXrect;
-	Game::gGraphics.tileTextures[tiType - TILE_TYPE_OFFSET][tgFrame].txRender();
+	Graphics::tileTextures[tiType - TILE_TYPE_OFFSET][tgFrame].txRect = tgGFXrect;
+	Graphics::tileTextures[tiType - TILE_TYPE_OFFSET][tgFrame].txRender();
 }
 
 /*

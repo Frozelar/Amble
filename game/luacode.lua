@@ -18,7 +18,7 @@ graphicsIdentifiers = {
 	{ {"DirtBlock", 1}, {"DirtWall", 1} }, -- tiles (# frames (PER tile subidentifier))
 	{ {"Player", 5} }, -- player states (# frame SETS (5 by default)
 	{ {"Dude", 5} }, -- enemies (# frame SETS (5 by default))
-	{ {"Bit", 4}, {"Byte", 4} } -- collectibles (# frames)
+	{ {"Bit", 4}, {"Byte", 4} }, -- collectibles (# frames)
 	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} } -- particles (# frames)
 }
 
@@ -37,8 +37,8 @@ audioIdentifiers = {
 
 -- {name, # frames}
 frameIdentifiers = {
-	{ {"Idle", 4}, {"WalkLeft", 4}, {"WalkRight", 4}, {"Jump", 2}, {"Fall", 2} } -- most entities (currently only used with enemies and players)
-	{ {"State1", 4} } -- most objects (CURRENTLY UNUSED, CHANGE FRAMES IN graphicsIdentifiers INSTEAD)
+	{ {"Idle", 4}, {"WalkLeft", 4}, {"WalkRight", 4}, {"Jump", 2}, {"Fall", 2} }, -- most entities (currently only used with enemies and players)
+	{ {"Default", 4} } -- most objects (CURRENTLY UNUSED, CHANGE FRAMES IN graphicsIdentifiers INSTEAD)
 }
 
 gravityArray = { 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8 }
@@ -109,6 +109,7 @@ function Player:new(levelUnit)
   self.tgHitbox = Rectangle:new(0, 0, 0, 0)
   self.tgHitbox.w = PLAYER_W
   self.tgHitbox.h = PLAYER_H
+  print("new playah")
   return self
 end
 
@@ -231,6 +232,28 @@ function init()
   local j = -1
   for i = 1, #things, 1 do
     if things[i] ~= -1 then
+      if thingTypes[things[i]] == "player" then
+        things[i] = Player:new(i)
+      elseif thingTypes[things[i]] == "tile" then
+        things[i] = Tile:new(i)
+      elseif thingTypes[things[i]] == "enemy" then
+        things[i] = Enemy:new(i)
+      elseif thingTypes[things[i]] == "collectible" then
+        things[i] = Collectible:new(i)
+      else
+        things[i] = nil
+      end
+    else
+		things[i] = nil
+	end
+  end
+end
+
+--[[
+function init()
+  local j = -1
+  for i = 1, #things, 1 do
+    if things[i] ~= -1 then
       if things[i] == thingTypes["player"] then
 		print("PLAYER MADE EEEE")
         things[i] = Player:new(i)
@@ -248,7 +271,9 @@ function init()
 	end
   end
 end
+]]
 
+--[[
 function initIdentifiers()
 	dir = "resources/"
 	ext = ".png"
@@ -257,6 +282,7 @@ function initIdentifiers()
 		table.insert(graphicsIdentifiers, tiles[i], (dir .. tileTypes[i] .. ext))
 	end
 end
+]]
 
 --[[
 function handleEnvironment()

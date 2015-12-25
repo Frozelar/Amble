@@ -80,8 +80,8 @@ int Game::gScore = 0;
 // const int Game::MAX_PARTICLES = 4096;
 std::vector<Particle*> Game::particles;
 
-Game Game::gGame;
-Level Game::gLevel;
+// Game Game::gGame;
+// Level Game::gLevel;
 
 Game::Game()
 {

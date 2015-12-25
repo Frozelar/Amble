@@ -28,8 +28,8 @@ void Collectible::tgRender(void)
 		tgFrame = 0;
 	}
 
-	Game::gGraphics.collectibleTextures[clType - COLLECTIBLE_TYPE_OFFSET][tgFrame].txRect = tgGFXrect;
-	Game::gGraphics.collectibleTextures[clType - COLLECTIBLE_TYPE_OFFSET][tgFrame].txRender();
+	Graphics::collectibleTextures[clType - COLLECTIBLE_TYPE_OFFSET][tgFrame].txRect = tgGFXrect;
+	Graphics::collectibleTextures[clType - COLLECTIBLE_TYPE_OFFSET][tgFrame].txRender();
 }
 
 void Collectible::clCollect(void)

@@ -78,32 +78,43 @@ void LuaBridge::labInitValues(void)
 		{
 			lua_pushnumber(L, j + 1);													// frameIdentifiers[], frameSet[], j
 			lua_gettable(L, -2);														// frameIdentifiers[], frameSet[], identifier[]
+			if (lua_isnil(L, -1))
+			{
+				lua_pop(L, 2);														// frameIdentifiers[]
+				break;
+			}
 			lua_pushnumber(L, 1);														// frameIdentifiers[], frameSet[], identifier[], 1
 			lua_gettable(L, -2);														// frameIdentifiers[], frameSet[], identifier[], identifier
 			lua_pushnumber(L, 2);														// frameIdentifiers[], frameSet[], identifier[], identifier, 2
 			lua_gettable(L, -3);														// frameIdentifiers[], frameSet[], identifier[], identifier, # of frames
+
+			/*
 			if (lua_isnil(L, -1) == 1 || lua_isnil(L, -2) == 1)
 			{
-				lua_pop(L, 4);															// frameIdentifiers[]
+				lua_pop(L, 4);						// frameIdentifiers[]
 				break;
 			}
-			else if (lua_isstring(L, -2) == 1 && lua_isinteger(L, -1) == 1)
+			*/
+			if (lua_isstring(L, -2) == 1 && lua_isinteger(L, -1) == 1)
 			{
+				identifier = lua_tostring(L, -2);
+				framenum = lua_tointeger(L, -1);
 				// frames.resize(lua_tointeger(L, -1));
-				for (int k = 0; k < lua_tointeger(L, -1); k++)
+				for (int k = 0; k < framenum; k++)
 				{
 					// frames[k] = lua_tostring(L, -2) + (char)(k + 1);
-					frame << lua_tostring(L, -2) << (k + 1);
-					if (j == ENTITIES)
+					frame << identifier << (k + 1);
+					if (i == ENTITIES)
 					{
 						Graphics::entityFrameTypeIdentifiers.resize(j + 1);
 						Graphics::entityFrameTypeIdentifiers[j].resize(k + 1);
 						Graphics::entityFrameTypeIdentifiers[j][k] = frame.str();
+						std::cout << frame.str() << std::endl;
 					}
-					else if (j == OBJECTS)
+					else if (i == OBJECTS)
 					{
 						Graphics::objectFrameTypeIdentifiers.resize(j + 1);
-						Graphics::objectFrameTypeIdentifiers.resize(k + 1);
+						Graphics::objectFrameTypeIdentifiers[j].resize(k + 1);
 						Graphics::objectFrameTypeIdentifiers[j][k] = frame.str();
 					}
 					// frames[k] = frame.str();
@@ -120,7 +131,7 @@ void LuaBridge::labInitValues(void)
 	{
 		lua_pushnumber(L, i + 1);														// tileSubIdentifiers[], i + 1
 		lua_gettable(L, -2);															// tileSubIdentifiers[], tileSubIdentifier
-		Graphics::tileSubIdentifiers.resize(i);
+		Graphics::tileSubIdentifiers.resize(i + 1);
 		Graphics::tileSubIdentifiers[i] = lua_tostring(L, -1);							// tileSubIdentifiers[], tileSubIdentifier
 		lua_pop(L, 1);																	// tileSubIdentifiers[]
 	}
@@ -135,21 +146,27 @@ void LuaBridge::labInitValues(void)
 		{
 			lua_pushnumber(L, j + 1);													// graphicsIdentifiers[], graphicSet[], j
 			lua_gettable(L, -2);														// graphicsIdentifiers[], graphicSet[], identifier[]
-			// lua_pushnumber(L, (oneortwo = (oneortwo == 1 ? 2 : 1)));		// graphicsIdentifiers[], graphicSet[], identifier[], (1 or 2)
+			if (lua_isnil(L, -1))
+			{
+				lua_pop(L, 2);														// graphicsIdentifiers[]
+				break;
+			}
 			lua_pushnumber(L, 1);														// graphicsIdentifiers[], graphicSet[], identifier[], 1
 			lua_gettable(L, -2);														// graphicsIdentifiers[], graphicSet[], identifier[], identifier
 			lua_pushnumber(L, 2);														// graphicsIdentifiers[], graphicSet[], identifier[], identifier, 2
 			lua_gettable(L, -3);														// graphicsIdentifiers[], graphicSet[], identifier[], identifier, # of frames (or frame sets)
-			framenum = lua_tointeger(L, -1);
-			identifier = lua_tostring(L, -2);
 
+			/*
 			if (lua_isnil(L, -1) == 1 || lua_isnil(L, -2) == 1)
 			{
-				lua_pop(L, 4);															// graphicsIdentifiers[]
+				lua_pop(L, 4);										// graphicsIdentifiers[]
 				break;
 			}
-			else if (lua_isstring(L, -2) == 1 && lua_isinteger(L, -1) == 1)
+			*/
+			if (lua_isstring(L, -2) == 1 && lua_isinteger(L, -1) == 1)
 			{
+				framenum = lua_tointeger(L, -1);
+				identifier = lua_tostring(L, -2);
 				// frames.resize(lua_tointeger(L, -1));
 				// for (int k = 0; k < lua_tointeger(L, -1); k++)
 				// 	frames[k] = lua_tostring(L, -2) + (char)(k + 1);
@@ -351,14 +368,14 @@ void LuaBridge::labInitValues(void)
 			}
 			else if (lua_isstring(L, -1) == 1)
 			{
-				if (j == SFX)
+				if (i == SFX)
 				{
 					Audio::sfx.resize(j + 1);
 					Audio::sfxIdentifiers.resize(j + 1);
 					Audio::sfxIdentifiers[j] = lua_tostring(L, -1);
 					// Audio::sfxIdentifiers.insert(Audio::sfxIdentifiers.end(), lua_tostring(L, -1));
 				}
-				else if (j == MUSIC)
+				else if (i == MUSIC)
 				{
 					Audio::music.resize(j + 1);
 					Audio::musicIdentifiers.resize(j + 1);
@@ -597,7 +614,6 @@ int LuaBridge::labHandleEnvironment(void)
 	{
 		if (Game::things[i] != NULL)
 		{
-			std::cout << i << std::endl;
 			lua_getglobal(L, "things");							// things table
 			lua_pushnumber(L, i + 1);							// things table, i
 			lua_gettable(L, -2);								// things table, specific thing
@@ -605,12 +621,10 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pushstring(L, "tgVerticals");					// things table, specific thing, "tgVerticals"
 			lua_pushnumber(L, Game::things[i]->tgVerticals);	// things table, specific thing, "tgVerticals", tgVerticals
 			lua_settable(L, -3);								// things table, specific thing
-			std::cout << "RRRRRRRRRRRRRRRRRREEEEQ" << std::endl;
 			lua_pushstring(L, "tgSpeed");						// things table, specific thing, "tgSpeed"
 			lua_pushnumber(L, Game::things[i]->tgSpeed);		// things table, specific thing, "tgSpeed", tgSpeed
 			lua_settable(L, -3);								// things table, specific thing
 			// lua_pop(L, 2);
-			std::cout << "HURRRRR" << std::endl;
 
 			lua_pushstring(L, "tgHitbox");						// things table, specific thing, "tgHitbox"
 			lua_gettable(L, -2);								// things table, specific thing, tgHitbox
@@ -650,10 +664,10 @@ int LuaBridge::labHandleEnvironment(void)
 				}
 			}
 		}
+		std::cout << i << std::endl;
 	}
 	// lua_getglobal(L, "handleEnvironment");
 	// lua_call(L, 0, 0);
-
 	lua_getglobal(L, "points");									// points
 	Game::gScore = (int)lua_tonumber(L, -1);					// points
 	lua_pop(L, 1);												// 
@@ -662,7 +676,7 @@ int LuaBridge::labHandleEnvironment(void)
 		if (Game::things[i] != NULL)
 		{
 			lua_getglobal(L, "things");							// things table
-			lua_pushnumber(L, i);								// things table, i
+			lua_pushnumber(L, i + 1);							// things table, i
 			lua_gettable(L, -2);								// things table, specific thing
 			lua_pushstring(L, "tgVerticals");					// things table, specific thing, "tgVerticals"
 			lua_gettable(L, -2);								// things table, specific thing, tgVerticals
@@ -692,22 +706,7 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pop(L, 5);										//
 		}
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	std::cout << "PPPOEERR" << std::endl;
 
 	// this should already be handled in things, down below
 	/*

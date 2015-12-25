@@ -30,7 +30,7 @@ std::vector<std::string> Graphics::entityFrameTypeIdentifiers(TOTAL_ENTITY_FRAME
 std::vector<std::string> Graphics::objectFrameTypeIdentifiers(TOTAL_OBJECT_FRAME_TYPES);
 */
 
-Graphics Game::gGraphics;
+// Graphics Game::gGraphics;
 
 Graphics::Graphics()
 {

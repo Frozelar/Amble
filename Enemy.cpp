@@ -60,25 +60,25 @@ void Enemy::tgRender(void)
 	++tgFrameWaitCounter;
 	if ((tgDirection != NO_DIRECTION && tgFrameWaitCounter % 4 == 0) ||
 		(tgFrame == IDLE_1 && tgFrameWaitCounter % 64 == 0) ||
-		(tgFrame > IDLE_1 && tgFrame <= IDLE_5 && tgFrameWaitCounter % 16 == 0))
+		(tgFrame > IDLE_1 && tgFrame <= IDLE_4 && tgFrameWaitCounter % 16 == 0))
 	{
 		tgFrame++;
 		tgFrameWaitCounter = 0;
 	}
 
-	if (tgVerticals < 0 && (tgFrame < JUMP_1 || tgFrame > JUMP_5))
+	if (tgVerticals < 0 && (tgFrame < JUMP_1 || tgFrame > JUMP_2))
 		tgFrame = JUMP_1;
-	else if (tgVerticals > 0 && (tgFrame < FALL_1 || tgFrame > FALL_5))
+	else if (tgVerticals > 0 && (tgFrame < FALL_1 || tgFrame > FALL_2))
 		tgFrame = FALL_1;
-	else if (tgSpeed < 0 && tgVerticals == 0 && (tgFrame < WALK_LEFT_1 || tgFrame > WALK_LEFT_5))
+	else if (tgSpeed < 0 && tgVerticals == 0 && (tgFrame < WALK_LEFT_1 || tgFrame > WALK_LEFT_4))
 		tgFrame = WALK_LEFT_1;
-	else if (tgSpeed > 0 && tgVerticals == 0 && (tgFrame < WALK_RIGHT_1 || tgFrame > WALK_RIGHT_5))
+	else if (tgSpeed > 0 && tgVerticals == 0 && (tgFrame < WALK_RIGHT_1 || tgFrame > WALK_RIGHT_4))
 		tgFrame = WALK_RIGHT_1;
-	else if (tgSpeed == 0 && tgVerticals == 0 && (tgFrame < IDLE_1 || tgFrame > IDLE_5))
+	else if (tgSpeed == 0 && tgVerticals == 0 && (tgFrame < IDLE_1 || tgFrame > IDLE_4))
 		tgFrame = IDLE_1;
 
-	Game::gGraphics.enemyTextures[enType - ENEMY_TYPE_OFFSET][tgFrame].txRect = tgGFXrect;
-	Game::gGraphics.enemyTextures[enType - ENEMY_TYPE_OFFSET][tgFrame].txRender();
+	Graphics::enemyTextures[enType - ENEMY_TYPE_OFFSET][tgFrame].txRect = tgGFXrect;
+	Graphics::enemyTextures[enType - ENEMY_TYPE_OFFSET][tgFrame].txRender();
 }
 
 void Enemy::tgApplyAI(void)

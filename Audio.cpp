@@ -1,6 +1,6 @@
 #include "Audio.h"
 
-Audio Game::gAudio;
+// Audio Game::gAudio;
 
 std::vector<Mix_Music*> Audio::music(TOTAL_MUSIC_TYPES);
 std::vector<Mix_Chunk*> Audio::sfx(TOTAL_SFX_TYPES);

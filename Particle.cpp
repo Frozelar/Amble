@@ -39,7 +39,7 @@ void Particle::ptRender()
 		if ((++ptFrame) >= TOTAL_OBJECT_FRAME_TYPES)
 			ptFrame = 0;
 
-	Game::gGraphics.particleTextures[ptType][ptFrame].txRect = ptRect;
+	Graphics::particleTextures[ptType][ptFrame].txRect = ptRect;
 	Graphics::particleTextures[ptType][ptFrame].txAlpha(ptAlpha);
 	Graphics::particleTextures[ptType][ptFrame].txRender();
 }

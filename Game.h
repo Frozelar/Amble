@@ -10,16 +10,16 @@ enum ThingType{
 };
 
 enum EntityFrameType{
-	IDLE_1, IDLE_2, IDLE_3, IDLE_4, IDLE_5,
-	WALK_LEFT_1, WALK_LEFT_2, WALK_LEFT_3, WALK_LEFT_4, WALK_LEFT_5,
-	WALK_RIGHT_1, WALK_RIGHT_2, WALK_RIGHT_3, WALK_RIGHT_4, WALK_RIGHT_5,
-	JUMP_1, JUMP_2, JUMP_3, JUMP_4, JUMP_5,
-	FALL_1, FALL_2, FALL_3, FALL_4, FALL_5,
+	IDLE_1, IDLE_2, IDLE_3, IDLE_4,
+	WALK_LEFT_1, WALK_LEFT_2, WALK_LEFT_3, WALK_LEFT_4,
+	WALK_RIGHT_1, WALK_RIGHT_2, WALK_RIGHT_3, WALK_RIGHT_4,
+	JUMP_1, JUMP_2,
+	FALL_1, FALL_2,
 	TOTAL_ENTITY_FRAME_TYPES
 };
 
 enum ObjectFrameType{
-	FRAME_1, FRAME_2, FRAME_3, FRAME_4, FRAME_5, TOTAL_OBJECT_FRAME_TYPES
+	FRAME_1, FRAME_2, FRAME_3, FRAME_4, TOTAL_OBJECT_FRAME_TYPES
 };
 const int TOTAL_ANIMATION_FRAMES = 5;
 
@@ -115,17 +115,17 @@ public:
 	static SDL_Window* gWindow;
 	static SDL_Renderer* gRenderer;
 	static SDL_Event gEvent;
-	static Audio gAudio;
+	// static Audio gAudio;
 	static std::vector<Collision*> gColliding;
-	static Graphics gGraphics;
+	// static Graphics gGraphics;
 	static Player gPlayer;
 	// static LuaBridge gLuaBridge;
 	static std::vector<Thing*> things;
 	static std::vector<Particle*> particles;
 	static int gScore;
 
-	static Game gGame;
-	static Level gLevel;
+	// static Game gGame;
+	// static Level gLevel;
 
 	static void centerCamera(void);
 	static void applyAI(void);
