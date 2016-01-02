@@ -9,21 +9,21 @@ Thing::Thing(SDL_Rect* box, int type, int unit)
 	tgHealth = Game::DEFAULT_HEALTH;
 	tgSpeed = 0;
 	tgFrame = 0;
-	tgFrameWaitCounter = 0;
+	// tgFrameWaitCounter = 0;
 	tgVerticals = 0;
 	tgSelected = 0;
 }
 
 void Thing::tgSyncTexture(void)
 {
-	if (tgType != TILE)
+	if (tgType != Game::ThingType["tile"])
 	{
 		tgGFXrect.x = tgHitboxRect.x - Game::DEFAULT_OFFSET;
 		tgGFXrect.y = tgHitboxRect.y - Game::DEFAULT_OFFSET;
 		tgGFXrect.w = tgHitboxRect.w + Game::DEFAULT_OFFSET * 2;
 		tgGFXrect.h = tgHitboxRect.h + Game::DEFAULT_OFFSET * 2;
 	}
-	else if (tgType == TILE)
+	else // if (tgType == Game::ThingType["tile"])
 	{
 		tgGFXrect.x = tgHitboxRect.x;
 		tgGFXrect.y = tgHitboxRect.y;
@@ -50,16 +50,17 @@ void Thing::tgRender(void)
 	std::cout << "Error: Executing the rendering of a Thing!" << std::endl;
 }
 
-void Thing::tgResolveCollision(Thing* thing, Direction dir)
+void Thing::tgResolveCollision(Thing* thing, int dir)
 {
-	if (dir == LEFT || dir == RIGHT)
-		tgDirection = invertDir(tgDirection);
-	else if (dir == UP)
+	if (dir == Game::Direction["left"] || dir == Game::Direction["right"])
+		tgSpeed = -tgSpeed;
+		// tgDirection = invertDir(tgDirection);
+	else if (dir == Game::Direction["up"])
 	{
 		if (thing->tgVerticals < 0)
 			thing->tgVerticals = 1;
 	}
-	else if (dir == DOWN)
+	else if (dir == Game::Direction["down"])
 	{
 		if (thing->tgVerticals > 0)
 			thing->tgVerticals = 0;

@@ -1,5 +1,6 @@
 #include "Include.h"
 #include "Thing.h"
+#include "LuaBridge.h"
 
 //struct Collision{
 //	Thing* thing1 = NULL;
@@ -60,25 +61,26 @@ void close(void)
 	{
 		if (Game::things[i] != NULL)
 		{
-			delete Game::things[i];
+			if (Game::things[i]->tgType != Game::ThingType["player"])
+				delete Game::things[i];
 			Game::things[i] = NULL;
 		}
 	}
 
-
+	LuaBridge::labClose();
 
 	Mix_CloseAudio();
 	Mix_Quit();
 	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
-
 	SDL_DestroyRenderer(Game::gRenderer);
 	SDL_DestroyWindow(Game::gWindow);
 	Game::gWindow = NULL;
 	Game::gRenderer = NULL;
 }
 
+/*
 Direction invertDir(Direction dir)
 {
 	switch (dir)
@@ -95,3 +97,4 @@ Direction invertDir(Direction dir)
 		return dir;
 	}
 }
+*/

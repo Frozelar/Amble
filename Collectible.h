@@ -13,5 +13,5 @@ public:
 	void tgApplyAI(void);
 	void tgHandleVerticals(void);
 
-	int clType = COLLECTIBLE_TYPE_OFFSET;
+	int clType = 0;
 };

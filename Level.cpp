@@ -109,7 +109,7 @@ void Level::moveLevel(void)
 	{
 		for (int i = 0; i < Level::LEVEL_UNITS; i++)
 		{
-			if (Game::things[i] != NULL && Game::things[i]->tgType != PLAYER)
+			if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
 			{
 				Game::things[i]->tgHitboxRect.y += Level::gLevelMovementsY;
 				Game::things[i]->tgHitboxRect.x += Level::gLevelMovementsX;

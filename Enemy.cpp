@@ -1,6 +1,6 @@
 #include "Enemy.h"
 
-Enemy::Enemy(SDL_Rect* box, int subtype, int unit) : Thing(box, ENEMY, unit)
+Enemy::Enemy(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType["enemy"], unit)
 {
 	tgHitboxRect.w = Game::DEFAULT_ENEMY_W;
 	tgHitboxRect.h = Game::DEFAULT_ENEMY_H;
@@ -15,9 +15,9 @@ Enemy::Enemy(SDL_Rect* box, int subtype, int unit) : Thing(box, ENEMY, unit)
 
 void Enemy::tgResolveCollision(Thing* thing, Direction dir)
 {
-	if (thing->tgType == PLAYER || thing->tgType == ENEMY)
+	if (thing->tgType == Game::ThingType["player"] || thing->tgType == Game::ThingType["enemy"])
 	{
-		if (dir == RIGHT || dir == LEFT)
+		if (dir == Game::Direction["right"] || dir == Game::Direction["left"])
 		{
 			thing->tgSpeed *= 0.5;
 		}
@@ -28,7 +28,7 @@ void Enemy::tgResolveCollision(Thing* thing, Direction dir)
 		else
 			std::cout << "Collision error: " << tgLevelUnit << " " << thing->tgLevelUnit << std::endl;
 
-		if (thing->tgType == PLAYER)
+		if (thing->tgType == Game::ThingType["player"])
 			thing->tgHealth -= enPower;
 	}
 	/*
@@ -57,28 +57,30 @@ void Enemy::tgRender(void)
 {
 	tgSyncTexture();
 
+	/*
 	++tgFrameWaitCounter;
-	if ((tgDirection != NO_DIRECTION && tgFrameWaitCounter % 4 == 0) ||
-		(tgFrame == IDLE_1 && tgFrameWaitCounter % 64 == 0) ||
-		(tgFrame > IDLE_1 && tgFrame <= IDLE_4 && tgFrameWaitCounter % 16 == 0))
+	if ((tgSpeed != 0 && tgFrameWaitCounter % 4 == 0) ||
+		(tgFrame == Game::EntityFrameType["Idle1"] && tgFrameWaitCounter % 64 == 0) ||
+		(tgFrame > Game::EntityFrameType["Idle1"] && tgFrame <= Game::EntityFrameGroup["Idle"] && tgFrameWaitCounter % 16 == 0))
 	{
 		tgFrame++;
 		tgFrameWaitCounter = 0;
 	}
 
-	if (tgVerticals < 0 && (tgFrame < JUMP_1 || tgFrame > JUMP_2))
-		tgFrame = JUMP_1;
-	else if (tgVerticals > 0 && (tgFrame < FALL_1 || tgFrame > FALL_2))
-		tgFrame = FALL_1;
-	else if (tgSpeed < 0 && tgVerticals == 0 && (tgFrame < WALK_LEFT_1 || tgFrame > WALK_LEFT_4))
-		tgFrame = WALK_LEFT_1;
-	else if (tgSpeed > 0 && tgVerticals == 0 && (tgFrame < WALK_RIGHT_1 || tgFrame > WALK_RIGHT_4))
-		tgFrame = WALK_RIGHT_1;
-	else if (tgSpeed == 0 && tgVerticals == 0 && (tgFrame < IDLE_1 || tgFrame > IDLE_4))
-		tgFrame = IDLE_1;
+	if (tgVerticals < 0 && (tgFrame < Game::EntityFrameType["Jump1"] || tgFrame > Game::EntityFrameGroup["Jump"]))
+		tgFrame = Game::EntityFrameType["Jump1"];
+	else if (tgVerticals > 0 && (tgFrame < Game::EntityFrameType["Fall1"] || tgFrame > Game::EntityFrameGroup["Fall"]))
+		tgFrame = Game::EntityFrameType["Fall1"];
+	else if (tgSpeed < 0 && tgVerticals == 0 && (tgFrame < Game::EntityFrameType["WalkLeft1"] || tgFrame > Game::EntityFrameGroup["WalkLeft"]))
+		tgFrame = Game::EntityFrameType["WalkLeft1"];
+	else if (tgSpeed > 0 && tgVerticals == 0 && (tgFrame < Game::EntityFrameType["WalkRight1"] || tgFrame > Game::EntityFrameGroup["WalkRight"]))
+		tgFrame = Game::EntityFrameType["WalkRight1"];
+	else if (tgSpeed == 0 && tgVerticals == 0 && (tgFrame < Game::EntityFrameType["Idle1"] || tgFrame > Game::EntityFrameGroup["Idle"]))
+		tgFrame = Game::EntityFrameType["Idle1"];
+		*/
 
-	Graphics::enemyTextures[enType - ENEMY_TYPE_OFFSET][tgFrame].txRect = tgGFXrect;
-	Graphics::enemyTextures[enType - ENEMY_TYPE_OFFSET][tgFrame].txRender();
+	Graphics::enemyTextures[enType][tgFrame].txRect = tgGFXrect;
+	Graphics::enemyTextures[enType][tgFrame].txRender();
 }
 
 void Enemy::tgApplyAI(void)
@@ -86,8 +88,8 @@ void Enemy::tgApplyAI(void)
 	// tgHandleVerticals();
 	// tgHitboxRect.x += tgSpeed;
 	SDL_Rect directionCheckRect{ tgHitboxRect.x, tgHitboxRect.y, 1, 1 /* tgHitboxRect.w, tgHitboxRect.h */ };
-	Thing directionCheck{ &directionCheckRect, TEMP, -1 };
-	Direction direction = NO_DIRECTION;
+	Thing directionCheck{ &directionCheckRect, Game::ThingType["temp"], -1 };
+	int direction = Game::Direction["none"];
 	bool actuallyColliding = false;
 	bool colliding = Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true);
 
@@ -100,18 +102,17 @@ void Enemy::tgApplyAI(void)
 				directionCheck.tgHitboxRect.h = tgHitboxRect.h;
 
 				// check which direction for each collision
-				for (int j = LEFT; j < Game::TOTAL_DIRECTIONS + 1; j++)
+				for (int j = Game::Direction["left"]; j < Game::Direction["total"]; j++)
 				{
-					switch (j)
+					if (j == Game::Direction["right"])
 					{
-					case RIGHT:
 						directionCheck.tgHitboxRect.x += tgHitboxRect.w;
-						direction = RIGHT;
-						break;
-					case LEFT:
+						direction = Game::Direction["right"];
+					}
+					else if (j == Game::Direction["left"])
+					{
 						directionCheck.tgHitboxRect.x = tgHitboxRect.x;
-						direction = LEFT;
-						break;
+						direction = Game::Direction["left"];
 					}
 					if (Game::checkCollision(&directionCheck, Game::things[Game::gColliding[i]->thing2->tgLevelUnit], -1, false))
 						break;
@@ -120,23 +121,18 @@ void Enemy::tgApplyAI(void)
 				directionCheck.tgHitboxRect.x = tgHitboxRect.x;
 				directionCheck.tgHitboxRect.h = 1;
 				directionCheck.tgHitboxRect.w = tgHitboxRect.w;
-				for (int j = UP; j < Game::TOTAL_DIRECTIONS - 1; j++)
+				for (int j = Game::Direction["up"]; j < Game::Direction["total"]; j++)
 				{
-					switch (j)
-					{
-					case UP:
+					if (j == Game::Direction["up"])
 						directionCheck.tgHitboxRect.y = tgHitboxRect.y;
-						break;
-					case DOWN:
+					else if (j == Game::Direction["down"])
 						directionCheck.tgHitboxRect.y += tgHitboxRect.h;
-						break;
-					}
 					if (Game::checkCollision(&directionCheck, Game::things[Game::gColliding[i]->thing2->tgLevelUnit], -1, false))
 					{
-						if (j == UP)
-							direction = UP;
-						else if (j == DOWN)
-							direction = DOWN;
+						if (j == Game::Direction["up"])
+							direction = Game::Direction["up"];
+						else if (j == Game::Direction["down"])
+							direction = Game::Direction["down"];
 						break;
 					}
 					directionCheck.tgHitboxRect.y = tgHitboxRect.y;

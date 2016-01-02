@@ -1,6 +1,6 @@
 #include "Collectible.h"
 
-Collectible::Collectible(SDL_Rect* box, int subtype, int unit) : Thing(box, COLLECTIBLE, unit)
+Collectible::Collectible(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType["collectible"], unit)
 {
 	tgHitboxRect.w = Game::DEFAULT_ENEMY_W;
 	tgHitboxRect.h = Game::DEFAULT_ENEMY_H;
@@ -17,19 +17,21 @@ void Collectible::tgRender(void)
 {
 	tgSyncTexture();
 
+	/*
 	++tgFrameWaitCounter;
 	if (tgFrameWaitCounter > 4)
 	{
 		tgFrame++;
 		tgFrameWaitCounter = 0;
 	}
-	if (tgFrame >= TOTAL_OBJECT_FRAME_TYPES)
+	if (tgFrame >= Game::ObjectFrameType["total"])
 	{
 		tgFrame = 0;
 	}
+	*/
 
-	Graphics::collectibleTextures[clType - COLLECTIBLE_TYPE_OFFSET][tgFrame].txRect = tgGFXrect;
-	Graphics::collectibleTextures[clType - COLLECTIBLE_TYPE_OFFSET][tgFrame].txRender();
+	Graphics::collectibleTextures[clType][tgFrame].txRect = tgGFXrect;
+	Graphics::collectibleTextures[clType][tgFrame].txRender();
 }
 
 void Collectible::clCollect(void)
@@ -51,7 +53,7 @@ void Collectible::clCollect(void)
 
 void Collectible::tgResolveCollision(Thing* thing, Direction dir)
 {
-	if (thing->tgType == PLAYER)
+	if (thing->tgType == Game::ThingType["player"])
 		tgHealth = 0;
 }
 

@@ -15,7 +15,7 @@ public:
 	// void tgApplyAI(void);
 	int tgGetSubtype(void);
 
-	int tiType = TILE_TYPE_OFFSET;
+	int tiType = 0;
 	bool tiIsSolid = true;
 	bool tiIsAnimated = false;
 };

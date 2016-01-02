@@ -2,8 +2,8 @@
 
 // Audio Game::gAudio;
 
-std::vector<Mix_Music*> Audio::music(TOTAL_MUSIC_TYPES);
-std::vector<Mix_Chunk*> Audio::sfx(TOTAL_SFX_TYPES);
+std::vector<Mix_Music*> Audio::music(Game::MusicType["total"]);
+std::vector<Mix_Chunk*> Audio::sfx(Game::SoundEffectType["total"]);
 std::vector<std::string> Audio::musicIdentifiers;
 std::vector<std::string> Audio::sfxIdentifiers;
 
@@ -51,14 +51,10 @@ bool Audio::auInit()
 	return true;
 }
 
-void Audio::auPlay(int track)
+void Audio::auPlay(int track, char type)
 {
-	if (track > MUSIC_STARTING_VALUE && track < MUSIC_ENDING_VALUE)
-	{
+	if (type == 's')
 		Mix_PlayChannel(-1, sfx[track], 0);
-	}
-	else if (track > SFX_STARTING_VALUE && track < SFX_ENDING_VALUE)
-	{
+	else if (type == 'm')
 		Mix_PlayMusic(music[track], -1);
-	}
 }

@@ -1,21 +1,25 @@
 #include "Particle.h"
 
-Particle::Particle(SDL_Rect* placement, ParticleType type, int num, SDL_Point* destination, int life)
+Particle::Particle(SDL_Rect* placement, int type, int num, SDL_Point* destination, int life, int speed)
 {
 	ptNumber = num;
 	ptType = type;
 	ptRect = *placement;
-	if (destination != NULL && life != -1)
-	{
+	if (destination != NULL)
 		ptDirection = *destination;
-		ptLifeSpan = life;
-	}
 	else
 	{
 		ptDirection.x = rand() % 18 + (-9);
 		ptDirection.y = rand() % 18 + (-9);
-		ptLifeSpan = rand() % 100 + 1;
 	}
+	if(life != -1)
+		ptLifeSpan = life;
+	else
+		ptLifeSpan = rand() % 100 + 1;
+	if (speed != -1)
+		ptSpeed = speed;
+	else
+		ptSpeed = rand() % 4 + 1;
 }
 
 Particle::~Particle()
@@ -35,9 +39,11 @@ void Particle::ptMove()
 
 void Particle::ptRender()
 {
+	/*
 	if (ptFrameWaitCounter <= 0)
 		if ((++ptFrame) >= TOTAL_OBJECT_FRAME_TYPES)
 			ptFrame = 0;
+	*/
 
 	Graphics::particleTextures[ptType][ptFrame].txRect = ptRect;
 	Graphics::particleTextures[ptType][ptFrame].txAlpha(ptAlpha);

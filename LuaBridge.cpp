@@ -9,7 +9,22 @@ LuaBridge LuaBridge::gLuaBridge;
 
 LuaBridge::LuaBridge()
 {
+	int num = 0;
 	L = luaL_newstate();
+	GFXIDLocations["backgrounds"] = num;
+	GFXIDLocations["tiles"] = (++num);
+	GFXIDLocations["players"] = (++num);
+	GFXIDLocations["enemies"] = (++num);
+	GFXIDLocations["collectibles"] = (++num);
+	GFXIDLocations["particles"] = (++num);
+	GFXIDLocations["total"] = (++num);
+	FrameIDLocations["entities"] = (num = 0);
+	FrameIDLocations["objects"] = (++num);
+	FrameIDLocations["total"] = (++num);
+	AudioIDLocations["sfx"] = (num = 0);
+	AudioIDLocations["music"] = (++num);
+	AudioIDLocations["total"] = (++num);
+
 	// for (int i = 0; i < MAX_ARGS; i++)
 	//	labStack[i] = NULL;
 }
@@ -57,20 +72,24 @@ void LuaBridge::labInitValues(void)
 	// Game::TOTAL_JUMP_ARRAY_UNITS = lua_getglobal(L, "TOTAL_JUMP_ARRAY_UNITS");
 	// Game::TOTAL_DASH_ARRAY_UNITS = lua_getglobal(L, "TOTAL_DASH_ARRAY_UNITS");
 	lua_getglobal(L, "TOTAL_ENEMY_TYPES");
-	TOTAL_ENEMY_TYPES = lua_tonumber(L, -1);
+	Game::EnemyType["total"] = lua_tonumber(L, -1);
+	// TOTAL_ENEMY_TYPES = lua_tonumber(L, -1);
 	lua_getglobal(L, "TOTAL_TILE_TYPES");
-	TOTAL_TILE_TYPES = lua_tonumber(L, -1);
+	Game::TileType["total"] = lua_tonumber(L, -1);
+	// TOTAL_TILE_TYPES = lua_tonumber(L, -1)
 	lua_getglobal(L, "TOTAL_COLLECTIBLE_TYPES");
-	TOTAL_COLLECTIBLE_TYPES = lua_tonumber(L, -1);
+	Game::CollectibleType["total"] = lua_tonumber(L, -1);
+	// TOTAL_COLLECTIBLE_TYPES = lua_tonumber(L, -1);
 	lua_getglobal(L, "TOTAL_TILE_SUBTYPES");
-	TOTAL_TILE_SUBTYPES = lua_tonumber(L, -1);
+	Game::TileSubType["total"] = lua_tonumber(L, -1);
+	// TOTAL_TILE_SUBTYPES = lua_tonumber(L, -1);
 	// Player* pl = &Game::gPlayer;
 	// lua_pushlightuserdata(L, pl);
 	// lua_settable(L, LUA_REGISTRYINDEX);
 	lua_pop(L, 14);
 
 	lua_getglobal(L, "frameIdentifiers");												// frameIdentifiers[]
-	for (int i = 0; i < TOTAL_FRAME_IDS; i++)
+	for (int i = 0; i < FrameIDLocations["total"]; i++)
 	{
 		lua_pushnumber(L, i + 1);														// frameIdentifiers[], i
 		lua_gettable(L, -2);															// frameIdentifiers[], frameSet[]
@@ -100,22 +119,31 @@ void LuaBridge::labInitValues(void)
 				identifier = lua_tostring(L, -2);
 				framenum = lua_tointeger(L, -1);
 				// frames.resize(lua_tointeger(L, -1));
+				if (i == FrameIDLocations["entities"])
+				{
+					Graphics::entityFrameTypeIdentifiers.resize(j + 1);
+					Game::EntityFrameGroup[identifier] = framenum;
+				}
+				else if (i == FrameIDLocations["objects"])
+				{
+					Graphics::objectFrameTypeIdentifiers.resize(j + 1);
+					Game::ObjectFrameGroup[identifier] = framenum;
+				}
 				for (int k = 0; k < framenum; k++)
 				{
 					// frames[k] = lua_tostring(L, -2) + (char)(k + 1);
 					frame << identifier << (k + 1);
-					if (i == ENTITIES)
+					if (i == FrameIDLocations["entities"])
 					{
-						Graphics::entityFrameTypeIdentifiers.resize(j + 1);
 						Graphics::entityFrameTypeIdentifiers[j].resize(k + 1);
 						Graphics::entityFrameTypeIdentifiers[j][k] = frame.str();
-						std::cout << frame.str() << std::endl;
+						Game::EntityFrameType[frame.str()] = j;
 					}
-					else if (i == OBJECTS)
+					else if (i == FrameIDLocations["objects"])
 					{
-						Graphics::objectFrameTypeIdentifiers.resize(j + 1);
 						Graphics::objectFrameTypeIdentifiers[j].resize(k + 1);
 						Graphics::objectFrameTypeIdentifiers[j][k] = frame.str();
+						Game::ObjectFrameType[frame.str()] = j;
 					}
 					// frames[k] = frame.str();
 					frame.str(std::string());
@@ -127,18 +155,20 @@ void LuaBridge::labInitValues(void)
 	lua_pop(L, 1);																		// 
 
 	lua_getglobal(L, "tileSubIdentifiers");												// tileSubIdentifiers[]
-	for (int i = 0; i < TOTAL_TILE_SUBTYPES; i++)
+	for (int i = 0; i < Game::TileSubType["total"]; i++)
 	{
 		lua_pushnumber(L, i + 1);														// tileSubIdentifiers[], i + 1
 		lua_gettable(L, -2);															// tileSubIdentifiers[], tileSubIdentifier
+		identifier = lua_tostring(L, -1);
 		Graphics::tileSubIdentifiers.resize(i + 1);
-		Graphics::tileSubIdentifiers[i] = lua_tostring(L, -1);							// tileSubIdentifiers[], tileSubIdentifier
+		Graphics::tileSubIdentifiers[i] = identifier;									// tileSubIdentifiers[], tileSubIdentifier
+		Game::TileSubType[identifier] = i;
 		lua_pop(L, 1);																	// tileSubIdentifiers[]
 	}
 	lua_pop(L, 1);																		// 
 	
 	lua_getglobal(L, "graphicsIdentifiers");											// graphicsIdentifiers[]
-	for (int i = 0; i < TOTAL_GRAPHIC_IDS; i++)
+	for (int i = 0; i < GFXIDLocations["total"]; i++)
 	{
 		lua_pushnumber(L, i + 1);														// graphicsIdentifiers[], i
 		lua_gettable(L, -2);															// graphicsIdentifiers[], graphicSet[]
@@ -170,7 +200,7 @@ void LuaBridge::labInitValues(void)
 				// frames.resize(lua_tointeger(L, -1));
 				// for (int k = 0; k < lua_tointeger(L, -1); k++)
 				// 	frames[k] = lua_tostring(L, -2) + (char)(k + 1);
-				if (i == BACKGROUNDS)
+				if (i == GFXIDLocations["backgrounds"])
 				{
 					Graphics::backgroundTextures.resize(j + 1);
 					Graphics::backgroundTextures[j].resize(framenum);
@@ -194,8 +224,9 @@ void LuaBridge::labInitValues(void)
 						Graphics::backgroundIdentifiers[j][0] = frame.str();
 					}
 					// Graphics::backgroundIdentifiers[j] = frames[j];
+					Game::BackgroundType[identifier] = j;
 				}
-				else if (i == TILES)
+				else if (i == GFXIDLocations["tiles"])
 				{
 					int m = 0;
 					Graphics::tileTextures.resize(j + 1);
@@ -229,8 +260,9 @@ void LuaBridge::labInitValues(void)
 						}
 						// }
 					}
+					Game::TileType[identifier] = j;
 				}
-				else if (i == PLAYERS)
+				else if (i == GFXIDLocations["players"])
 				{
 					int m = 0;
 					Graphics::playerTextures.resize(j + 1);
@@ -262,8 +294,9 @@ void LuaBridge::labInitValues(void)
 							Graphics::playerIdentifiers[j][k] = identifier;
 						}
 					}
+					// Game::PlayerType[identifier] = j;
 				}
-				else if (i == ENEMIES)
+				else if (i == GFXIDLocations["enemies"])
 				{
 					int m = 0;
 					Graphics::enemyTextures.resize(j + 1);
@@ -295,8 +328,9 @@ void LuaBridge::labInitValues(void)
 							Graphics::enemyIdentifiers[j][k] = identifier;
 						}
 					}
+					Game::EnemyType[identifier] = j;
 				}
-				else if (i == COLLECTIBLES)
+				else if (i == GFXIDLocations["collectibles"])
 				{
 					Graphics::collectibleTextures.resize(j + 1);
 					Graphics::collectibleTextures[j].resize(framenum);
@@ -316,8 +350,9 @@ void LuaBridge::labInitValues(void)
 					}
 					else
 						Graphics::collectibleIdentifiers[j][0] = identifier;
+					Game::CollectibleType[identifier] = j;
 				}
-				else if (i == PARTICLES)
+				else if (i == GFXIDLocations["particles"])
 				{
 					Graphics::particleTextures.resize(j + 1);
 					Graphics::particleTextures[j].resize(framenum);
@@ -337,6 +372,7 @@ void LuaBridge::labInitValues(void)
 					}
 					else
 						Graphics::particleIdentifiers[j][0] = identifier;
+					Game::ParticleType[identifier] = j;
 				}
 				lua_pop(L, 3);															// graphicsIdentifiers[], graphicSet[]
 			}
@@ -353,7 +389,7 @@ void LuaBridge::labInitValues(void)
 	lua_pop(L, 1);																		// 
 
 	lua_getglobal(L, "audioIdentifiers");												// audioIdentifiers[]
-	for (int i = 0; i < TOTAL_AUDIO_IDS; i++)
+	for (int i = 0; i < AudioIDLocations["total"]; i++)
 	{
 		lua_pushnumber(L, i + 1);														// audioIdentifiers[], i
 		lua_gettable(L, -2);															// audioIdentifiers[], audioSet[]
@@ -368,19 +404,22 @@ void LuaBridge::labInitValues(void)
 			}
 			else if (lua_isstring(L, -1) == 1)
 			{
-				if (i == SFX)
+				identifier = lua_tostring(L, -1);
+				if (i == AudioIDLocations["sfx"])
 				{
 					Audio::sfx.resize(j + 1);
 					Audio::sfxIdentifiers.resize(j + 1);
-					Audio::sfxIdentifiers[j] = lua_tostring(L, -1);
+					Audio::sfxIdentifiers[j] = identifier;
 					// Audio::sfxIdentifiers.insert(Audio::sfxIdentifiers.end(), lua_tostring(L, -1));
+					Game::SoundEffectType[identifier] = j;
 				}
-				else if (i == MUSIC)
+				else if (i == AudioIDLocations["music"])
 				{
 					Audio::music.resize(j + 1);
 					Audio::musicIdentifiers.resize(j + 1);
-					Audio::musicIdentifiers[j] = lua_tostring(L, -1);
+					Audio::musicIdentifiers[j] = identifier;
 					// Audio::musicIdentifiers.insert(Audio::musicIdentifiers.end(), lua_tostring(L, -1));
+					Game::MusicType[identifier] = j;
 				}
 				lua_pop(L, 1);															// audioIdentifiers[], audioSet[]
 			}
@@ -469,6 +508,11 @@ void LuaBridge::labInitValues(void)
 		lua_pop(L, 1);							// floatArray
 	}
 	lua_pop(L, 1);								// 
+	lua_getglobal(L, "gBackground");			// gBackground
+	lua_pushstring(L, "bgSetType");				// gBackground, "bgSetType"
+	lua_gettable(L, -2);						// gBackground, bgSetType()
+	lua_pushnumber(L, Graphics::bgState);		// gBackground, bgSetType(), bgState
+	lua_call(L, 1, 0);							// gBackground
 
 	/*
 	lua_createtable(L, Level::LEVEL_UNITS, 0);											// things
@@ -540,27 +584,28 @@ void LuaBridge::labInitValues(void)
 		// lua_settable(L, -3);
 		// }
 	}
+	lua_pop(L, 1);
 	lua_getglobal(L, "init");
 	lua_call(L, 0, 0);
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{
 		if (Game::things[i] != NULL)
 		{
-			if (Game::things[i]->tgType == ENEMY)
+			if (Game::things[i]->tgType == Game::ThingType["enemy"])
 			{
 				lua_pushstring(L, "enSubtype");						// things, specific thing, "enSubtype"
 				lua_pushnumber(L, Game::things[i]->tgGetSubtype());	// things, specific thing, "enSubtype", subtype
 				lua_settable(L, -3);								// things, specific thing
 				lua_pop(L, 1);										// things
 			}
-			else if (Game::things[i]->tgType == TILE)
+			else if (Game::things[i]->tgType == Game::ThingType["tile"])
 			{
 				lua_pushstring(L, "tiSubtype");						// things, specific thing, "tiSubtype"
 				lua_pushnumber(L, Game::things[i]->tgGetSubtype());	// things, specific thing, "tiSubtype", subtype
 				lua_settable(L, -3);								// things, specific thing
 				lua_pop(L, 1);										// things
 			}
-			else if (Game::things[i]->tgType == COLLECTIBLE)
+			else if (Game::things[i]->tgType == Game::ThingType["collectible"])
 			{
 				lua_pushstring(L, "clSubtype");						// things, specific thing, "clSubtype"
 				lua_pushnumber(L, Game::things[i]->tgGetSubtype());	// things, specific thing, "clSubtype", subtype
@@ -617,7 +662,7 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_getglobal(L, "things");							// things table
 			lua_pushnumber(L, i + 1);							// things table, i
 			lua_gettable(L, -2);								// things table, specific thing
-			std::cout << i << ": " << lua_typename(L, lua_type(L, -1)) << std::endl;
+			// std::cout << i << ": " << lua_typename(L, lua_type(L, -1)) << std::endl;
 			lua_pushstring(L, "tgVerticals");					// things table, specific thing, "tgVerticals"
 			lua_pushnumber(L, Game::things[i]->tgVerticals);	// things table, specific thing, "tgVerticals", tgVerticals
 			lua_settable(L, -3);								// things table, specific thing
@@ -625,7 +670,6 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pushnumber(L, Game::things[i]->tgSpeed);		// things table, specific thing, "tgSpeed", tgSpeed
 			lua_settable(L, -3);								// things table, specific thing
 			// lua_pop(L, 2);
-
 			lua_pushstring(L, "tgHitbox");						// things table, specific thing, "tgHitbox"
 			lua_gettable(L, -2);								// things table, specific thing, tgHitbox
 			lua_pushstring(L, "x");								// things table, specific thing, tgHitbox, "x"
@@ -634,28 +678,29 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pushstring(L, "y");								// things table, specific thing, tgHitbox, "y"
 			lua_pushnumber(L, Game::things[i]->tgHitboxRect.y);	// things table, specific thing, tgHitbox, "y", y
 			lua_settable(L, -3);								// things table, specific thing, tgHitbox
-			lua_pop(L, 1);										//
+			lua_pop(L, 3);										//
 
-			if (Game::things[i]->tgType == ENEMY)
+			/*
+			if (Game::things[i]->tgType == Game::ThingType["enemy"])
 			{
 				lua_getfield(L, -1, "enHandleAI");			// things table, specific thing, enHandleAI()
 				lua_call(L, 0, 0);							// things table, specific thing
 				// lua_pop(L, 1);							// things table, specific thing
 			}
-			else if (Game::things[i]->tgType == TILE)
+			else if (Game::things[i]->tgType == Game::ThingType["tile"])
 			{
 				lua_getfield(L, -1, "tiHandleAI");			// things table, specific thing, tiHandleAI()
 				lua_call(L, 0, 0);							// things table, specific thing
 				// lua_pop(L, 1);
 			}
-			else if (Game::things[i]->tgType == PLAYER)
+			else if (Game::things[i]->tgType == Game::ThingType["player"])
 			{
 				// ?
 			}
-			else if (Game::things[i]->tgType == COLLECTIBLE)
+			else */ if (Game::things[i]->tgType == Game::ThingType["collectible"])
 			{
-				lua_getfield(L, -1, "clHandleAI");			// things table, specific thing, clHandleAI()
-				lua_call(L, 0, 0);							// things table, specific thing
+				// lua_getfield(L, -1, "clHandleAI");	// things table, specific thing, clHandleAI()
+				// lua_call(L, 0, 0);					// things table, specific thing
 				if (Game::things[i]->tgHealth == 0)
 				{
 					lua_getfield(L, -1, "clCollect");		// things table, specific thing, clCollect()
@@ -664,10 +709,9 @@ int LuaBridge::labHandleEnvironment(void)
 				}
 			}
 		}
-		std::cout << i << std::endl;
 	}
-	// lua_getglobal(L, "handleEnvironment");
-	// lua_call(L, 0, 0);
+	lua_getglobal(L, "handleEnvironment");
+	lua_call(L, 0, 0);
 	lua_getglobal(L, "points");									// points
 	Game::gScore = (int)lua_tonumber(L, -1);					// points
 	lua_pop(L, 1);												// 
@@ -685,10 +729,16 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pushstring(L, "tgSpeed");						// things table, specific thing, "tgSpeed"
 			lua_gettable(L, -2);								// things table, specific thing, tgSpeed
 			Game::things[i]->tgSpeed = (int)lua_tonumber(L, -1);
+			/*
 			if (Game::things[i]->tgSpeed > 0)
 				Game::things[i]->tgDirection = RIGHT;
 			else if (Game::things[i]->tgSpeed < 0)
 				Game::things[i]->tgDirection = LEFT;
+				*/
+			lua_pop(L, 1);										// things table, specific thing
+			lua_pushstring(L, "tgFrame");						// things table, specific thing, "tgFrame"
+			lua_gettable(L, -2);								// things table, specific thing, tgFrame
+			Game::things[i]->tgFrame = (int)lua_tonumber(L, -1) - 1;
 			lua_pop(L, 1);										// things table, specific thing
 
 			// lua_getglobal(L, "things");		// things table
@@ -706,7 +756,71 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pop(L, 5);										//
 		}
 	}
-	std::cout << "PPPOEERR" << std::endl;
+
+	lua_getglobal(L, "gBackground");							// gBackground
+	lua_pushstring(L, "bgType");								// gBackground, "bgType"
+	lua_gettable(L, -2);										// gBackground, bgType
+	if (Graphics::bgState != (int)lua_tonumber(L, -1))
+		Graphics::bgState = (int)lua_tonumber(L, -1);
+	lua_pop(L, 2);												// 
+
+	lua_getglobal(L, "totalParticles");							// totalParticles
+	if (Game::particles.size() != (int)lua_tonumber(L, -1))
+	{
+		SDL_Rect pRect;
+		int pType;
+		int pNum = (int)lua_tonumber(L, -1) - 1;
+		SDL_Point pDestination;
+		int pLife;
+		int pSpeed;
+
+		lua_getglobal(L, "gParticles");							// totalParticles, gParticles
+		lua_insert(L, 1);										// gParticles, totalParticles
+		lua_gettable(L, -2);									// gParticles, specific particle
+		lua_pushstring(L, "ptRect");							// gParticles, specific particle, "ptRect"
+		lua_gettable(L, -2);									// gParticles, specific particle, ptRect
+		lua_pushstring(L, "x");									// gParticles, specific particle, ptRect, "x"
+		lua_gettable(L, -2);									// gParticles, specific particle, ptRect, x
+		lua_insert(L, 3);										// gParticles, specific particle, x, ptRect
+		lua_pushstring(L, "y");									// gParticles, specific particle, x, ptRect, "y"
+		lua_gettable(L, -2);									// gParticles, specific particle, x, ptRect, y
+		lua_insert(L, 4);										// gParticles, specific particle, x, y, ptRect
+		lua_pushstring(L, "w");									// gParticles, specific particle, x, y, ptRect, "w"
+		lua_gettable(L, -2);									// gParticles, specific particle, x, y, ptRect, w
+		lua_insert(L, 5);										// gParticles, specific particle, x, y, w, ptRect
+		lua_pushstring(L, "h");									// gParticles, specific particle, x, y, w, ptRect, "h"
+		lua_gettable(L, -2);									// gParticles, specific particle, x, y, w, ptRect, h
+		lua_insert(L, 6);										// gParticles, specific particle, x, y, w, h, ptRect
+		pRect.x = lua_tonumber(L, -5);
+		pRect.y = lua_tonumber(L, -4);
+		pRect.w = lua_tonumber(L, -3);
+		pRect.h = lua_tonumber(L, -2);
+		lua_pop(L, 5);											// gParticles, specific particle
+		lua_pushstring(L, "ptDestination");						// gParticles, specific particle, "ptDestination"
+		lua_gettable(L, -2);									// gParticles, specific particle, ptDestination
+		lua_pushstring(L, "x");									// gParticles, specific particle, ptDestination, "x"
+		lua_gettable(L, -2);									// gParticles, specific particle, ptDestination, x
+		lua_insert(L, 3);										// gParticles, specific particle, x, ptDestination
+		lua_pushstring(L, "y");									// gParticles, specific particle, x, ptDestination, "y"
+		lua_gettable(L, -2);									// gParticles, specific particle, x, ptDestination, y
+		lua_insert(L, 4);										// gParticles, specific particle, x, y, ptDestination
+		pDestination.x = lua_tonumber(L, -3);
+		pDestination.y = lua_tonumber(L, -2);
+		lua_pop(L, 3);											// gParticles, specific particle
+		lua_pushstring(L, "ptType");							// gParticles, specific particle, "ptType"
+		lua_gettable(L, -2);									// gParticles, specific particle, ptType
+		lua_pushstring(L, "ptLife");							// gParticles, specific particle, ptType, "ptLife"
+		lua_gettable(L, -3);									// gParticles, specific particle, ptType, ptLife
+		lua_pushstring(L, "ptSpeed");							// gParticles, specific particle, ptType, ptLife, "ptSpeed"
+		lua_gettable(L, -4);									// gParticles, specific particle, ptType, ptLife, ptSpeed
+		pType = lua_tonumber(L, -3);
+		pLife = lua_tonumber(L, -2);
+		pSpeed = lua_tonumber(L, -1);
+		lua_pop(L, 5);											// 
+
+		Game::particles.resize(pNum + 1);
+		Game::particles[pNum] = new Particle(&pRect, pType, pNum, &pDestination, pLife, pSpeed);
+	}
 
 	// this should already be handled in things, down below
 	/*
@@ -773,7 +887,9 @@ int LuaBridge::labHandleEnvironment(void)
 		}
 	}
 	*/
-
+	
+	// std::cout << (lua_isnoneornil(L, -1) == 1 ? "nil" : "notnil") << std::endl;
+	// SDL_Delay(5000);
 	return 0;
 }
 
@@ -788,6 +904,12 @@ int LuaBridge::labCheckCollision(lua_State* L)
 		lua_pushboolean(L, false);
 
 	return 1;
+}
+
+int LuaBridge::labClose(void)
+{
+	lua_close(L);
+	return 0;
 }
 
 /*

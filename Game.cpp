@@ -5,6 +5,21 @@
 #include "Collectible.h"
 #include "Player.h"
 
+std::map<std::string, int> Direction;
+std::map<std::string, int> ThingType;
+std::map<std::string, int> EntityFrameType;
+std::map<std::string, int> EntityFrameGroup;
+std::map<std::string, int> ObjectFrameType;
+std::map<std::string, int> ObjectFrameGroup;
+std::map<std::string, int> TileType;
+std::map<std::string, int> TileSubType;
+std::map<std::string, int> EnemyType;
+std::map<std::string, int> CollectibleType;
+std::map<std::string, int> BackgroundType;
+std::map<std::string, int> MusicType;
+std::map<std::string, int> SoundEffectType;
+std::map<std::string, int> ParticleType;
+
 // window width (in pixels)
 int Game::WINDOW_W = 800;
 
@@ -42,7 +57,7 @@ int Game::DEFAULT_SPEED = 2;
 // const int Game::TOTAL_COLLISIONS = 16;
 
 // total number of directions
-const int Game::TOTAL_DIRECTIONS = TOT_DIR - 1;
+// const int Game::TOTAL_DIRECTIONS = TOT_DIR - 1;
 
 // default value for health (more or less just for debugging)
 const int Game::DEFAULT_HEALTH = 100;
@@ -85,7 +100,18 @@ std::vector<Particle*> Game::particles;
 
 Game::Game()
 {
-	std::cout << "GAME" << std::endl;
+	int num = 0;
+	Direction["none"] = num;
+	Direction["left"] = (++num);
+	Direction["right"] = (++num);
+	Direction["up"] = (++num);
+	Direction["down"] = (++num);
+
+	ThingType["temp"] = (num = 0) /* -1 */;
+	ThingType["player"] = (++num);
+	ThingType["tile"] = (++num);
+	ThingType["enemy"] = (++num);
+	ThingType["collectible"] = (++num);
 }
 
 Game::~Game()
@@ -104,8 +130,8 @@ bool Game::checkCollision(Thing* thingOne, Thing* thingTwo, int levelUnit, bool 
 	{
 		for (int i = 0; i < Level::LEVEL_UNITS; i++)
 		{
-			if (Game::gColliding[i] != NULL)
-				Game::gColliding[i] = NULL;
+			if (gColliding[i] != NULL)
+				gColliding[i] = NULL;
 		}
 	}
 
@@ -114,18 +140,18 @@ bool Game::checkCollision(Thing* thingOne, Thing* thingTwo, int levelUnit, bool 
 	{
 		for (int i = 0; i < Level::LEVEL_UNITS; i++)
 		{
-			if (Game::things[i] != NULL && i != levelUnit)
+			if (things[i] != NULL && i != levelUnit)
 			{
-				if ((thingOne->tgHitboxRect.x + thingOne->tgHitboxRect.w > Game::things[i]->tgHitboxRect.x &&
-					thingOne->tgHitboxRect.x < Game::things[i]->tgHitboxRect.x + Game::things[i]->tgHitboxRect.w) &&
-					(thingOne->tgHitboxRect.y + thingOne->tgHitboxRect.h > Game::things[i]->tgHitboxRect.y &&
-					thingOne->tgHitboxRect.y < Game::things[i]->tgHitboxRect.y + Game::things[i]->tgHitboxRect.h))
+				if ((thingOne->tgHitboxRect.x + thingOne->tgHitboxRect.w > things[i]->tgHitboxRect.x &&
+					thingOne->tgHitboxRect.x < things[i]->tgHitboxRect.x + things[i]->tgHitboxRect.w) &&
+					(thingOne->tgHitboxRect.y + thingOne->tgHitboxRect.h > things[i]->tgHitboxRect.y &&
+					thingOne->tgHitboxRect.y < things[i]->tgHitboxRect.y + things[i]->tgHitboxRect.h))
 				{
 					if (outputCollision)
 					{
-						Game::gColliding[i] = new Collision();
-						Game::gColliding[i]->thing1 = thingOne;
-						Game::gColliding[i]->thing2 = Game::things[i];
+						gColliding[i] = new Collision();
+						gColliding[i]->thing1 = thingOne;
+						gColliding[i]->thing2 = things[i];
 					}
 					isColliding = true;
 				}
@@ -158,9 +184,9 @@ void Game::applyAI(void)
 {
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{
-		if (Game::things[i] != NULL && Game::things[i]->tgType != TEMP && Game::things[i]->tgType != PLAYER)
+		if (things[i] != NULL && things[i]->tgType != ThingType["temp"] && things[i]->tgType != ThingType["player"])
 		{
-			Game::things[i]->tgApplyAI();
+			things[i]->tgApplyAI();
 		}
 	}
 }
@@ -169,17 +195,17 @@ void Game::centerCamera(void)
 {
 	int differenceX = -1;
 	int differenceY = -1;
-	if (Game::gPlayer.tgHitboxRect.x + Game::gPlayer.tgHitboxRect.w / 2 != Game::WINDOW_W / 2 ||
-		Game::gPlayer.tgHitboxRect.y + Game::gPlayer.tgHitboxRect.h / 2 != Game::WINDOW_H / 2)
+	if (gPlayer.tgHitboxRect.x + gPlayer.tgHitboxRect.w / 2 != WINDOW_W / 2 ||
+		gPlayer.tgHitboxRect.y + gPlayer.tgHitboxRect.h / 2 != WINDOW_H / 2)
 	{
-		differenceX = Game::WINDOW_W / 2 - (Game::gPlayer.tgHitboxRect.x + Game::gPlayer.tgHitboxRect.w / 2);
-		differenceY = Game::WINDOW_H / 2 - (Game::gPlayer.tgHitboxRect.y + Game::gPlayer.tgHitboxRect.h / 2);
-		for (int i = 0; i < (int)Game::things.size(); i++)
+		differenceX = WINDOW_W / 2 - (gPlayer.tgHitboxRect.x + gPlayer.tgHitboxRect.w / 2);
+		differenceY = WINDOW_H / 2 - (gPlayer.tgHitboxRect.y + gPlayer.tgHitboxRect.h / 2);
+		for (int i = 0; i < (int)things.size(); i++)
 		{
-			if (Game::things[i] != NULL)
+			if (things[i] != NULL)
 			{
-				Game::things[i]->tgHitboxRect.x += differenceX;
-				Game::things[i]->tgHitboxRect.y += differenceY;
+				things[i]->tgHitboxRect.x += differenceX;
+				things[i]->tgHitboxRect.y += differenceY;
 			}
 		}
 	}
@@ -189,23 +215,23 @@ void Game::newThing(int type = -1, int levelUnit = -1, int x = -1, int y = -1)
 {
 	if (x == -1 || y == -1)
 	{
-		x = (levelUnit - ((levelUnit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W;
-		y = (levelUnit / Level::LEVEL_W) * Game::DEFAULT_H;
+		x = (levelUnit - ((levelUnit / Level::LEVEL_W) * Level::LEVEL_W)) * DEFAULT_W;
+		y = (levelUnit / Level::LEVEL_W) * DEFAULT_H;
 	}
 	if (levelUnit > -1 && type > -1)
 	{
-		if (type == PLAYER)
+		if (type == ThingType["player"])
 		{
-			Game::gPlayer.tgHitboxRect.x = x;
-			Game::gPlayer.tgHitboxRect.y = y;
-			Game::gPlayer.tgLevelUnit = levelUnit;
-			Game::things[levelUnit] = &Game::gPlayer;
+			gPlayer.tgHitboxRect.x = x;
+			gPlayer.tgHitboxRect.y = y;
+			gPlayer.tgLevelUnit = levelUnit;
+			things[levelUnit] = &gPlayer;
 		}
-		else if (type > TILE_TYPE_OFFSET && type < TOTAL_TILE_TYPES)
-			Game::things[levelUnit] = new Tile(NULL, type, levelUnit);
-		else if (type > ENEMY_TYPE_OFFSET && type < TOTAL_ENEMY_TYPES)
-			Game::things[levelUnit] = new Enemy(NULL, type, levelUnit);
-		else if (type > COLLECTIBLE_TYPE_OFFSET && type < TOTAL_COLLECTIBLE_TYPES)
-			Game::things[levelUnit] = new Collectible(NULL, type, levelUnit);
+		else if (type > TILE_TYPE_OFFSET && type < TileType["total"])
+			things[levelUnit] = new Tile(NULL, type - TILE_TYPE_OFFSET, levelUnit);
+		else if (type > ENEMY_TYPE_OFFSET && type < EnemyType["total"])
+			things[levelUnit] = new Enemy(NULL, type - ENEMY_TYPE_OFFSET, levelUnit);
+		else if (type > COLLECTIBLE_TYPE_OFFSET && type < CollectibleType["total"])
+			things[levelUnit] = new Collectible(NULL, type - COLLECTIBLE_TYPE_OFFSET, levelUnit);
 	}
 }

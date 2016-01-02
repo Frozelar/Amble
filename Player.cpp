@@ -3,7 +3,7 @@
 // Texture Graphics::playerTextures[TOTAL_ENTITY_FRAME_TYPES];
 Player Game::gPlayer;
 
-Player::Player(SDL_Rect* box, int unit) : Thing(box, PLAYER, unit)
+Player::Player(SDL_Rect* box, int unit) : Thing(box, Game::ThingType["player"], unit)
 {
 	tgHitboxRect.w = Game::PLAYER_W;
 	tgHitboxRect.h = Game::PLAYER_H;
@@ -30,7 +30,7 @@ void Player::plHandleEvent(SDL_Event* e)
 			if (tgSpeed < 0)
 			{
 				tgSpeed = 0;
-				tgDirection = NO_DIRECTION;
+				// tgDirection = NO_DIRECTION;
 			}
 			break;
 		case SDLK_s:
@@ -39,7 +39,7 @@ void Player::plHandleEvent(SDL_Event* e)
 			if (tgSpeed > 0)
 			{
 				tgSpeed = 0;
-				tgDirection = NO_DIRECTION;
+				// tgDirection = NO_DIRECTION;
 			}
 			break;
 		}
@@ -66,7 +66,7 @@ void Player::plHandleEvent(SDL_Event* e)
 			break;
 		case SDLK_a:
 			tgSpeed = -Game::DEFAULT_SPEED;
-			tgDirection = LEFT;
+			// tgDirection = LEFT;
 			break;
 		case SDLK_s:
 			// tgSpeed = DEFAULT_SPEED;
@@ -74,7 +74,7 @@ void Player::plHandleEvent(SDL_Event* e)
 			break;
 		case SDLK_d:
 			tgSpeed = Game::DEFAULT_SPEED;
-			tgDirection = RIGHT;
+			// tgDirection = RIGHT;
 			break;
 		}
 	}
@@ -138,9 +138,9 @@ void Player::plHandleDashing(void)
 
 void Player::plMove(void)
 {
-	Direction dir = NO_DIRECTION;
+	int dir = Game::Direction["none"];
 	bool colliding = Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true);
-	Thing nextMove{ &tgHitboxRect, TEMP, tgLevelUnit };
+	Thing nextMove{ &tgHitboxRect, Game::ThingType["temp"], tgLevelUnit };
 	int moveX = 0, moveY = 0;
 	bool left = false, right = false, up = false, down = false;
 
@@ -223,22 +223,22 @@ void Player::plMove(void)
 			if (up)
 			{
 				up = false;
-				dir = UP;
+				dir = Game::Direction["up"];
 			}
 			else if (left)
 			{
 				left = false;
-				dir = LEFT;
+				dir = Game::Direction["left"];
 			}
 			else if (right)
 			{
 				right = false;
-				dir = RIGHT;
+				dir = Game::Direction["right"];
 			}
 			else if (down)
 			{
 				down = false;
-				dir = DOWN;
+				dir = Game::Direction["down"];
 			}
 			Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], dir);
 		}
@@ -249,6 +249,7 @@ void Player::tgRender(void)
 {
 	tgSyncTexture();
 
+	/*
 	++tgFrameWaitCounter;
 	if (((tgSpeed != 0 || tgVerticals != 0) && tgFrameWaitCounter % 4 == 0) ||
 		(tgFrame == IDLE_1 && tgFrameWaitCounter % 64 == 0) ||
@@ -268,8 +269,9 @@ void Player::tgRender(void)
 		tgFrame = WALK_RIGHT_1;
 	else if (tgSpeed == 0 && tgVerticals == 0 && (tgFrame < IDLE_1 || tgFrame > IDLE_4))
 		tgFrame = IDLE_1;
+		*/
 
-	std::cout << "PLAYERTEXTURES SIZE:   " << Graphics::playerTextures[0].size();
+	// std::cout << "PLAYERTEXTURES SIZE:   " << Graphics::playerTextures[0].size() << std::endl;
 	if ((plJumps < 3 && (tgVerticals < -((int)Game::jumpArray.size() - 4) || (tgVerticals >= 1 && tgVerticals <= 8))) || 
 		(plDashing == 1 || plDashing == -1))
 		Graphics::playerTextures[plState][tgFrame].txColor(210, 180, 90);

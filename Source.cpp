@@ -12,9 +12,7 @@ int main(int argc, char** argv)
 
 	// init();
 	Level::generateLevel();
-	std::cout << "ehh" << std::endl;
 	LuaBridge::labInitValues();
-	std::cout << "ohman" << std::endl;
 	while (!quit)
 	{
 		// labHandleEnvironment needs to be called before applyAI 

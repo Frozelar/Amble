@@ -11,6 +11,7 @@
 #include <random>
 #include <time.h>
 #include <vector>
+#include <map>
 
 class Texture;
 class Thing;
@@ -34,4 +35,4 @@ enum Direction;
 bool init(void);
 void close(void);
 
-Direction invertDir(Direction);
+// Direction invertDir(Direction);

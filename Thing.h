@@ -1,8 +1,6 @@
 #pragma once
 #include "Game.h"
 
-
-
 class Thing
 {
 public:
@@ -11,7 +9,8 @@ public:
 
 	virtual void tgRender(void);
 
-	virtual void tgResolveCollision(Thing*, Direction);
+	// Thing* = thing being collided with, int = direction of collision relative to this thing (not the passed thing)
+	virtual void tgResolveCollision(Thing*, int);
 
 	// uses default gravity and jumping
 	virtual void tgHandleVerticals(void);
@@ -26,11 +25,11 @@ public:
 	int tgHealth;
 	int tgSpeed;
 	int tgFrame;
-	int tgFrameWaitCounter;
+	// int tgFrameWaitCounter;
 	int tgLevelUnit;
 	int tgVerticals;
 	bool tgSelected;
-	Direction tgDirection;
+	// Direction tgDirection;
 	SDL_Rect tgHitboxRect;
 	SDL_Rect tgGFXrect;
 };

@@ -9,7 +9,7 @@ public:
 
 	bool auInit(void);
 
-	void auPlay(int);
+	void auPlay(int, char);
 
 	static std::vector<Mix_Music*> music;
 	static std::vector<Mix_Chunk*> sfx;

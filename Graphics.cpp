@@ -1,23 +1,23 @@
 #include "Graphics.h"
 
-std::vector< std::vector<Texture> > Graphics::backgroundTextures(TOTAL_BACKGROUND_TYPES);
+std::vector< std::vector<Texture> > Graphics::backgroundTextures(Game::BackgroundType["total"]);
 int Graphics::bgState = 0;
 int Graphics::bgFrame = 0;
 // Texture Graphics::tileTextures[TOTAL_TILE_TYPES][TOTAL_OBJECT_FRAME_TYPES];
-std::vector< std::vector<Texture> > Graphics::tileTextures(TOTAL_TILE_TYPES);
-std::vector< std::vector<Texture> > Graphics::playerTextures(TOTAL_ENTITY_FRAME_TYPES);
-std::vector< std::vector<Texture> > Graphics::collectibleTextures(TOTAL_COLLECTIBLE_TYPES);
-std::vector< std::vector<Texture> > Graphics::enemyTextures(TOTAL_ENEMY_TYPES);
-std::vector< std::vector<Texture> > Graphics::particleTextures(TOTAL_PARTICLE_TYPES);
-std::vector< std::vector<std::string> > Graphics::backgroundIdentifiers(TOTAL_BACKGROUND_TYPES);
+std::vector< std::vector<Texture> > Graphics::tileTextures(Game::TileType["total"]);
+std::vector< std::vector<Texture> > Graphics::playerTextures(Game::EntityFrameType["total"]);
+std::vector< std::vector<Texture> > Graphics::collectibleTextures(Game::CollectibleType["total"]);
+std::vector< std::vector<Texture> > Graphics::enemyTextures(Game::EnemyType["total"]);
+std::vector< std::vector<Texture> > Graphics::particleTextures(Game::ParticleType["total"]);
+std::vector< std::vector<std::string> > Graphics::backgroundIdentifiers(Game::BackgroundType["total"]);
 std::vector< std::vector<std::string> > Graphics::playerIdentifiers;
-std::vector< std::vector<std::string> > Graphics::enemyIdentifiers(TOTAL_ENEMY_TYPES);
-std::vector< std::vector<std::string> > Graphics::tileIdentifiers(TOTAL_TILE_TYPES);
-std::vector<std::string> Graphics::tileSubIdentifiers(TOTAL_TILE_SUBTYPES);
-std::vector< std::vector<std::string> > Graphics::collectibleIdentifiers(TOTAL_COLLECTIBLE_TYPES);
-std::vector< std::vector<std::string> > Graphics::particleIdentifiers(TOTAL_PARTICLE_TYPES);
-std::vector< std::vector<std::string> > Graphics::entityFrameTypeIdentifiers(TOTAL_ENTITY_FRAME_TYPES);
-std::vector< std::vector<std::string> > Graphics::objectFrameTypeIdentifiers(TOTAL_OBJECT_FRAME_TYPES);
+std::vector< std::vector<std::string> > Graphics::enemyIdentifiers(Game::EnemyType["total"]);
+std::vector< std::vector<std::string> > Graphics::tileIdentifiers(Game::TileType["total"]);
+std::vector<std::string> Graphics::tileSubIdentifiers(Game::TileSubType["total"]);
+std::vector< std::vector<std::string> > Graphics::collectibleIdentifiers(Game::CollectibleType["total"]);
+std::vector< std::vector<std::string> > Graphics::particleIdentifiers(Game::ParticleType["total"]);
+std::vector< std::vector<std::string> > Graphics::entityFrameTypeIdentifiers(Game::EntityFrameType["total"]);
+std::vector< std::vector<std::string> > Graphics::objectFrameTypeIdentifiers(Game::ObjectFrameType["total"]);
 
 /*
 std::vector<std::string> Graphics::backgroundIdentifiers(TOTAL_BACKGROUND_TYPES);
@@ -238,7 +238,7 @@ void Graphics::gxRender(void)
 {
 	SDL_Rect cameraRect{ 0 - Game::DEFAULT_W * Game::DEFAULT_H, 0 - Game::DEFAULT_W * Game::DEFAULT_H,
 		Game::WINDOW_W + Game::DEFAULT_W * Game::DEFAULT_H * 2, Game::WINDOW_H + Game::DEFAULT_W * Game::DEFAULT_H * 2 };
-	Thing camera{ &cameraRect, TEMP, -1 };
+	Thing camera{ &cameraRect, Game::ThingType["temp"], -1 };
 	SDL_SetRenderDrawColor(Game::gRenderer, 105, 105, 245, 255);
 	SDL_RenderClear(Game::gRenderer);
 
@@ -252,13 +252,13 @@ void Graphics::gxRender(void)
 	{
 		if (Game::things[i] != NULL)
 		{
-			if (Game::checkCollision(Game::things[i], &camera, -1, false) && Game::things[i]->tgType != TEMP)
+			if (Game::checkCollision(Game::things[i], &camera, -1, false) && Game::things[i]->tgType != Game::ThingType["temp"])
 			{
 				// Game::things[i]->tgSyncTexture();
 				Game::things[i]->tgRender();
 			}
 		}
 	}
-
+	// std::cout << "gxRender" << std::endl;
 	SDL_RenderPresent(Game::gRenderer);
 }
