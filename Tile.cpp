@@ -1,4 +1,8 @@
 #include "Tile.h"
+#include "Game.h"
+#include "Graphics.h"
+#include "Level.h"
+#include "Texture.h"
 
 Tile::Tile(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType["tile"], unit)
 {
@@ -132,16 +136,14 @@ void Tile::tgRender(void)
 	}
 	*/
 
-	Graphics::tileTextures[tiType][tgFrame].txRect = tgGFXrect;
-	Graphics::tileTextures[tiType][tgFrame].txRender();
+	Graphics::tileTextures[tiType - 1][tgFrame]->txRect = tgGFXrect;
+	Graphics::tileTextures[tiType - 1][tgFrame]->txRender();
 }
 
-/*
 void Tile::tgApplyAI(void)
 {
 
 }
-*/
 
 int Tile::tgGetSubtype(void)
 {

@@ -20,7 +20,7 @@ TOTAL_COLLECTIBLE_TYPES = #collectibleTypes
 graphicsIdentifiers = { 
 	{ {"Underground", 1} }, -- backgrounds (# frames)
 	{ {"DirtBlock", 1}, {"DirtWall", 1} }, -- tiles (# frames (PER tile subidentifier))
-	{ {"Player", 5} }, -- player states (# frame SETS (5 by default)
+	{ {"" --[[ "Player" ]], 5} }, -- player states (# frame SETS (5 by default)
 	{ {"Dude", 5} }, -- enemies (# frame SETS (5 by default))
 	{ {"Bit", 4}, {"Byte", 4} }, -- collectibles (# frames)
 	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} } -- particles (# frames)
@@ -28,8 +28,8 @@ graphicsIdentifiers = {
 
 tileSubIdentifiers = {
 	"Center", "Top", "TopRight", "Right", "BottomRight", "Bottom", "BottomLeft", "Left", "TopLeft", 
-	"Single",
-	"SlopeTopLeft", "SlopeTopRight", "SlopeBottomLeft", "SlopeBottomRight"
+	--[[ "Single",
+	"SlopeTopLeft", "SlopeTopRight", "SlopeBottomLeft", "SlopeBottomRight" ]]
 }
 TOTAL_TILE_SUBTYPES = #tileSubIdentifiers
 
@@ -79,12 +79,20 @@ things = {}
 
 points = 0
 
-Point = { x, y }
+Point = { x = 0, y = 0 }
+Point.__index = Point
+
+setmetatable(Point, {
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		self:new(...)
+		return self
+	end
+})
+
 function Point:new(px, py)
-	setmetatable({}, Point)
 	self.x = px
 	self.y = py
-	return self
 end
 
 function Point:__eq(other)
@@ -92,14 +100,22 @@ function Point:__eq(other)
 	self.y = other.y
 end
 
-Rectangle = { x, y, w, h }
+Rectangle = { x = 0, y = 0, w = 0, h = 0 }
+Rectangle.__index = Rectangle
+
+setmetatable(Rectangle, {
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		self:new(...)
+		return self
+	end
+})
+
 function Rectangle:new(px, py, pw, ph)
-  setmetatable({}, Rectangle)
   self.x = px
   self.y = py
   self.w = pw
   self.h = ph
-  return self
 end
 
 function Rectangle:__eq(other)
@@ -110,19 +126,36 @@ function Rectangle:__eq(other)
 end
 
 Background = { bgType, bgRect, bgFrame, bgFrameInterval, bgMaxFrames }
+Background.__index = Background
+
+setmetatable(Background, {
+	-- __index = Rectangle,
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		Background:new(...)
+		return self
+	end
+})
+
 function Background:new()
-	setmetatable({}, Background)
-	self.bgRect = Rectangle:new(0, 0, WINDOW_W, WINDOW_H)
+	self.bgRect = Rectangle(0, 0, WINDOW_W, WINDOW_H)
 	self.bgType = -1
 	self.bgFrame = 1
 	self.bgFrameInterval = 1
-	self.bgMaxFrames = -1 
-	return self
+	self.bgMaxFrames = -1
 end
 
+--[[
 function Background:bgSetType(pType)
+	print(pType)
 	self.bgType = pType
 	self.bgMaxFrames = graphicsIdentifiers[1][self.bgType][2]
+end
+]]
+
+function bgSetType(pType)
+	gBackground.bgType = pType
+	gBackground.bgMaxFrames = graphicsIdentifiers[1][gBackground.bgType][2]
 end
 
 function Background:bgCycleFrames()
@@ -137,9 +170,18 @@ function Background:bgCycleFrames()
 end
 
 Particle = { ptType, ptRect, ptDestination, ptLife, ptSpeed, ptFrame, ptFrameInterval, ptMaxFrames }
+Particle.__index = Particle
+
+setmetatable(Particle, {
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		self:new(...)
+		return self
+	end
+})
+
 function Particle:new(pType, px, py)
-	setmetatable({}, Particle)
-	self.ptRect = Rectangle:new(px, py, 0, 0)
+	self.ptRect = Rectangle(px, py, 0, 0)
 	if string.sub(graphicsIdentifiers[6][pType][1], 1, 3) == "Big" then
 		ptRect.w = 2
 		ptRect.h = 2
@@ -155,7 +197,6 @@ function Particle:new(pType, px, py)
 	self.ptFrame = 0
 	self.ptFrameInterval = 0
 	self.ptMaxFrames = graphicsIdentifiers[6][self.ptType][2]
-	return self
 end
 
 function Particle:ptCycleFrames()
@@ -169,31 +210,51 @@ function Particle:ptCycleFrames()
 	end
 end
 
-Thing = { tgVerticals, tgSpeed, tgHitbox, tgLevelUnit, tgFrame, tgFrameInterval, tgMaxFrames }
+Thing = { tgType, tgVerticals, tgSpeed, tgHitbox, tgLevelUnit, tgFrame, tgFrameInterval, tgMaxFrames }
+Thing.__index = Thing
+
+setmetatable(Thing, {
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		self:new(...)
+		return self
+	end
+})
+
 function Thing:new(levelUnit)
-  setmetatable({}, Thing)
+  self.tgType = 0
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
-  self.tgHitbox = Rectangle:new(0, 0, 0, 0)
+  self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgFrame = 1
   self.tgFrameInterval = 0
   -- self.tgMaxFrames = 0
-  return self
 end
 
-Player = Thing:new()
+Player = {plJumps, plDashing}
+Player.__index = Player
+
+setmetatable(Player, {
+	__index = Thing,
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		self:new(...)
+		return self
+	end
+})
+
 function Player:new(levelUnit)
-  setmetatable({}, Player)
+  --self.tgType = thingTypes["player"]
+  self.tgType = "player"
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
   self.plJumps = 0
   self.plDashing = 0
-  self.tgHitbox = Rectangle:new(0, 0, 0, 0)
+  self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = PLAYER_W
   self.tgHitbox.h = PLAYER_H
-  return self
 end
 
 function Player:plCycleFrames()
@@ -227,19 +288,30 @@ function Player:plCycleFrames()
 	end
 end
 
-Tile = Thing:new()
+Tile = {tiIsSolid, tiSubtype}
+Tile.__index = Tile
+
+setmetatable(Tile, {
+	__index = Thing,
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		self:new(...)
+		return self
+	end
+})
+
 function Tile:new(levelUnit)
-  setmetatable({}, Tile)
+  --self.tgType = thingTypes["tile"]
+  self.tgType = "tile"
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
   self.tiIsSolid = true
-  self.tiSubtype = -1
-  self.tgHitbox = Rectangle:new(0, 0, 0, 0)
+  self.tiSubtype = 1																-- NEED TO CHANGE THIS LATERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR~~~~~~~~~~~~~~~~~~~~~~
+  self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = DEFAULT_W
   self.tgHitbox.h = DEFAULT_H
   self.tgMaxFrames = graphicsIdentifiers[2][self.tiSubtype][2]
-  return self
 end
 
 function Tile:tiHandleAI()
@@ -265,23 +337,34 @@ function Tile:tiCycleFrames()
 	end
 end
 
-Enemy = Thing:new()
+Enemy = {enPower, enSubtype, enDashing}
+Enemy.__index = Enemy
+
+setmetatable(Enemy, {
+	__index = Thing,
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		self:new(...)
+		return self
+	end
+})
+
 function Enemy:new(levelUnit)
-  setmetatable({}, Enemy)
+  --self.tgType = thingTypes["enemy"]
+  self.tgType = "enemy"
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
   self.enPower = 5
   self.enSubtype = -1
   self.enDashing = 0
-  self.tgHitbox = Rectangle:new(0, 0, 0, 0)
+  self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = DEFAULT_ENEMY_W
   self.tgHitbox.h = DEFAULT_ENEMY_H
-  return self
 end
 
 function Enemy:enHandleAI()
-  local checkrect = Rectangle:new(0, 0, 0, 0)
+  local checkrect = Rectangle(0, 0, 0, 0)
   local iscolliding = false
   
   for i = 1, #things do
@@ -359,17 +442,27 @@ function Enemy:enCycleFrames()
 	end
 end
 
-Collectible = Thing:new()
+Collectible = {clSubtype}
+Collectible.__index = Collectible
+
+setmetatable(Collectible, {
+	__index = Thing,
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		self:new(...)
+		return self
+	end
+})
+
 function Collectible:new(levelUnit)
-  setmetatable({}, Collectible)
+  self.tgType = "collectible"
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
   self.clSubtype = -1
-  self.tgHitbox = Rectangle:new(0, 0, 0, 0)
+  self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = DEFAULT_W
   self.tgHitbox.h = DEFAULT_H
-  return self
 end
 
 function Collectible:clHandleAI()
@@ -403,8 +496,8 @@ function Collectible:clCycleFrames()
 	end
 end
 
-gBackground = Background:new()
-gPlayer = Player:new()
+gBackground = Background()
+--gPlayer = Player:new()
 gParticles = {}
 totalParticles = #gParticles
 
@@ -436,7 +529,7 @@ function initFrames()
 	end
 	for i = 1, #frameIdentifiers[2] do
 		for j = 1, frameIdentifiers[2][i][2] do
-			objectFrames[i][j] = --[[ frameIdentifiers[2][i][1] .. ]] j
+			objectFrames[i][j] = j
 		end
 	end
 	]]
@@ -445,18 +538,20 @@ end
 function init()
   math.randomseed(os.time())
   initFrames()
-  
+  print("INITTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT " .. #things)
   local j = -1
-  for i = 1, #things, 1 do
+  for i = 1, #things do
     if things[i] ~= -1 then
-      if thingTypes[things[i].tgType] == "player" then
-        things[i] = Player:new(i)
-      elseif thingTypes[things[i].tgType] == "tile" then
-        things[i] = Tile:new(i)
-      elseif thingTypes[things[i].tgType] == "enemy" then
-        things[i] = Enemy:new(i)
-      elseif thingTypes[things[i].tgType] == "collectible" then
-        things[i] = Collectible:new(i)
+      if thingTypes[things[i]] == "player" then
+        things[i] = Player(i)
+	  print("MADE A PLAYAH: " .. things[i].tgLevelUnit)
+      elseif thingTypes[things[i]] == "tile" then
+        things[i] = Tile(i)
+	  print("MADE A TILE: " .. things[i].tgLevelUnit)
+      elseif thingTypes[things[i]] == "enemy" then
+        things[i] = Enemy(i)
+      elseif thingTypes[things[i]] == "collectible" then
+        things[i] = Collectible(i)
       else
         things[i] = nil
       end
@@ -470,18 +565,18 @@ function handleEnvironment()
 	totalParticles = #gParticles
 	for i = 0, #things, 1 do
 		if things[i] ~= nil then
-			if thingTypes[things[i].tgType] == "player" then
+			if things[i].tgType == "player" then							-- DOES NOT WORKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
 				things[i]:plCycleFrames()
 				
-			elseif thingTypes[things[i].tgType] == "tile" then
+			elseif things[i].tgType == "tile" then
 				things[i]:tiCycleFrames()
 				things[i]:tiHandleAI()
 				
-			elseif thingTypes[things[i].tgType] == "enemy" then
+			elseif things[i].tgType == "enemy" then
 				things[i]:enCycleFrames()
 				things[i]:enHandleAI()
 				
-			elseif thingTypes[things[i].tgType] == "collectible" then
+			elseif things[i].tgType == "collectible" then
 				things[i]:clCycleFrames()
 				things[i]:clHandleAI()
 				

@@ -1,5 +1,5 @@
 #include "luasource/lua.hpp"
-#include "Graphics.h"
+#include "Include.h"
 #pragma once
 #define Lua_Register( _s, _funcname) \
     lua_register( s, #_funcname, LUA ## _funcname)
@@ -34,5 +34,5 @@ public:
 	// static const int MAX_ARGS;
 	// static void* labStack[];
 	static lua_State* L;
-	static LuaBridge gLuaBridge;
+	// static LuaBridge gLuaBridge;
 };

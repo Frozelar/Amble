@@ -1,11 +1,12 @@
 #pragma once
-#include "Game.h"
+#include "Include.h"
 
 class Thing
 {
 public:
 	// SDL_Rect = hitbox rect; int = thing type; int = thing subtype; int = level unit
 	Thing(SDL_Rect* = NULL, int = -1, int = -1);
+	~Thing();
 
 	virtual void tgRender(void);
 

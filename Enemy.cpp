@@ -1,4 +1,8 @@
 #include "Enemy.h"
+#include "Game.h"
+#include "Graphics.h"
+#include "Level.h"
+#include "Texture.h"
 
 Enemy::Enemy(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType["enemy"], unit)
 {
@@ -79,8 +83,8 @@ void Enemy::tgRender(void)
 		tgFrame = Game::EntityFrameType["Idle1"];
 		*/
 
-	Graphics::enemyTextures[enType][tgFrame].txRect = tgGFXrect;
-	Graphics::enemyTextures[enType][tgFrame].txRender();
+	Graphics::enemyTextures[enType - 1][tgFrame]->txRect = tgGFXrect;
+	Graphics::enemyTextures[enType - 1][tgFrame]->txRender();
 }
 
 void Enemy::tgApplyAI(void)

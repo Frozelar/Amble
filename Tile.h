@@ -1,5 +1,6 @@
 #pragma once
-#include "Graphics.h"
+#include "Include.h"
+#include "Thing.h"
 
 class Tile : public Thing
 {
@@ -12,7 +13,7 @@ public:
 
 	void tgResolveCollision(Thing*, Direction);
 	void tgRender(void);
-	// void tgApplyAI(void);
+	void tgApplyAI(void);
 	int tgGetSubtype(void);
 
 	int tiType = 0;

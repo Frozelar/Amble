@@ -1,4 +1,7 @@
 #include "Particle.h"
+#include "Game.h"
+#include "Graphics.h"
+#include "Texture.h"
 
 Particle::Particle(SDL_Rect* placement, int type, int num, SDL_Point* destination, int life, int speed)
 {
@@ -32,7 +35,7 @@ void Particle::ptMove()
 	ptRect.x += ptDirection.x;
 	ptRect.y += ptDirection.y;
 	if (--ptLifeSpan <= 0)
-		ptDestroy();
+		Game::destroyParticle(ptNumber);
 	else if (ptLifeSpan <= 15)
 		ptAlpha -= 17;
 }
@@ -45,13 +48,15 @@ void Particle::ptRender()
 			ptFrame = 0;
 	*/
 
-	Graphics::particleTextures[ptType][ptFrame].txRect = ptRect;
-	Graphics::particleTextures[ptType][ptFrame].txAlpha(ptAlpha);
-	Graphics::particleTextures[ptType][ptFrame].txRender();
+	Graphics::particleTextures[ptType][ptFrame]->txRect = ptRect;
+	Graphics::particleTextures[ptType][ptFrame]->txAlpha(ptAlpha);
+	Graphics::particleTextures[ptType][ptFrame]->txRender();
 }
 
+/*
 void Particle::ptDestroy()
 {
 	delete Game::particles[ptNumber];
 	Game::particles[ptNumber] = NULL;
 }
+*/

@@ -1,5 +1,5 @@
 #pragma once
-#include "Texture.h"
+#include "Include.h"
 
 class Graphics
 {
@@ -12,14 +12,14 @@ public:
 
 	static void gxRender(void);
 
-	static std::vector< std::vector<Texture> > backgroundTextures;
+	static std::vector< std::vector<Texture*> > backgroundTextures;
 	static int bgState;
 	static int bgFrame;
-	static std::vector< std::vector<Texture> > tileTextures;
-	static std::vector< std::vector<Texture> > playerTextures;
-	static std::vector< std::vector<Texture> > collectibleTextures;
-	static std::vector< std::vector<Texture> > enemyTextures;
-	static std::vector< std::vector<Texture> > particleTextures;
+	static std::vector< std::vector<Texture*> > tileTextures;
+	static std::vector< std::vector<Texture*> > playerTextures;
+	static std::vector< std::vector<Texture*> > collectibleTextures;
+	static std::vector< std::vector<Texture*> > enemyTextures;
+	static std::vector< std::vector<Texture*> > particleTextures;
 	static std::vector< std::vector<std::string> > backgroundIdentifiers;
 	static std::vector< std::vector<std::string> > playerIdentifiers;
 	static std::vector< std::vector<std::string> > enemyIdentifiers;

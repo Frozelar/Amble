@@ -1,9 +1,21 @@
 #include "Thing.h"
+#include "Game.h"
 
 Thing::Thing(SDL_Rect* box, int type, int unit)
 {
 	if (box != NULL)
+	{
 		tgHitboxRect = *box;
+		tgSyncTexture();
+	}
+	/*
+	else
+	{
+		tgHitboxRect = new SDL_Rect();
+		tgGFXrect = new SDL_Rect();
+	}
+	*/
+
 	tgType = type;
 	tgLevelUnit = unit;
 	tgHealth = Game::DEFAULT_HEALTH;
@@ -12,6 +24,22 @@ Thing::Thing(SDL_Rect* box, int type, int unit)
 	// tgFrameWaitCounter = 0;
 	tgVerticals = 0;
 	tgSelected = 0;
+}
+
+Thing::~Thing()
+{
+	/*
+	if (tgHitboxRect != NULL)
+	{
+		delete tgHitboxRect;
+		tgHitboxRect = NULL;
+	}
+	if (tgGFXrect != NULL)
+	{
+		delete tgGFXrect;
+		tgHitboxRect = NULL;
+	}
+	*/
 }
 
 void Thing::tgSyncTexture(void)

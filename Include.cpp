@@ -1,11 +1,15 @@
 #include "Include.h"
+#include "Game.h"
+#include "Luabridge.h"
 #include "Thing.h"
-#include "LuaBridge.h"
+// #include "Thing.h"
 
-//struct Collision{
-//	Thing* thing1 = NULL;
-//	Thing* thing2 = NULL;
-//};
+/*
+class Collision {
+	Thing* thing1 = NULL;
+	Thing* thing2 = NULL;
+};
+*/
 
 bool init(void)
 {

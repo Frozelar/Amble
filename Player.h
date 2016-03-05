@@ -1,5 +1,6 @@
 #pragma once
-#include "LuaBridge.h"
+#include "Include.h"
+#include "Thing.h"
 
 class Player : public Thing
 {

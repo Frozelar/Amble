@@ -1,9 +1,10 @@
 #include "Audio.h"
+#include "Game.h"
 
-// Audio Game::gAudio;
+Audio* Game::gAudio;
 
-std::vector<Mix_Music*> Audio::music(Game::MusicType["total"]);
-std::vector<Mix_Chunk*> Audio::sfx(Game::SoundEffectType["total"]);
+std::vector<Mix_Music*> Audio::music;// (Game::MusicType["total"]);
+std::vector<Mix_Chunk*> Audio::sfx;// (Game::SoundEffectType["total"]);
 std::vector<std::string> Audio::musicIdentifiers;
 std::vector<std::string> Audio::sfxIdentifiers;
 
@@ -14,6 +15,8 @@ std::string Audio::sfxIdentifiers[TOTAL_SFX_TYPES] = { "Boom" };
 
 Audio::Audio()
 {
+	music.resize(Game::MusicType["total"]);
+	sfx.resize(Game::SoundEffectType["total"]);
 	if (!auInit())
 		std::cout << "Error initializing sounds!" << std::endl;
 }

@@ -166,12 +166,14 @@ public:
 	static TTF_Font* gFont;
 	static SDL_Window* gWindow;
 	static SDL_Renderer* gRenderer;
-	static SDL_Event gEvent;
-	// static Audio gAudio;
+	static SDL_Event* gEvent;
+	static Audio* gAudio;
 	static std::vector<Collision*> gColliding;
-	// static Graphics gGraphics;
-	static Player gPlayer;
-	// static LuaBridge gLuaBridge;
+	static Graphics* gGraphics;
+	static Player* gPlayer;
+	static Game* gGame;
+	static Level* gLevel;
+	static LuaBridge* gLuaBridge;
 	static std::vector<Thing*> things;
 	static std::vector<Particle*> particles;
 	static int gScore;
@@ -181,11 +183,15 @@ public:
 
 	static void centerCamera(void);
 	static void applyAI(void);
-	static void newThing(int, int, int, int);
+	// int type, int levelunit, int x (optional if levelunit is given), int y (optional if levelunit is given), int thingtype (use ONLY if offset is not used with the type)
+	static void newThing(int, int, int, int, int);
+	static void newParticle(SDL_Rect*, int, SDL_Point*, int, int);
+	static void destroyThing(int);
+	static void destroyParticle(int);
 
 	// Thing* = first thing, Thing* = second thing (or NULL to check first thing and everything), int = level unit of first thing,
 	// bool = whether to output collision to gColliding; returns whether or not there was a collision
 	static bool checkCollision(Thing* = NULL, Thing* = NULL, int = -1, bool = true);
 
-	static bool checkCollisionRects(SDL_Rect, SDL_Rect);
+	static bool checkCollisionRects(SDL_Rect*, SDL_Rect*);
 };

@@ -1,5 +1,6 @@
 #pragma once
-#include "Graphics.h"
+#include "Include.h"
+#include "Thing.h"
 
 class Enemy : public Thing
 {

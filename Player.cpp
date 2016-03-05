@@ -1,7 +1,11 @@
 #include "Player.h"
+#include "Game.h"
+#include "Graphics.h"
+#include "Level.h"
+#include "Texture.h"
 
 // Texture Graphics::playerTextures[TOTAL_ENTITY_FRAME_TYPES];
-Player Game::gPlayer;
+Player* Game::gPlayer = NULL;
 
 Player::Player(SDL_Rect* box, int unit) : Thing(box, Game::ThingType["player"], unit)
 {
@@ -271,13 +275,12 @@ void Player::tgRender(void)
 		tgFrame = IDLE_1;
 		*/
 
-	// std::cout << "PLAYERTEXTURES SIZE:   " << Graphics::playerTextures[0].size() << std::endl;
 	if ((plJumps < 3 && (tgVerticals < -((int)Game::jumpArray.size() - 4) || (tgVerticals >= 1 && tgVerticals <= 8))) || 
 		(plDashing == 1 || plDashing == -1))
-		Graphics::playerTextures[plState][tgFrame].txColor(210, 180, 90);
+		Graphics::playerTextures[plState][tgFrame]->txColor(210, 180, 90);
 	else
-		Graphics::playerTextures[plState][tgFrame].txColor(255, 255, 255);
+		Graphics::playerTextures[plState][tgFrame]->txColor(255, 255, 255);
 
-	Graphics::playerTextures[plState][tgFrame].txRect = tgGFXrect; // ????
-	Graphics::playerTextures[plState][tgFrame].txRender();
+	Graphics::playerTextures[plState][tgFrame]->txRect = tgGFXrect; // ????
+	Graphics::playerTextures[plState][tgFrame]->txRender();
 }

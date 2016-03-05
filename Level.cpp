@@ -1,8 +1,7 @@
 #include "Level.h"
+#include "Game.h"
 #include "Player.h"
-#include "Tile.h"
-#include "Collectible.h"
-#include "Enemy.h"
+#include "Thing.h"
 
 // default units in the level
 int Level::LEVEL_UNITS = Level::levelW() * Level::levelH();
@@ -24,6 +23,8 @@ int Level::LEVEL_PIXELS = LEVEL_UNITS * Game::DEFAULT_W;
 
 int Level::gLevelMovementsX = 0;
 int Level::gLevelMovementsY = 0;
+
+Level* Game::gLevel;
 
 Level::Level()
 {
@@ -73,8 +74,10 @@ bool Level::generateLevel(void)
 
 		if (unitType != -1)
 		{
+			//std::cout << "BRRRRRRRRR" << std::endl;
 			unit++;
-			Game::newThing(unitType, unit, x, y);
+			if(unitType != 0)
+				Game::newThing(unitType, unit, x, y, -1);
 
 			i += Game::DEFAULT_W;
 			j++;
@@ -98,10 +101,10 @@ void Level::moveLevel(void)
 {
 	// if (Game::gPlayer.tgSpeed != 0)
 	// 	Level::gLevelMovementsX -= Game::gPlayer.tgSpeed;
-	if (Game::gPlayer.tgHitboxRect.x != Game::gPlayer.plOldHitboxRect.x)
-		Level::gLevelMovementsX += (Game::gPlayer.plOldHitboxRect.x - Game::gPlayer.tgHitboxRect.x);
-	if (Game::gPlayer.tgHitboxRect.y != Game::gPlayer.plOldHitboxRect.y)
-		Level::gLevelMovementsY += (Game::gPlayer.plOldHitboxRect.y - Game::gPlayer.tgHitboxRect.y);
+	if (Game::gPlayer->tgHitboxRect.x != Game::gPlayer->plOldHitboxRect.x)
+		Level::gLevelMovementsX += (Game::gPlayer->plOldHitboxRect.x - Game::gPlayer->tgHitboxRect.x);
+	if (Game::gPlayer->tgHitboxRect.y != Game::gPlayer->plOldHitboxRect.y)
+		Level::gLevelMovementsY += (Game::gPlayer->plOldHitboxRect.y - Game::gPlayer->tgHitboxRect.y);
 	// if (Game::gPlayer.tgVerticals != 0)
 	// 	Level::gLevelMovementsY += (Game::gPlayer.plOldHitboxRect.y - (Game::gPlayer.tgHitboxRect.y +
 	// 	(Game::gPlayer.tgVerticals > 0 ? Game::gravityArray[Game::gPlayer.tgVerticals] : -Game::jumpArray[-Game::gPlayer.tgVerticals])));
@@ -118,7 +121,7 @@ void Level::moveLevel(void)
 	}
 	Level::gLevelMovementsX = 0;
 	Level::gLevelMovementsY = 0;
-	Game::gPlayer.tgHitboxRect = Game::gPlayer.plOldHitboxRect;
+	Game::gPlayer->tgHitboxRect = Game::gPlayer->plOldHitboxRect;
 
 	// if ((Game::gPlayer.tgSpeed > 0 && Game::gPlayer.tgDirection == LEFT) || 
 	// 	(Game::gPlayer.tgSpeed < 0 && Game::gPlayer.tgDirection == RIGHT))

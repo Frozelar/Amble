@@ -1,14 +1,18 @@
 #include "Graphics.h"
+#include "Game.h"
+#include "Level.h"
+#include "Texture.h"
+#include "Thing.h"
 
-std::vector< std::vector<Texture> > Graphics::backgroundTextures(Game::BackgroundType["total"]);
+std::vector< std::vector<Texture*> > Graphics::backgroundTextures(Game::BackgroundType["total"]);
 int Graphics::bgState = 0;
 int Graphics::bgFrame = 0;
 // Texture Graphics::tileTextures[TOTAL_TILE_TYPES][TOTAL_OBJECT_FRAME_TYPES];
-std::vector< std::vector<Texture> > Graphics::tileTextures(Game::TileType["total"]);
-std::vector< std::vector<Texture> > Graphics::playerTextures(Game::EntityFrameType["total"]);
-std::vector< std::vector<Texture> > Graphics::collectibleTextures(Game::CollectibleType["total"]);
-std::vector< std::vector<Texture> > Graphics::enemyTextures(Game::EnemyType["total"]);
-std::vector< std::vector<Texture> > Graphics::particleTextures(Game::ParticleType["total"]);
+std::vector< std::vector<Texture*> > Graphics::tileTextures(Game::TileType["total"]);
+std::vector< std::vector<Texture*> > Graphics::playerTextures(Game::EntityFrameType["total"]);
+std::vector< std::vector<Texture*> > Graphics::collectibleTextures(Game::CollectibleType["total"]);
+std::vector< std::vector<Texture*> > Graphics::enemyTextures(Game::EnemyType["total"]);
+std::vector< std::vector<Texture*> > Graphics::particleTextures(Game::ParticleType["total"]);
 std::vector< std::vector<std::string> > Graphics::backgroundIdentifiers(Game::BackgroundType["total"]);
 std::vector< std::vector<std::string> > Graphics::playerIdentifiers;
 std::vector< std::vector<std::string> > Graphics::enemyIdentifiers(Game::EnemyType["total"]);
@@ -30,7 +34,7 @@ std::vector<std::string> Graphics::entityFrameTypeIdentifiers(TOTAL_ENTITY_FRAME
 std::vector<std::string> Graphics::objectFrameTypeIdentifiers(TOTAL_OBJECT_FRAME_TYPES);
 */
 
-// Graphics Game::gGraphics;
+Graphics* Game::gGraphics;
 
 Graphics::Graphics()
 {
@@ -76,39 +80,58 @@ bool Graphics::gxInit(void)
 	for (int i = 0; i < playerIdentifiers.size(); i++)
 	{
 		for (int j = 0; j < playerIdentifiers[i].size(); j++)
+		{
 			// playerTextures[i].resize(j + 1);		// should already be sized correctly from luabridge
-			playerTextures[i][j].txLoadF(dir + playerIdentifiers[i][j] + ext);
+			playerTextures[i][j] = new Texture();
+			playerTextures[i][j]->txLoadF(dir + "pl" + playerIdentifiers[i][j] + ext);
+		}
 	}
 	for (int i = 0; i < enemyIdentifiers.size(); i++)
 	{
 		for (int j = 0; j < enemyIdentifiers[i].size(); j++)
+		{
 			// enemyTextures[i].resize(j + 1);
-			enemyTextures[i][j].txLoadF(dir + enemyIdentifiers[i][j] + ext);
+			enemyTextures[i][j] = new Texture();
+			enemyTextures[i][j]->txLoadF(dir + "en" + enemyIdentifiers[i][j] + ext);
+		}
 	}
 	for (int i = 0; i < tileIdentifiers.size(); i++)
 	{
 		for (int j = 0; j < tileIdentifiers[i].size(); j++)
+		{
 			// tileTextures[i].resize(j + 1);
-			tileTextures[i][j].txLoadF(dir + tileIdentifiers[i][j] + ext);
+			tileTextures[i][j] = new Texture();
+			tileTextures[i][j]->txLoadF(dir + "ti" + tileIdentifiers[i][j] + ext);
+		}
 	}
 	for (int i = 0; i < collectibleIdentifiers.size(); i++)
 	{
 		for (int j = 0; j < collectibleIdentifiers[i].size(); j++)
+		{
 			// collectibleTextures[i].resize(j + 1);
-			collectibleTextures[i][j].txLoadF(dir + collectibleIdentifiers[i][j] + ext);
+			collectibleTextures[i][j] = new Texture();
+			collectibleTextures[i][j]->txLoadF(dir + "cl" + collectibleIdentifiers[i][j] + ext);
+		}
 	}
 	for (int i = 0; i < particleIdentifiers.size(); i++)
 	{
 		for (int j = 0; j < particleIdentifiers[i].size(); j++)
+		{
 			// particleTextures[i].resize(j + 1);
-			particleTextures[i][j].txLoadF(dir + particleIdentifiers[i][j] + ext);
+			particleTextures[i][j] = new Texture();
+			particleTextures[i][j]->txLoadF(dir + "pt" + particleIdentifiers[i][j] + ext);
+		}
 	}
 	for (int i = 0; i < backgroundIdentifiers.size(); i++)
 	{
 		for (int j = 0; j < backgroundIdentifiers[i].size(); j++)
+		{
 			// backgroundTextures[i].resize(j + 1);
-			backgroundTextures[i][j].txLoadF(dir + backgroundIdentifiers[i][j] + ext);
+			backgroundTextures[i][j] = new Texture();
+			backgroundTextures[i][j]->txLoadF(dir + "bg" + backgroundIdentifiers[i][j] + ext);
+		}
 	}
+	bgState = 0;
 
 	/*
 	for (int frame = 0; frame < playerTextures.size() && frame < entityFrameTypeIdentifiers.size(); frame++)
@@ -242,11 +265,11 @@ void Graphics::gxRender(void)
 	SDL_SetRenderDrawColor(Game::gRenderer, 105, 105, 245, 255);
 	SDL_RenderClear(Game::gRenderer);
 
-	Graphics::backgroundTextures[bgState][bgFrame].txRect.x = 0;
-	Graphics::backgroundTextures[bgState][bgFrame].txRect.y = 0;
-	Graphics::backgroundTextures[bgState][bgFrame].txRect.w = Game::WINDOW_W;
-	Graphics::backgroundTextures[bgState][bgFrame].txRect.h = Game::WINDOW_H;
-	Graphics::backgroundTextures[bgState][bgFrame].txRender();
+	Graphics::backgroundTextures[bgState - 1][bgFrame]->txRect.x = 0;
+	Graphics::backgroundTextures[bgState - 1][bgFrame]->txRect.y = 0;
+	Graphics::backgroundTextures[bgState - 1][bgFrame]->txRect.w = Game::WINDOW_W;
+	Graphics::backgroundTextures[bgState - 1][bgFrame]->txRect.h = Game::WINDOW_H;
+	Graphics::backgroundTextures[bgState - 1][bgFrame]->txRender();
 	// gPlayer->tgRender();
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{
@@ -254,6 +277,7 @@ void Graphics::gxRender(void)
 		{
 			if (Game::checkCollision(Game::things[i], &camera, -1, false) && Game::things[i]->tgType != Game::ThingType["temp"])
 			{
+				std::cout << "THINGTYPE:::: " << Game::things[i]->tgLevelUnit << std::endl;
 				// Game::things[i]->tgSyncTexture();
 				Game::things[i]->tgRender();
 			}

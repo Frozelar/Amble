@@ -1,5 +1,6 @@
 #pragma once
-#include "Audio.h"
+#include "Include.h"
+#include "Game.h"
 
 class Texture
 {
@@ -12,7 +13,7 @@ public:
 	~Texture();
 
 	// render the texture to the screen
-	void txRender(SDL_Rect *clip = NULL, SDL_Point *center = NULL,
+	void txRender(SDL_Rect* clip = NULL, SDL_Point* center = NULL,
 		double rotation = 0.0, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
 	// load up a texture from a file

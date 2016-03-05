@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics.h"
+#include "Include.h"
 
 
 class Particle
@@ -13,7 +13,7 @@ public:
 
 	void ptRender(void);
 
-	void ptDestroy(void);
+	// void ptDestroy(void);
 
 	int ptType = 0;
 	int ptLifeSpan = 0;

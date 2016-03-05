@@ -1,4 +1,8 @@
 #include "Collectible.h"
+#include "Game.h"
+#include "Graphics.h"
+#include "Level.h"
+#include "Texture.h"
 
 Collectible::Collectible(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType["collectible"], unit)
 {
@@ -30,8 +34,8 @@ void Collectible::tgRender(void)
 	}
 	*/
 
-	Graphics::collectibleTextures[clType][tgFrame].txRect = tgGFXrect;
-	Graphics::collectibleTextures[clType][tgFrame].txRender();
+	Graphics::collectibleTextures[clType - 1][tgFrame]->txRect = tgGFXrect;
+	Graphics::collectibleTextures[clType - 1][tgFrame]->txRender();
 }
 
 void Collectible::clCollect(void)

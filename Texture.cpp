@@ -3,6 +3,7 @@
 Texture::Texture(int passedX, int passedY, int passedW, int passedH)
 {
 	// set properties
+	// txRect = new SDL_Rect();
 	txRect.x = passedX;
 	txRect.y = passedY;
 	txRect.w = passedW;
@@ -12,6 +13,7 @@ Texture::Texture(int passedX, int passedY, int passedW, int passedH)
 Texture::~Texture()
 {
 	// free everything
+	// delete txRect;
 	txFree();
 }
 
@@ -50,7 +52,7 @@ bool Texture::txLoadF(std::string path)
 	if (imageSurface == NULL)
 	{
 		// output a message if the surface failed to load
-		printf("Error loading image at the specified path: %s\n", path);
+		printf("Error loading image at the specified path: %s\n", path.c_str());
 		printf("IMG_GetError: %s\n", IMG_GetError());
 		success = false;
 	}

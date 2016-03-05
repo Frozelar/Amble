@@ -13,6 +13,8 @@
 #include <vector>
 #include <map>
 
+// #include "Game.h"
+
 class Texture;
 class Thing;
 class Tile;
@@ -24,8 +26,9 @@ class Audio;
 class Game;
 class Particle;
 class Level;
+class LuaBridge;
 
-struct Collision{
+struct Collision {
 	Thing* thing1 = NULL;
 	Thing* thing2 = NULL;
 };

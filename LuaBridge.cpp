@@ -1,11 +1,20 @@
 #include "LuaBridge.h"
+#include "Game.h"
+#include "Audio.h"
+#include "Graphics.h"
+#include "Level.h"
+#include "Thing.h"
 #include <sstream>
 
 // const int LuaBridge::MAX_ARGS = 64;
 // void* LuaBridge::labStack[MAX_ARGS];
 
 lua_State* LuaBridge::L;
-LuaBridge LuaBridge::gLuaBridge;
+LuaBridge* Game::gLuaBridge;
+
+std::map<std::string, int> LuaBridge::GFXIDLocations;
+std::map<std::string, int> LuaBridge::FrameIDLocations;
+std::map<std::string, int> LuaBridge::AudioIDLocations;
 
 LuaBridge::LuaBridge()
 {
@@ -221,7 +230,7 @@ void LuaBridge::labInitValues(void)
 					else
 					{
 						// frames[0] = identifier;
-						Graphics::backgroundIdentifiers[j][0] = frame.str();
+						Graphics::backgroundIdentifiers[j][0] = identifier /* frame.str() */;
 					}
 					// Graphics::backgroundIdentifiers[j] = frames[j];
 					Game::BackgroundType[identifier] = j;
@@ -284,6 +293,7 @@ void LuaBridge::labInitValues(void)
 								// frames[k] = frame.str();
 								frame.str(std::string());
 							}
+							m--;
 						}
 						else
 						{
@@ -318,6 +328,7 @@ void LuaBridge::labInitValues(void)
 								// frames[k] = frame.str();
 								frame.str(std::string());
 							}
+							m--;
 						}
 						else
 						{
@@ -443,7 +454,6 @@ void LuaBridge::labInitValues(void)
 	*/
 
 	/*
-	std::cout << "MADE IT HERE ERERERERE" << std::endl;
 	Graphics::enemyIdentifiers = { "Dude" };
 	Graphics::tileIdentifiers = { "DirtBlock", "DirtWall" };
 	Graphics::tileSubIdentifiers = { "Center", "Top", "TopRight", "Right", "BottomRight", "Bottom", "BottomLeft", "Left", "TopLeft" };
@@ -508,11 +518,12 @@ void LuaBridge::labInitValues(void)
 		lua_pop(L, 1);							// floatArray
 	}
 	lua_pop(L, 1);								// 
-	lua_getglobal(L, "gBackground");			// gBackground
-	lua_pushstring(L, "bgSetType");				// gBackground, "bgSetType"
-	lua_gettable(L, -2);						// gBackground, bgSetType()
-	lua_pushnumber(L, Graphics::bgState);		// gBackground, bgSetType(), bgState
-	lua_call(L, 1, 0);							// gBackground
+	// lua_getglobal(L, "gBackground");	// gBackground
+	// lua_pushstring(L, "bgSetType");	// "bgSetType"
+	// lua_gettable(L, -2);				// bgSetType()
+	lua_getglobal(L, "bgSetType");				// bgSetType()
+	lua_pushnumber(L, Graphics::bgState + 1);	// bgSetType(), bgState
+	lua_call(L, 1, 0);							// 
 
 	/*
 	lua_createtable(L, Level::LEVEL_UNITS, 0);											// things
@@ -569,11 +580,11 @@ void LuaBridge::labInitValues(void)
 	*/
 
 	//lua_getglobal(L, "handleLevelLoad");												// handleLevelLoad()
-	//lua_pushnumber(L, Level::LEVEL_UNITS);												// handleLevelLoad(), LEVEL_UNITS
-	//lua_call(L, 1, 0);																	//
+	//lua_pushnumber(L, Level::LEVEL_UNITS);											// handleLevelLoad(), LEVEL_UNITS
+	//lua_call(L, 1, 0);																//
 
 	lua_getglobal(L, "things");															// things
-	for (int i = 0; i < Level::LEVEL_UNITS; i++)
+	for (int i = 0; i < Game::things.size() /* Level::LEVEL_UNITS */; i++)
 	{
 		// if (Game::things[i] != NULL)
 		// {
@@ -585,12 +596,17 @@ void LuaBridge::labInitValues(void)
 		// }
 	}
 	lua_pop(L, 1);
+
 	lua_getglobal(L, "init");
 	lua_call(L, 0, 0);
-	for (int i = 0; i < Level::LEVEL_UNITS; i++)
+
+	lua_getglobal(L, "things");										// things
+	for (int i = 0; i < Game::things.size() /* Level::LEVEL_UNITS */; i++)
 	{
-		if (Game::things[i] != NULL)
+		if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
 		{
+			lua_pushnumber(L, i + 1);								// things, i
+			lua_gettable(L, -2);									// things, specific thing
 			if (Game::things[i]->tgType == Game::ThingType["enemy"])
 			{
 				lua_pushstring(L, "enSubtype");						// things, specific thing, "enSubtype"
@@ -614,7 +630,6 @@ void LuaBridge::labInitValues(void)
 			}
 		}
 	}
-
 	// lua_getglobal(L, "init");
 	// lua_call(L, 0, 0);
 }
@@ -662,7 +677,6 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_getglobal(L, "things");							// things table
 			lua_pushnumber(L, i + 1);							// things table, i
 			lua_gettable(L, -2);								// things table, specific thing
-			// std::cout << i << ": " << lua_typename(L, lua_type(L, -1)) << std::endl;
 			lua_pushstring(L, "tgVerticals");					// things table, specific thing, "tgVerticals"
 			lua_pushnumber(L, Game::things[i]->tgVerticals);	// things table, specific thing, "tgVerticals", tgVerticals
 			lua_settable(L, -3);								// things table, specific thing
@@ -676,7 +690,7 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pushnumber(L, Game::things[i]->tgHitboxRect.x);	// things table, specific thing, tgHitbox, "x", x
 			lua_settable(L, -3);								// things table, specific thing, tgHitbox
 			lua_pushstring(L, "y");								// things table, specific thing, tgHitbox, "y"
-			lua_pushnumber(L, Game::things[i]->tgHitboxRect.y);	// things table, specific thing, tgHitbox, "y", y
+			lua_pushnumber(L, Game::things[i]->tgHitboxRect.y);// things table, specific thing, tgHitbox, "y", y
 			lua_settable(L, -3);								// things table, specific thing, tgHitbox
 			lua_pop(L, 3);										//
 
@@ -738,7 +752,7 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pop(L, 1);										// things table, specific thing
 			lua_pushstring(L, "tgFrame");						// things table, specific thing, "tgFrame"
 			lua_gettable(L, -2);								// things table, specific thing, tgFrame
-			Game::things[i]->tgFrame = (int)lua_tonumber(L, -1) - 1;
+			// Game::things[i]->tgFrame = (int)lua_tonumber(L, -1) - 1;
 			lua_pop(L, 1);										// things table, specific thing
 
 			// lua_getglobal(L, "things");		// things table
@@ -769,7 +783,7 @@ int LuaBridge::labHandleEnvironment(void)
 	{
 		SDL_Rect pRect;
 		int pType;
-		int pNum = (int)lua_tonumber(L, -1) - 1;
+		// int pNum = (int)lua_tonumber(L, -1) - 1;
 		SDL_Point pDestination;
 		int pLife;
 		int pSpeed;
@@ -818,8 +832,9 @@ int LuaBridge::labHandleEnvironment(void)
 		pSpeed = lua_tonumber(L, -1);
 		lua_pop(L, 5);											// 
 
-		Game::particles.resize(pNum + 1);
-		Game::particles[pNum] = new Particle(&pRect, pType, pNum, &pDestination, pLife, pSpeed);
+		// Game::particles.resize(pNum + 1);
+		/* Game::particles[pNum] = */ 
+		Game::newParticle(&pRect, pType, /* pNum, */ &pDestination, pLife, pSpeed);
 	}
 
 	// this should already be handled in things, down below
@@ -888,17 +903,15 @@ int LuaBridge::labHandleEnvironment(void)
 	}
 	*/
 	
-	// std::cout << (lua_isnoneornil(L, -1) == 1 ? "nil" : "notnil") << std::endl;
-	// SDL_Delay(5000);
 	return 0;
 }
 
 int LuaBridge::labCheckCollision(lua_State* L)
 {
-	SDL_Rect t1 = Game::things[(int)lua_tonumber(L, -2)]->tgHitboxRect;
-	SDL_Rect t2 = Game::things[(int)lua_tonumber(L, -1)]->tgHitboxRect;
+	SDL_Rect* t1 = &Game::things[(int)lua_tonumber(L, -2)]->tgHitboxRect;
+	SDL_Rect* t2 = &Game::things[(int)lua_tonumber(L, -1)]->tgHitboxRect;
 
-	if ((t1.x + t1.w > t2.x || t1.x < t2.x + t2.w) && (t1.y + t1.h > t2.y && t1.y < t2.y + t2.h))
+	if ((t1->x + t1->w > t2->x || t1->x < t2->x + t2->w) && (t1->y + t1->h > t2->y && t1->y < t2->y + t2->h))
 		lua_pushboolean(L, true);
 	else
 		lua_pushboolean(L, false);
