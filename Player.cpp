@@ -84,7 +84,6 @@ void Player::plHandleEvent(SDL_Event* e)
 	}
 }
 
-
 void Player::tgHandleVerticals(void)
 {
 	if (tgVerticals >= (int)Game::gravityArray.size() - 1)
@@ -105,8 +104,6 @@ void Player::tgHandleVerticals(void)
 		*/
 		
 }
-
-
 
 void Player::plHandleDashing(void)
 {
@@ -138,7 +135,6 @@ void Player::plHandleDashing(void)
 		plActionCounter++;
 	}
 }
-
 
 void Player::plMove(void)
 {
@@ -181,7 +177,7 @@ void Player::plMove(void)
 				right = true;
 			else if (tgSpeed < 0)
 				left = true;
-			tgSpeed = 0;
+			// tgSpeed = 0;
 		}
 		tgHitboxRect.x += moveX;
 	}
@@ -210,6 +206,17 @@ void Player::plMove(void)
 		}
 		tgHitboxRect.y += moveY;
 		// if (moveY == (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]))
+		if (tgVerticals >= (int)Game::gravityArray.size() - 1)
+			tgVerticals = Game::gravityArray.size() - 2;
+		else if (-tgVerticals >= (int)Game::jumpArray.size() - 1)
+			tgVerticals = 0;
+
+		/*
+		if (tgVerticals < 0)
+			tgHitboxRect.y -= Game::jumpArray[-(tgVerticals--)];
+		else if (tgVerticals > 0)
+			tgHitboxRect.y += Game::gravityArray[tgVerticals++];
+			*/
 	}
 	if (tgVerticals == 0)
 	{
@@ -253,28 +260,6 @@ void Player::tgRender(void)
 {
 	tgSyncTexture();
 
-	/*
-	++tgFrameWaitCounter;
-	if (((tgSpeed != 0 || tgVerticals != 0) && tgFrameWaitCounter % 4 == 0) ||
-		(tgFrame == IDLE_1 && tgFrameWaitCounter % 64 == 0) ||
-		(tgFrame > IDLE_1 && tgFrame <= IDLE_4 && tgFrameWaitCounter % 16 == 0))
-	{
-		tgFrame++;
-		tgFrameWaitCounter = 0;
-	}
-
-	if (tgVerticals < 0 && (tgFrame < JUMP_1 || tgFrame > JUMP_2))
-		tgFrame = JUMP_1;
-	else if (tgVerticals > 0 && (tgFrame < FALL_1 || tgFrame > FALL_2))
-		tgFrame = FALL_1;
-	else if (tgSpeed < 0 && tgVerticals == 0 && (tgFrame < WALK_LEFT_1 || tgFrame > WALK_LEFT_4))
-		tgFrame = WALK_LEFT_1;
-	else if (tgSpeed > 0 && tgVerticals == 0 && (tgFrame < WALK_RIGHT_1 || tgFrame > WALK_RIGHT_4))
-		tgFrame = WALK_RIGHT_1;
-	else if (tgSpeed == 0 && tgVerticals == 0 && (tgFrame < IDLE_1 || tgFrame > IDLE_4))
-		tgFrame = IDLE_1;
-		*/
-
 	if ((plJumps < 3 && (tgVerticals < -((int)Game::jumpArray.size() - 4) || (tgVerticals >= 1 && tgVerticals <= 8))) || 
 		(plDashing == 1 || plDashing == -1))
 		Graphics::playerTextures[plState][tgFrame]->txColor(210, 180, 90);
@@ -283,4 +268,5 @@ void Player::tgRender(void)
 
 	Graphics::playerTextures[plState][tgFrame]->txRect = tgGFXrect; // ????
 	Graphics::playerTextures[plState][tgFrame]->txRender();
+
 }

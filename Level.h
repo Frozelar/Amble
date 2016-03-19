@@ -11,6 +11,7 @@ public:
 	static const int levelH(void);
 	static bool generateLevel(void);
 	static void moveLevel(void);
+	static void playMusic(void);
 
 	static int LEVEL_UNITS;
 	static int LEVEL_W;

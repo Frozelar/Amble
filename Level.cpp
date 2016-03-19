@@ -2,6 +2,8 @@
 #include "Game.h"
 #include "Player.h"
 #include "Thing.h"
+#include "LuaBridge.h"
+#include "Audio.h"
 
 // default units in the level
 int Level::LEVEL_UNITS = Level::levelW() * Level::levelH();
@@ -74,7 +76,6 @@ bool Level::generateLevel(void)
 
 		if (unitType != -1)
 		{
-			//std::cout << "BRRRRRRRRR" << std::endl;
 			unit++;
 			if(unitType != 0)
 				Game::newThing(unitType, unit, x, y, -1);
@@ -94,6 +95,7 @@ bool Level::generateLevel(void)
 
 	levelMap.close();
 	Game::centerCamera();
+	LuaBridge::labChangedLevel = true;
 	return true;
 }
 
@@ -126,6 +128,11 @@ void Level::moveLevel(void)
 	// if ((Game::gPlayer.tgSpeed > 0 && Game::gPlayer.tgDirection == LEFT) || 
 	// 	(Game::gPlayer.tgSpeed < 0 && Game::gPlayer.tgDirection == RIGHT))
 	// 	Game::gPlayer.tgSpeed = 0;
+}
+
+void Level::playMusic(void)
+{
+	Audio::auPlay(0, 'm');
 }
 
 const int Level::levelW(void)

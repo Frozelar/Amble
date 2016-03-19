@@ -277,12 +277,10 @@ void Graphics::gxRender(void)
 		{
 			if (Game::checkCollision(Game::things[i], &camera, -1, false) && Game::things[i]->tgType != Game::ThingType["temp"])
 			{
-				std::cout << "THINGTYPE:::: " << Game::things[i]->tgLevelUnit << std::endl;
 				// Game::things[i]->tgSyncTexture();
 				Game::things[i]->tgRender();
 			}
 		}
 	}
-	// std::cout << "gxRender" << std::endl;
 	SDL_RenderPresent(Game::gRenderer);
 }

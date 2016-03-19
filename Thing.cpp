@@ -64,7 +64,7 @@ void Thing::tgHandleVerticals(void)
 {
 	if (tgVerticals >= (int)Game::gravityArray.size() - 1)
 		tgVerticals = Game::gravityArray.size() - 2;
-	else if (-tgVerticals >= (int)Game::gravityArray.size())
+	else if (-tgVerticals >= (int)Game::jumpArray.size() - 1)
 		tgVerticals = 0;
 	
 	if (tgVerticals < 0)

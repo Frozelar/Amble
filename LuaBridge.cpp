@@ -9,6 +9,7 @@
 // const int LuaBridge::MAX_ARGS = 64;
 // void* LuaBridge::labStack[MAX_ARGS];
 
+bool LuaBridge::labChangedLevel = false;
 lua_State* LuaBridge::L;
 LuaBridge* Game::gLuaBridge;
 
@@ -400,6 +401,7 @@ void LuaBridge::labInitValues(void)
 	lua_pop(L, 1);																		// 
 
 	lua_getglobal(L, "audioIdentifiers");												// audioIdentifiers[]
+	std::cout << "KIIIIIR: " << AudioIDLocations["total"] << std::endl;
 	for (int i = 0; i < AudioIDLocations["total"]; i++)
 	{
 		lua_pushnumber(L, i + 1);														// audioIdentifiers[], i
@@ -597,6 +599,17 @@ void LuaBridge::labInitValues(void)
 	}
 	lua_pop(L, 1);
 
+	if (labChangedLevel)
+	{
+		lua_pushnumber(L, (int)Level::LEVEL_W);		// levelW
+		lua_setglobal(L, "LEVEL_W");				//
+		lua_pushnumber(L, (int)Level::LEVEL_H);		// levelH
+		lua_setglobal(L, "LEVEL_H");				//
+		lua_pushnumber(L, (int)Level::LEVEL_UNITS); // levelUnits
+		lua_setglobal(L, "LEVEL_UNITS");			//
+		labChangedLevel = false;
+	}
+
 	lua_getglobal(L, "init");
 	lua_call(L, 0, 0);
 
@@ -609,6 +622,7 @@ void LuaBridge::labInitValues(void)
 			lua_gettable(L, -2);									// things, specific thing
 			if (Game::things[i]->tgType == Game::ThingType["enemy"])
 			{
+				std::cout << "SUBTYOEEEETTY: " << Game::things[i]->tgGetSubtype() << std::endl;
 				lua_pushstring(L, "enSubtype");						// things, specific thing, "enSubtype"
 				lua_pushnumber(L, Game::things[i]->tgGetSubtype());	// things, specific thing, "enSubtype", subtype
 				lua_settable(L, -3);								// things, specific thing
@@ -669,6 +683,16 @@ int LuaBridge::labHandleEnvironment(void)
 {
 	lua_pushnumber(L, Game::gScore);			// gScore
 	lua_setglobal(L, "points");					// 
+	if (labChangedLevel)
+	{
+		lua_pushnumber(L, (int)Level::levelW);		// levelW
+		lua_setglobal(L, "LEVEL_W");				//
+		lua_pushnumber(L, (int)Level::levelH);		// levelH
+		lua_setglobal(L, "LEVEL_H");				//
+		lua_pushnumber(L, (int)Level::LEVEL_UNITS); // levelUnits
+		lua_setglobal(L, "LEVEL_UNITS");			//
+		labChangedLevel = false;
+	}
 
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{
@@ -752,7 +776,7 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pop(L, 1);										// things table, specific thing
 			lua_pushstring(L, "tgFrame");						// things table, specific thing, "tgFrame"
 			lua_gettable(L, -2);								// things table, specific thing, tgFrame
-			// Game::things[i]->tgFrame = (int)lua_tonumber(L, -1) - 1;
+			Game::things[i]->tgFrame = (int)lua_tonumber(L, -1) - 1;
 			lua_pop(L, 1);										// things table, specific thing
 
 			// lua_getglobal(L, "things");		// things table
@@ -762,7 +786,7 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_gettable(L, -2);								// things table, specific thing, tgHitbox
 			lua_pushstring(L, "x");								// things table, specific thing, tgHitbox, "x"
 			lua_gettable(L, -2);								// things table, specific thing, tgHitbox, x
-			lua_insert(L, 3);									// things table, specific thing, x, tgHitbox
+			lua_insert(L, -2);									// things table, specific thing, x, tgHitbox
 			lua_pushstring(L, "y");								// things table, specific thing, x, tgHitbox, "y"
 			lua_gettable(L, -2);								// things table, specific thing, x, tgHitbox, y
 			Game::things[i]->tgHitboxRect.x = (int)lua_tonumber(L, -3);

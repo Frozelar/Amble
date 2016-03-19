@@ -33,6 +33,7 @@ public:
 
 	// static const int MAX_ARGS;
 	// static void* labStack[];
+	static bool labChangedLevel;
 	static lua_State* L;
 	// static LuaBridge gLuaBridge;
 };

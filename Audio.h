@@ -7,9 +7,9 @@ public:
 	Audio();
 	~Audio();
 
-	bool auInit(void);
+	static bool auInit(void);
 
-	void auPlay(int, char);
+	static void auPlay(int, char);
 
 	static std::vector<Mix_Music*> music;
 	static std::vector<Mix_Chunk*> sfx;

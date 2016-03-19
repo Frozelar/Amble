@@ -55,7 +55,7 @@ TOTAL_GRAVITY_ARRAY_UNITS = #gravityArray
 jumpArray = { 8, 8, 8, 7, 7, 6, 6, 5, 5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0 }
 TOTAL_JUMP_ARRAY_UNITS = #jumpArray
 
-dashArray = { 16, 12, 8, 6, 4, 2, 2, 1 }
+dashArray = { 16, 16, 12, 8, 6, 4, 2, 2, 1 }
 TOTAL_DASH_ARRAY_UNITS = #dashArray
 
 floatArray = { 0, 1, 1, 0, -1, -1, 0 }
@@ -73,8 +73,10 @@ DEFAULT_OFFSET = 2
 DEFAULT_SPEED = 2
 
 LEVEL_UNITS = 0
+LEVEL_W = 0
+LEVEL_H = 0
 
-gPlayer = nil
+-- gPlayer = nil
 things = {}
 
 points = 0
@@ -230,6 +232,15 @@ function Thing:new(levelUnit)
   self.tgFrame = 1
   self.tgFrameInterval = 0
   -- self.tgMaxFrames = 0
+  --[[
+  local lx, ly, amt = self.tgLevelUnit, self.tgLevelUnit, 0
+  while lx >= LEVEL_W do
+	lx = lx - LEVEL_W
+	amt = amt + 1
+  end
+  self.tgHitbox.x = lx * DEFAULT_W
+  self.tgHitbox.y = amt * DEFAULT_H
+	]]
 end
 
 Player = {plJumps, plDashing}
@@ -250,6 +261,8 @@ function Player:new(levelUnit)
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
+  self.tgFrame = 1
+  self.tgFrameInterval = 0
   self.plJumps = 0
   self.plDashing = 0
   self.tgHitbox = Rectangle(0, 0, 0, 0)
@@ -261,23 +274,30 @@ function Player:plCycleFrames()
 	local frameChange = ""
 	self.tgFrameInterval = self.tgFrameInterval + 1
 	-- if (speed ~= 0 and 4 frames have passed) or (frame == Idle1 and 64 frames have passed) or (thing is idle but is not on the first or last idle frame and 16 frames have passed) then (increment the frame and reset the frame counter)
-	if (self.tgSpeed ~= 0 and self.tgFrameInterval % 4 == 0) or 
+	if ((self.tgSpeed ~= 0 or self.tgVerticals ~= 0) and self.tgFrameInterval % 4 == 0) or 
 	(entityFrames[self.tgFrame] == "Idle1" and self.tgFrameInterval % 64 == 0) or
-	(string.sub(entityFrames[self.tgFrame], 1, 4) == "Idle" and string.find(entityFrames[self.tgFrame], "1", 5) == nil and string.find(entityFrames[self.tgFrame], "4", 5) == nil and self.tgFrameInterval % 16 == 0 ) then
+	(string.sub(entityFrames[self.tgFrame], 1, 4) == "Idle" and string.find(entityFrames[self.tgFrame], "1", 5) == nil --[[ and string.find(entityFrames[self.tgFrame], "4", 5) == nil ]] and self.tgFrameInterval % 16 == 0 ) then
 		self.tgFrame = self.tgFrame + 1
 		self.tgFrameInterval = 0
 	end
+	
+	if self.tgFrame > #entityFrames then
+		self.tgFrame = 1
+	end
+	
 	-- if (thing is jumping) and (frame is not a jumping frame) then (change the frame to a jumping one)
 	if (self.tgVerticals < 0) and (string.find(entityFrames[self.tgFrame], "Jump") == nil) then
 		frameChange = "Jump1"
 	elseif (self.tgVerticals > 0) and (string.find(entityFrames[self.tgFrame], "Fall") == nil) then
 		frameChange = "Fall1"
-	elseif (self.tgSpeed < 0) and (string.find(entityFrames[self.tgFrame], "WalkLeft") == nil) then
-		frameChange = "WalkLeft1"
-	elseif(self.tgSpeed > 0) and (string.find(entityFrames[self.tgFrame], "WalkRight") == nil) then
-		frameChange = "WalkRight1"
-	elseif(self.tgSpeed == 0) and (string.find(entityFrames[self.tgFrame], "Idle") == nil) then
-		frameChange = "Idle1"
+	elseif (self.tgVerticals == 0) then
+		if (self.tgSpeed < 0) and (string.find(entityFrames[self.tgFrame], "WalkLeft") == nil) then
+			frameChange = "WalkLeft1"
+		elseif(self.tgSpeed > 0) and (string.find(entityFrames[self.tgFrame], "WalkRight") == nil) then
+			frameChange = "WalkRight1"
+		elseif(self.tgSpeed == 0) and (string.find(entityFrames[self.tgFrame], "Idle") == nil) then
+			frameChange = "Idle1"
+		end
 	end
 	
 	if frameChange ~= "" then
@@ -306,6 +326,8 @@ function Tile:new(levelUnit)
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
+  self.tgFrame = 1
+  self.tgFrameInterval = 0
   self.tiIsSolid = true
   self.tiSubtype = 1																-- NEED TO CHANGE THIS LATERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR~~~~~~~~~~~~~~~~~~~~~~
   self.tgHitbox = Rectangle(0, 0, 0, 0)
@@ -316,7 +338,7 @@ end
 
 function Tile:tiHandleAI()
   for i = 1, #things do
-    if things[i] ~= nil and thingTypes[things[i].tgType] == "tile" then
+    if things[i] ~= -1 and thingTypes[things[i].tgType] == "tile" then
       if tileTypes[things[i].tiSubtype] == "dirtBlock" then
         -- instead of doing this, just include the things that actually need AI??
       elseif tileTypes[things[i].tiSubtype] == "dirtWall" then
@@ -355,6 +377,9 @@ function Enemy:new(levelUnit)
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
+  self.tgFrame = 1
+  self.tgFrameInterval = 0
+  self.tgMaxFrames = #entityFrames
   self.enPower = 5
   self.enSubtype = -1
   self.enDashing = 0
@@ -367,38 +392,72 @@ function Enemy:enHandleAI()
   local checkrect = Rectangle(0, 0, 0, 0)
   local iscolliding = false
   
-  for i = 1, #things do
-    if things[i] ~= nil and thingTypes[things[i].tgType] == "enemy" then
-      if enemyTypes[things[i].enSubtype] == "dude" then
-        if things[i].tgVerticals == 0 then
-          checkrect = things[i].tgHitbox
-          checkrect.w = checkrect.w + DEFAULT_W * 4
-          checkrect.x = checkrect.x - DEFAULT_W * 2
-          checkrect.h = checkrect.h + DEFAULT_H * 4
-          checkrect.y = checkrect.y - DEFAULT_H * 2
-          iscolliding = checkCollision(checkrect, gPlayer.tgHitbox)
-          if iscolliding == true then
-            things[i].tgVerticals = things[i].tgVerticals - 2
-            things[i].tgDashing = things[i].tgDashing + 1
-          end
+  if enemyTypes[self.enSubtype] == "dude" then
+  print("DUDEEEEEEEE")
+    if self.tgVerticals == 0 then
+      checkrect = self.tgHitbox
+      checkrect.w = checkrect.w + DEFAULT_W * 4
+      checkrect.x = checkrect.x - DEFAULT_W * 2
+      checkrect.h = checkrect.h + DEFAULT_H * 4
+      checkrect.y = checkrect.y - DEFAULT_H * 2
+      iscolliding = checkCollision(checkrect, things[gPlayerUnit].tgHitbox)
+      if iscolliding == true then
+        self.tgVerticals = self.tgVerticals - 2
+        self.tgDashing = self.tgDashing + 1
+      end
+    end
+    if self.tgDashing ~= 0 then
+      if self.tgDashing < #dashArray then
+        if self.tgSpeed > 0 then
+          self.tgHitbox.x = self.tgHitbox.x + dashArray[self.tgDashing]
+        elseif self.tgSpeed < 0 then
+          self.tgHitbox.x = self.tgHitbox.x - dashArray[self.tgDashing]
         end
-        if things[i].tgDashing ~= 0 then
-          if things[i].tgDashing < #dashArray then
-            if things[i].tgSpeed > 0 then
-              things[i].tgHitbox.x = things[i].tgHitbox.x + dashArray[things[i].tgDashing]
-            elseif things[i].tgSpeed < 0 then
-              things[i].tgHitbox.x = things[i].tgHitbox.x - dashArray[things[i].tgDashing]
-            end
-          else
-            things[i].tgDashing = 0
-          end
-        end
+      else
+        self.tgDashing = 0
       end
     end
   end
 end
 
 function Enemy:enCycleFrames()
+	local frameChange = ""
+	self.tgFrameInterval = self.tgFrameInterval + 1
+	-- if (speed ~= 0 and 4 frames have passed) or (frame == Idle1 and 64 frames have passed) or (thing is idle but is not on the first or last idle frame and 16 frames have passed) then (increment the frame and reset the frame counter)
+	if ((self.tgSpeed ~= 0 or self.tgVerticals ~= 0) and self.tgFrameInterval % 4 == 0) or 
+	(entityFrames[self.tgFrame] == "Idle1" and self.tgFrameInterval % 64 == 0) or
+	(string.sub(entityFrames[self.tgFrame], 1, 4) == "Idle" and string.find(entityFrames[self.tgFrame], "1", 5) == nil --[[ and string.find(entityFrames[self.tgFrame], "4", 5) == nil ]] and self.tgFrameInterval % 16 == 0 ) then
+		self.tgFrame = self.tgFrame + 1
+		self.tgFrameInterval = 0
+	end
+	
+	if self.tgFrame > #entityFrames then
+		self.tgFrame = 1
+	end
+	
+	-- if (thing is jumping) and (frame is not a jumping frame) then (change the frame to a jumping one)
+	if (self.tgVerticals < 0) and (string.find(entityFrames[self.tgFrame], "Jump") == nil) then
+		frameChange = "Jump1"
+	elseif (self.tgVerticals > 0) and (string.find(entityFrames[self.tgFrame], "Fall") == nil) then
+		frameChange = "Fall1"
+	elseif (self.tgVerticals == 0) then
+		if (self.tgSpeed < 0) and (string.find(entityFrames[self.tgFrame], "WalkLeft") == nil) then
+			frameChange = "WalkLeft1"
+		elseif(self.tgSpeed > 0) and (string.find(entityFrames[self.tgFrame], "WalkRight") == nil) then
+			frameChange = "WalkRight1"
+		elseif(self.tgSpeed == 0) and (string.find(entityFrames[self.tgFrame], "Idle") == nil) then
+			frameChange = "Idle1"
+		end
+	end
+	
+	if frameChange ~= "" then
+		self.tgFrame = 1
+		while entityFrames[self.tgFrame] ~= frameChange do
+			self.tgFrame = self.tgFrame + 1
+		end
+	end
+
+	--[[
 	local frameChange = ""
 	local id = ""
 	self.tgFrameInterval = self.tgFrameInterval + 1
@@ -430,16 +489,19 @@ function Enemy:enCycleFrames()
 	for i = 1, (#entityFrames[self.tgFrame] - 1) do
 		id = id .. (entityFrames[self.tgFrame])[i]
 	end
-	for i = 1, #entityFrames do
-		if string.find(entityFrames[self.tgFrame + i], id) == nil then
-			self.tgMaxFrames = (entityFrames[self.tgFrame + (i - 1)])[#entityFrames[self.tgFrame + (i - 1)]]
-			i = #entityFrames + 1
-		end
-	end
-	if self.tgFrame > self.tgMaxFrames then
-		self.tgFrame = 1
-		self.tgFrameInterval = 0
-	end
+	]]
+	
+	--for i = 1, #entityFrames do
+	--	if (entityFrames[i] ~= nil or string.find(entityFrames[self.tgFrame + i], id) == nil) then
+	--		self.tgMaxFrames = (entityFrames[self.tgFrame + (i - 1)])[#entityFrames[self.tgFrame + (i - 1)]]
+	--		i = #entityFrames + 1
+	--	end
+	--end
+	
+	-- if self.tgFrame > self.tgMaxFrames then
+	--	self.tgFrame = 1
+	--	self.tgFrameInterval = 0
+	-- end
 end
 
 Collectible = {clSubtype}
@@ -459,6 +521,8 @@ function Collectible:new(levelUnit)
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
+  self.tgFrame = 1
+  self.tgFrameInterval = 0
   self.clSubtype = -1
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = DEFAULT_W
@@ -475,7 +539,7 @@ end
 
 function Collectible:clCollect()
   for i = 1, #things do
-    if things[i] ~= nil and thingTypes[things[i].tgType] == "collectible" then
+    if things[i] ~= -1 and thingTypes[things[i].tgType] == "collectible" then
       if collectibleTypes[things[i].clSubtype] == "cbit" then
         points = points + 1
       elseif collectibleTypes[things[i].clSubtype] == "cbyte" then
@@ -497,7 +561,7 @@ function Collectible:clCycleFrames()
 end
 
 gBackground = Background()
---gPlayer = Player:new()
+gPlayerUnit = 0
 gParticles = {}
 totalParticles = #gParticles
 
@@ -538,34 +602,42 @@ end
 function init()
   math.randomseed(os.time())
   initFrames()
-  print("INITTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT " .. #things)
-  local j = -1
   for i = 1, #things do
     if things[i] ~= -1 then
       if thingTypes[things[i]] == "player" then
         things[i] = Player(i)
-	  print("MADE A PLAYAH: " .. things[i].tgLevelUnit)
+		gPlayerUnit = i
       elseif thingTypes[things[i]] == "tile" then
         things[i] = Tile(i)
-	  print("MADE A TILE: " .. things[i].tgLevelUnit)
       elseif thingTypes[things[i]] == "enemy" then
         things[i] = Enemy(i)
       elseif thingTypes[things[i]] == "collectible" then
         things[i] = Collectible(i)
-      else
-        things[i] = nil
+      --else
+        --things[i] = nil
       end
-    else
-		things[i] = nil
+	  
+	  if things[i] ~= -1 then
+		local lx, ly, amt = things[i].tgLevelUnit, things[i].tgLevelUnit, 0
+		while lx >= LEVEL_W do
+			lx = lx - LEVEL_W
+			amt = amt + 1
+		end
+		things[i].tgHitbox.x = lx * DEFAULT_W
+		things[i].tgHitbox.y = amt * DEFAULT_H
+	  end
+   --else
+		--things[i] = nil
 	end
   end
 end
 
 function handleEnvironment()
 	totalParticles = #gParticles
-	for i = 0, #things, 1 do
-		if things[i] ~= nil then
-			if things[i].tgType == "player" then							-- DOES NOT WORKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
+	--print("things: " .. #things)
+	for i = 1, #things do
+		if things[i] ~= -1 then
+			if things[i].tgType == "player" then
 				things[i]:plCycleFrames()
 				
 			elseif things[i].tgType == "tile" then
