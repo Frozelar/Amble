@@ -108,6 +108,7 @@ Game::Game()
 	Direction["right"] = (++num);
 	Direction["up"] = (++num);
 	Direction["down"] = (++num);
+	Direction["total"] = (++num);
 
 	ThingType["temp"] = (num = 0) /* -1 */;
 	ThingType["player"] = (++num);

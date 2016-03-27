@@ -55,31 +55,33 @@ void Tile::tgResolveCollision(Thing* thing)
 }
 */
 
-void Tile::tgResolveCollision(Thing* thing, Direction dir)
+void Tile::tgResolveCollision(Thing* thing, int dir)
 {
+	thing->tgColliding = tgType;
+	thing->tgColDir = dir;
 	if (tiIsSolid)
 	{
 		if (thing->tgType == Game::ThingType["player"] && dir == Game::Direction["right"])
 		{
-			if (thing->tgSpeed > 0)
-				thing->tgSpeed = 0;
+			// if (thing->tgSpeed > 0)
+				// thing->tgSpeed = 0;
 			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
 				thing->tgHitboxRect.x--;
-			thing->tgHitboxRect.x++;
+			// thing->tgHitboxRect.x++;
 		}
 		else if (thing->tgType == Game::ThingType["player"] && dir == Game::Direction["left"])
 		{
-			if (thing->tgSpeed < 0)
-				thing->tgSpeed = 0;
+			// if (thing->tgSpeed < 0)
+				// thing->tgSpeed = 0;
 			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
 				thing->tgHitboxRect.x++;
-			thing->tgHitboxRect.x--;
+			// thing->tgHitboxRect.x--;
 		}
 		else if (thing->tgType == Game::ThingType["enemy"] && dir == Game::Direction["right"])
 		{
 			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
 				thing->tgHitboxRect.x--;
-			thing->tgHitboxRect.x++;
+			// thing->tgHitboxRect.x++;
 			// thing->tgDirection = invertDir(thing->tgDirection);
 			thing->tgSpeed = -thing->tgSpeed;
 		}
@@ -87,7 +89,7 @@ void Tile::tgResolveCollision(Thing* thing, Direction dir)
 		{
 			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
 				thing->tgHitboxRect.x++;
-			thing->tgHitboxRect.x--;
+			// thing->tgHitboxRect.x--;
 			// thing->tgDirection = invertDir(thing->tgDirection);
 			thing->tgSpeed = -thing->tgSpeed;
 		}
@@ -97,7 +99,7 @@ void Tile::tgResolveCollision(Thing* thing, Direction dir)
 				thing->tgVerticals = 0;
 			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
 				thing->tgHitboxRect.y--;
-			thing->tgHitboxRect.y++;
+			// thing->tgHitboxRect.y++;
 		}
 		else if (dir == Game::Direction["up"])
 		{
@@ -105,7 +107,7 @@ void Tile::tgResolveCollision(Thing* thing, Direction dir)
 				thing->tgVerticals = 0;
 			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
 				thing->tgHitboxRect.y++;
-			thing->tgHitboxRect.y--;
+			// thing->tgHitboxRect.y--;
 		}
 		else
 			std::cout << "Collision error: " << tgLevelUnit << " " << thing->tgLevelUnit << std::endl;

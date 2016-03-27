@@ -88,7 +88,7 @@ void Player::tgHandleVerticals(void)
 {
 	if (tgVerticals >= (int)Game::gravityArray.size() - 1)
 		tgVerticals = (int)Game::gravityArray.size() - 2;
-	else if (-tgVerticals >= (int)Game::jumpArray.size())
+	else if (-tgVerticals >= (int)Game::jumpArray.size() - 1)
 		tgVerticals = 0;
 
 	if (tgVerticals < 0)
@@ -138,11 +138,13 @@ void Player::plHandleDashing(void)
 
 void Player::plMove(void)
 {
-	int dir = Game::Direction["none"];
-	bool colliding = Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true);
-	Thing nextMove{ &tgHitboxRect, Game::ThingType["temp"], tgLevelUnit };
-	int moveX = 0, moveY = 0;
-	bool left = false, right = false, up = false, down = false;
+	// int dir = Game::Direction["none"];
+	// bool colliding = Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true);
+	// Thing nextMove{ &tgHitboxRect, Game::ThingType["temp"], tgLevelUnit }, originalMove{ &tgHitboxRect, Game::ThingType["temp"], tgLevelUnit };
+	// int moveX = 0, moveY = 0;
+	// bool left = false, right = false, up = false, down = false;
+	// int left = 0, right = 0, up = 0, down = 0, lowest = 0;
+
 
 	if (tgVerticals == 0 && plOldVerticals != 0)
 	{
@@ -161,11 +163,89 @@ void Player::plMove(void)
 
 	if (tgSpeed != 0)
 	{
-		nextMove.tgHitboxRect = tgHitboxRect;
-		moveX += tgSpeed;
-		nextMove.tgHitboxRect.x += tgSpeed;
-		if (Game::checkCollision(&nextMove, NULL, tgLevelUnit, false))
+		tgHitboxRect.x += tgSpeed;
+		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+			for (int i = 0; i < Game::gColliding.size(); i++)
+				if (Game::gColliding[i] != NULL)
+					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgSpeed > 0 ? Game::Direction["right"] : Game::Direction["left"]));
+	}
+	if (tgVerticals == 0)
+	{
+		tgHitboxRect.y++;
+		if (!Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, false))
+			tgVerticals++;
+		tgHitboxRect.y--;
+	}
+	if (tgVerticals != 0)
+	{
+		tgHitboxRect.y += (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]);
+		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
 		{
+		for (int i = 0; i < Game::gColliding.size(); i++)
+			if (Game::gColliding[i] != NULL)
+				Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgVerticals > 0 ? Game::Direction["down"] : Game::Direction["up"]));
+		plJumps = 0;
+		}
+	}
+	// nextMove.tgHitboxRect = tgHitboxRect;
+
+	/*
+	if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+	{
+		for (int i = 0; i < Game::gColliding.size(); i++)
+			if (Game::gColliding[i] != NULL)
+			{
+				if (tgVerticals > 0)
+				{
+					while (Game::checkCollision(&nextMove, Game::gColliding[i]->thing2, NULL, false))
+						nextMove.tgHitboxRect.y--;
+					nextMove.tgHitboxRect.y++;
+				}
+				originalMove.tgHitboxRect = nextMove.tgHitboxRect;
+
+				while (Game::checkCollision(&nextMove, Game::gColliding[i]->thing2, NULL, false))
+					nextMove.tgHitboxRect.x--;
+				right = tgHitboxRect.x - nextMove.tgHitboxRect.x;
+				nextMove.tgHitboxRect = originalMove.tgHitboxRect;
+				while (Game::checkCollision(&nextMove, Game::gColliding[i]->thing2, NULL, false))
+					nextMove.tgHitboxRect.x++;
+				left = nextMove.tgHitboxRect.x - tgHitboxRect.x;
+				nextMove.tgHitboxRect = originalMove.tgHitboxRect;
+				while (Game::checkCollision(&nextMove, Game::gColliding[i]->thing2, NULL, false))
+					nextMove.tgHitboxRect.y--;
+				down = tgHitboxRect.y - nextMove.tgHitboxRect.y;
+				nextMove.tgHitboxRect = originalMove.tgHitboxRect;
+				while (Game::checkCollision(&nextMove, Game::gColliding[i]->thing2, NULL, false))
+					nextMove.tgHitboxRect.y++;
+				up = nextMove.tgHitboxRect.y - tgHitboxRect.y;
+
+				lowest = up; dir = Game::Direction["up"];
+				if (down < lowest) { lowest = down; dir = Game::Direction["down"]; }
+				if (left < lowest) { lowest = left; dir = Game::Direction["left"]; }
+				if (right < lowest) { lowest = right; dir = Game::Direction["right"]; }
+
+				Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], dir);
+			}
+	}
+	if (tgVerticals == 0)
+	{
+		nextMove.tgHitboxRect = tgHitboxRect;
+		nextMove.tgHitboxRect.y++;
+		if (!Game::checkCollision(&nextMove, NULL, tgLevelUnit, false))
+			tgVerticals++;
+	}
+	*/
+
+	/*
+	if (tgSpeed != 0)
+	{
+		nextMove.tgHitboxRect = tgHitboxRect;
+		// moveX += tgSpeed;
+		nextMove.tgHitboxRect.x += tgSpeed;
+		nextMove.tgHitboxRect.y--;
+		if (Game::checkCollision(&nextMove, NULL, tgLevelUnit, true))
+		{
+			/*
 			moveX -= (tgSpeed < 0 ? -1 : 1);
 			nextMove.tgHitboxRect.x -= (tgSpeed < 0 ? -1 : 1);
 			while (Game::checkCollision(&nextMove, NULL, tgLevelUnit, false))
@@ -173,21 +253,23 @@ void Player::plMove(void)
 				moveX -= (tgSpeed < 0 ? -1 : 1);
 				nextMove.tgHitboxRect.x -= (tgSpeed < 0 ? -1 : 1);
 			}
+			
 			if (tgSpeed > 0)
 				right = true;
 			else if (tgSpeed < 0)
 				left = true;
 			// tgSpeed = 0;
 		}
-		tgHitboxRect.x += moveX;
+		tgHitboxRect.x += tgSpeed /* moveX ;
 	}
 	if (tgVerticals != 0)
 	{
 		nextMove.tgHitboxRect = tgHitboxRect;
-		moveY += (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]);
+		// moveY += (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]);
 		nextMove.tgHitboxRect.y += (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]);
-		if (Game::checkCollision(&nextMove, NULL, tgLevelUnit, false))
+		if (Game::checkCollision(&nextMove, NULL, tgLevelUnit, true))
 		{
+			/*
 			moveY -= (tgVerticals < 0 ? -1 : 1);
 			nextMove.tgHitboxRect.y -= (tgVerticals < 0 ? -1 : 1);
 			while (Game::checkCollision(&nextMove, NULL, tgLevelUnit, false))
@@ -195,6 +277,7 @@ void Player::plMove(void)
 				moveY -= (tgVerticals < 0 ? -1 : 1);
 				nextMove.tgHitboxRect.y -= (tgVerticals < 0 ? -1 : 1);
 			}
+			
 			if (tgVerticals < 0)
 				up = true;
 			else if (tgVerticals > 0)
@@ -204,7 +287,7 @@ void Player::plMove(void)
 			}
 			tgVerticals = 0;
 		}
-		tgHitboxRect.y += moveY;
+		tgHitboxRect.y += (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]) /* moveY ;
 		// if (moveY == (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]))
 		if (tgVerticals >= (int)Game::gravityArray.size() - 1)
 			tgVerticals = Game::gravityArray.size() - 2;
@@ -216,7 +299,7 @@ void Player::plMove(void)
 			tgHitboxRect.y -= Game::jumpArray[-(tgVerticals--)];
 		else if (tgVerticals > 0)
 			tgHitboxRect.y += Game::gravityArray[tgVerticals++];
-			*/
+			
 	}
 	if (tgVerticals == 0)
 	{
@@ -226,7 +309,7 @@ void Player::plMove(void)
 			tgVerticals++;
 	}
 
-	Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true);
+	// Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true);
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{
 		if (Game::gColliding[i] != NULL)
@@ -254,6 +337,12 @@ void Player::plMove(void)
 			Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], dir);
 		}
 	}
+	*/
+}
+
+void Player::tgResolveCollision(Thing* thing, int dir)
+{
+	// ???
 }
 
 void Player::tgRender(void)

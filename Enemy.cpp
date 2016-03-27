@@ -17,7 +17,7 @@ Enemy::Enemy(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType[
 	enType = subtype;
 }
 
-void Enemy::tgResolveCollision(Thing* thing, Direction dir)
+void Enemy::tgResolveCollision(Thing* thing, int dir)
 {
 	if (thing->tgType == Game::ThingType["player"] || thing->tgType == Game::ThingType["enemy"])
 	{
@@ -27,7 +27,7 @@ void Enemy::tgResolveCollision(Thing* thing, Direction dir)
 		}
 		else if (thing->tgVerticals != 0)
 		{
-			thing->tgVerticals = (tgVerticals < 0 ? Game::jumpArray.size() - 25 : Game::gravityArray.size());
+			thing->tgVerticals = (tgVerticals < 0 ? Game::jumpArray.size() - 25 : Game::gravityArray.size() - 1);
 		}
 		else
 			std::cout << "Collision error: " << tgLevelUnit << " " << thing->tgLevelUnit << std::endl;
@@ -36,19 +36,20 @@ void Enemy::tgResolveCollision(Thing* thing, Direction dir)
 			thing->tgHealth -= enPower;
 	}
 	/*
-	else if (tgType == TILE)
+	else if (thing->tgType == Game::ThingType["tile"])
 	{
 		enIsColliding = true;
-		if (dir == RIGHT || dir == LEFT)
+		if (dir == Game::Direction["right"] || dir == Game::Direction["left"])
 		{
-			tgDirection = invertDir(tgDirection);
+			// tgDirection = invertDir(tgDirection);
+			tgSpeed = -tgSpeed;
 		}
-		else if (dir == DOWN)
+		else if (dir == Game::Direction["down"])
 		{
 			if (tgVerticals < 0)
 				tgVerticals = 1;
 		}
-		else if (dir == UP)
+		else if (dir == Game::Direction["up"])
 		{
 			if (tgVerticals > 0)
 				tgVerticals = 0;
@@ -89,9 +90,44 @@ void Enemy::tgRender(void)
 
 void Enemy::tgApplyAI(void)
 {
-	// tgHandleVerticals();
+	// int dir = Game::Direction["none"];
+	// bool colliding = Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true);
+	// Thing nextMove{ &tgHitboxRect, Game::ThingType["temp"], tgLevelUnit };
+	// int moveX = 0, moveY = 0;
+	// bool left = false, right = false, up = false, down = false;
+
+	tgHandleVerticals();
+
+	if (tgSpeed != 0)
+	{
+		tgHitboxRect.x += tgSpeed;
+		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+			for (int i = 0; i < Game::gColliding.size(); i++)
+				if (Game::gColliding[i] != NULL)
+					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgSpeed > 0 ? Game::Direction["right"] : Game::Direction["left"]));
+	}
+	if (tgVerticals == 0)
+	{
+		tgHitboxRect.y++;
+		if (!Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, false))
+			tgVerticals++;
+		tgHitboxRect.y--;
+	}
+	if (tgVerticals != 0)
+	{
+		tgHitboxRect.y += (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]);
+		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+			for (int i = 0; i < Game::gColliding.size(); i++)
+				if (Game::gColliding[i] != NULL)
+					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgVerticals > 0 ? Game::Direction["down"] : Game::Direction["up"]));
+	}
+
+
+
+	/*
+	tgHandleVerticals();
 	// tgHitboxRect.x += tgSpeed;
-	SDL_Rect directionCheckRect{ tgHitboxRect.x, tgHitboxRect.y, 1, 1 /* tgHitboxRect.w, tgHitboxRect.h */ };
+	SDL_Rect directionCheckRect{ tgHitboxRect.x, tgHitboxRect.y, 1, 1 /* tgHitboxRect.w, tgHitboxRect.h  };
 	Thing directionCheck{ &directionCheckRect, Game::ThingType["temp"], -1 };
 	int direction = Game::Direction["none"];
 	bool actuallyColliding = false;
@@ -103,11 +139,26 @@ void Enemy::tgApplyAI(void)
 		{
 			if (Game::gColliding[i] != NULL)
 			{
-				directionCheck.tgHitboxRect.h = tgHitboxRect.h;
+				directionCheck.tgHitboxRect.h = tgHitboxRect.h - 1;
 
 				// check which direction for each collision
 				for (int j = Game::Direction["left"]; j < Game::Direction["total"]; j++)
 				{
+					if (j == Game::Direction["left"])
+						directionCheck.tgHitboxRect.x = tgHitboxRect.x;
+					else if (j == Game::Direction["right"])
+						directionCheck.tgHitboxRect.x += tgHitboxRect.w;
+					if (Game::checkCollision(&directionCheck, Game::things[Game::gColliding[i]->thing2->tgLevelUnit], -1, false))
+					{
+						if (j == Game::Direction["left"])
+							direction = Game::Direction["left"];
+						else if (j == Game::Direction["right"])
+							direction = Game::Direction["right"];
+						break;
+					}
+					directionCheck.tgHitboxRect.x = tgHitboxRect.x;
+
+					/*
 					if (j == Game::Direction["right"])
 					{
 						directionCheck.tgHitboxRect.x += tgHitboxRect.w;
@@ -121,28 +172,36 @@ void Enemy::tgApplyAI(void)
 					if (Game::checkCollision(&directionCheck, Game::things[Game::gColliding[i]->thing2->tgLevelUnit], -1, false))
 						break;
 					directionCheck.tgHitboxRect.x = tgHitboxRect.x;
-				}
-				directionCheck.tgHitboxRect.x = tgHitboxRect.x;
-				directionCheck.tgHitboxRect.h = 1;
-				directionCheck.tgHitboxRect.w = tgHitboxRect.w;
-				for (int j = Game::Direction["up"]; j < Game::Direction["total"]; j++)
-				{
-					if (j == Game::Direction["up"])
-						directionCheck.tgHitboxRect.y = tgHitboxRect.y;
-					else if (j == Game::Direction["down"])
-						directionCheck.tgHitboxRect.y += tgHitboxRect.h;
-					if (Game::checkCollision(&directionCheck, Game::things[Game::gColliding[i]->thing2->tgLevelUnit], -1, false))
-					{
-						if (j == Game::Direction["up"])
-							direction = Game::Direction["up"];
-						else if (j == Game::Direction["down"])
-							direction = Game::Direction["down"];
-						break;
-					}
-					directionCheck.tgHitboxRect.y = tgHitboxRect.y;
+					
 				}
 
-				Game::things[Game::gColliding[i]->thing2->tgLevelUnit]->tgResolveCollision(Game::things[tgLevelUnit], direction);
+				if(direction != Game::Direction["none"])
+					Game::things[Game::gColliding[i]->thing2->tgLevelUnit]->tgResolveCollision(Game::things[tgLevelUnit], direction);
+				else
+				{
+					std::cout << direction << std::endl;
+					directionCheck.tgHitboxRect.x = tgHitboxRect.x;
+					directionCheck.tgHitboxRect.h = 1;
+					directionCheck.tgHitboxRect.w = tgHitboxRect.w;
+					for (int j = Game::Direction["up"]; j < Game::Direction["total"]; j++)
+					{
+						if (j == Game::Direction["up"])
+							directionCheck.tgHitboxRect.y = tgHitboxRect.y;
+						else if (j == Game::Direction["down"])
+							directionCheck.tgHitboxRect.y += tgHitboxRect.h;
+						if (Game::checkCollision(&directionCheck, Game::things[Game::gColliding[i]->thing2->tgLevelUnit], -1, false))
+						{
+							if (j == Game::Direction["up"])
+								direction = Game::Direction["up"];
+							else if (j == Game::Direction["down"])
+								direction = Game::Direction["down"];
+							Game::things[Game::gColliding[i]->thing2->tgLevelUnit]->tgResolveCollision(Game::things[tgLevelUnit], direction);
+							break;
+						}
+						directionCheck.tgHitboxRect.y = tgHitboxRect.y;
+					}
+				}
+
 				actuallyColliding = true;
 			}
 		}
@@ -153,6 +212,7 @@ void Enemy::tgApplyAI(void)
 		if (tgVerticals == 0)
 			tgVerticals++;
 	}
+	*/
 
 
 	/*

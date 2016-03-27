@@ -24,6 +24,8 @@ Thing::Thing(SDL_Rect* box, int type, int unit)
 	// tgFrameWaitCounter = 0;
 	tgVerticals = 0;
 	tgSelected = 0;
+	tgColliding = 0;
+	tgColDir = 0;
 }
 
 Thing::~Thing()
@@ -81,8 +83,10 @@ void Thing::tgRender(void)
 void Thing::tgResolveCollision(Thing* thing, int dir)
 {
 	if (dir == Game::Direction["left"] || dir == Game::Direction["right"])
+	{
 		tgSpeed = -tgSpeed;
 		// tgDirection = invertDir(tgDirection);
+	}
 	else if (dir == Game::Direction["up"])
 	{
 		if (thing->tgVerticals < 0)

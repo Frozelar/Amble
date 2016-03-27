@@ -71,6 +71,7 @@ DEFAULT_ENEMY_W = 8
 DEFAULT_ENEMY_H = 8
 DEFAULT_OFFSET = 2
 DEFAULT_SPEED = 2
+DEFAULT_COOLDOWN = 128
 
 LEVEL_UNITS = 0
 LEVEL_W = 0
@@ -231,6 +232,7 @@ function Thing:new(levelUnit)
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgFrame = 1
   self.tgFrameInterval = 0
+  self.tgColliding = 0
   -- self.tgMaxFrames = 0
   --[[
   local lx, ly, amt = self.tgLevelUnit, self.tgLevelUnit, 0
@@ -263,6 +265,7 @@ function Player:new(levelUnit)
   self.tgLevelUnit = levelUnit
   self.tgFrame = 1
   self.tgFrameInterval = 0
+  self.tgColliding = 0
   self.plJumps = 0
   self.plDashing = 0
   self.tgHitbox = Rectangle(0, 0, 0, 0)
@@ -375,14 +378,17 @@ function Enemy:new(levelUnit)
   --self.tgType = thingTypes["enemy"]
   self.tgType = "enemy"
   self.tgVerticals = 0
+  self.tgDashing = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgMaxFrames = #entityFrames
+  self.tgColliding = 0
   self.enPower = 5
   self.enSubtype = -1
   self.enDashing = 0
+  self.enCooldown = 0
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = DEFAULT_ENEMY_W
   self.tgHitbox.h = DEFAULT_ENEMY_H
@@ -392,9 +398,14 @@ function Enemy:enHandleAI()
   local checkrect = Rectangle(0, 0, 0, 0)
   local iscolliding = false
   
+  if self.enCooldown > 0 then
+	self.enCooldown = self.enCooldown - 1
+  end
+  
   if enemyTypes[self.enSubtype] == "dude" then
-  print("DUDEEEEEEEE")
-    if self.tgVerticals == 0 then
+	--if thingTypes[self.tgColliding] == "tile"
+  
+    if self.tgVerticals == 0 and self.tgDashing == 0 and self.enCooldown == 0 then
       checkrect = self.tgHitbox
       checkrect.w = checkrect.w + DEFAULT_W * 4
       checkrect.x = checkrect.x - DEFAULT_W * 2
@@ -402,21 +413,46 @@ function Enemy:enHandleAI()
       checkrect.y = checkrect.y - DEFAULT_H * 2
       iscolliding = checkCollision(checkrect, things[gPlayerUnit].tgHitbox)
       if iscolliding == true then
-        self.tgVerticals = self.tgVerticals - 2
+        self.tgHitbox.y = self.tgHitbox.y - DEFAULT_H
         self.tgDashing = self.tgDashing + 1
       end
-    end
+	end
     if self.tgDashing ~= 0 then
+	  -- self.tgVerticals = self.tgVerticals + 1
+	  if self.enCooldown == 0 then
+		self.enCooldown = DEFAULT_COOLDOWN
+	  end
       if self.tgDashing < #dashArray then
         if self.tgSpeed > 0 then
           self.tgHitbox.x = self.tgHitbox.x + dashArray[self.tgDashing]
         elseif self.tgSpeed < 0 then
           self.tgHitbox.x = self.tgHitbox.x - dashArray[self.tgDashing]
         end
+		self.tgDashing = self.tgDashing + 1
       else
         self.tgDashing = 0
       end
     end
+	if self.tgSpeed == 0 then
+		self.tgSpeed = DEFAULT_SPEED
+	end
+	--self.tgHitbox.x = self.tgHitbox.x + self.tgSpeed
+	
+	--[[
+	self.tgHitbox.x = self.tgHitbox.x + self.tgSpeed
+	for i = 1, #things do
+		if things[i] ~= -1 and things[i].tgLevelUnit ~= self.tgLevelUnit then
+			iscolliding = checkCollision(self.tgHitbox, things[i].tgHitbox)
+			if iscolliding == true then
+				if thingTypes[things[i].tgType] == "enemy" or thingTypes[things[i].tgType] == "tile" then
+					self.tgSpeed = -self.tgSpeed
+				elseif thingTypes[things[i].tgType] == "player" then
+					print("uh well hi")
+				end
+			end
+		end
+	end
+	]]
   end
 end
 

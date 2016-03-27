@@ -11,7 +11,7 @@ public:
 	// destroy texture
 	// ~Tile();
 
-	void tgResolveCollision(Thing*, Direction);
+	void tgResolveCollision(Thing*, int);
 	void tgRender(void);
 	void tgApplyAI(void);
 	int tgGetSubtype(void);

@@ -15,7 +15,7 @@ public:
 	void tgRender(void);
 
 	// Thing* = what it is colliding with, Direction = which side of the Thing* the collision occurred at
-	void tgResolveCollision(Thing*, Direction);
+	void tgResolveCollision(Thing*, int);
 
 	int tgGetSubtype(void);
 

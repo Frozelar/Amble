@@ -23,6 +23,8 @@ public:
 
 	void plHandleDashing(void);
 
+	void tgResolveCollision(Thing*, int);
+
 	int plJumps = 0;
 	int plDashing = 0;
 	int plActionCounter = 0;

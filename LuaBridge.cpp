@@ -932,10 +932,14 @@ int LuaBridge::labHandleEnvironment(void)
 
 int LuaBridge::labCheckCollision(lua_State* L)
 {
-	SDL_Rect* t1 = &Game::things[(int)lua_tonumber(L, -2)]->tgHitboxRect;
-	SDL_Rect* t2 = &Game::things[(int)lua_tonumber(L, -1)]->tgHitboxRect;
+	SDL_Rect t1;
+	SDL_Rect t2;
+	t1.x = lua_getfield(L, 1, "x"); t1.y = lua_getfield(L, 1, "y");
+	t1.w = lua_getfield(L, 1, "w"); t1.h = lua_getfield(L, 1, "h");
+	t2.x = lua_getfield(L, 2, "x"); t2.y = lua_getfield(L, 2, "y");
+	t2.w = lua_getfield(L, 2, "w"); t2.h = lua_getfield(L, 2, "h");
 
-	if ((t1->x + t1->w > t2->x || t1->x < t2->x + t2->w) && (t1->y + t1->h > t2->y && t1->y < t2->y + t2->h))
+	if ((t1.x + t1.w > t2.x || t1.x < t2.x + t2.w) && (t1.y + t1.h > t2.y && t1.y < t2.y + t2.h))
 		lua_pushboolean(L, true);
 	else
 		lua_pushboolean(L, false);
