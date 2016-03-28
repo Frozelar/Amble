@@ -102,6 +102,7 @@ bool Graphics::gxInit(void)
 			// tileTextures[i].resize(j + 1);
 			tileTextures[i][j] = new Texture();
 			tileTextures[i][j]->txLoadF(dir + "ti" + tileIdentifiers[i][j] + ext);
+			std::cout << dir + "ti" + tileIdentifiers[i][j] + ext << std::endl;
 		}
 	}
 	for (int i = 0; i < collectibleIdentifiers.size(); i++)
