@@ -266,11 +266,12 @@ void Graphics::gxRender(void)
 	SDL_SetRenderDrawColor(Game::gRenderer, 105, 105, 245, 255);
 	SDL_RenderClear(Game::gRenderer);
 
-	Graphics::backgroundTextures[bgState - 1][bgFrame]->txRect.x = 0;
-	Graphics::backgroundTextures[bgState - 1][bgFrame]->txRect.y = 0;
-	Graphics::backgroundTextures[bgState - 1][bgFrame]->txRect.w = Game::WINDOW_W;
-	Graphics::backgroundTextures[bgState - 1][bgFrame]->txRect.h = Game::WINDOW_H;
-	Graphics::backgroundTextures[bgState - 1][bgFrame]->txRender();
+	bgState = Level::levelBG;
+	Graphics::backgroundTextures[bgState][bgFrame]->txRect.x = 0;
+	Graphics::backgroundTextures[bgState][bgFrame]->txRect.y = 0;
+	Graphics::backgroundTextures[bgState][bgFrame]->txRect.w = Game::WINDOW_W;
+	Graphics::backgroundTextures[bgState][bgFrame]->txRect.h = Game::WINDOW_H;
+	Graphics::backgroundTextures[bgState][bgFrame]->txRender();
 	// gPlayer->tgRender();
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{

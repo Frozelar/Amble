@@ -29,7 +29,7 @@
 
 # Others
 .zip
-.tar.gz
+.gz
 lua-5.3.1
 game/.vs
 game/Debug

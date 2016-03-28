@@ -57,7 +57,6 @@ bool Audio::auInit()
 
 void Audio::auPlay(int track, char type)
 {
-	std::cout << "EEEEEEEEEEERR "; std::cout << musicIdentifiers[track] << std::endl;
 	if (type == 's')
 		Mix_PlayChannel(-1, sfx[track], 0);
 	else if (type == 'm')

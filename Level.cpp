@@ -23,6 +23,9 @@ int Level::LEVEL_H_PIXELS = LEVEL_H * Game::DEFAULT_H;
 // default pixels in the level
 int Level::LEVEL_PIXELS = LEVEL_UNITS * Game::DEFAULT_W;
 
+int Level::levelTrack = 0;
+int Level::levelBG = 0;
+
 int Level::gLevelMovementsX = 0;
 int Level::gLevelMovementsY = 0;
 
@@ -60,7 +63,9 @@ bool Level::generateLevel(void)
 	Game::gColliding.resize(Level::LEVEL_UNITS);
 
 	levelMap >> unitType;
+	levelBG = unitType - Game::BACKGROUND_TYPE_OFFSET - 1;
 	levelMap >> unitType;
+	levelTrack = unitType - Game::MUSIC_TYPE_OFFSET - 1;
 
 	for (int i = 0, j = 0; i < Level::LEVEL_PIXELS;)
 	{
@@ -132,8 +137,15 @@ void Level::moveLevel(void)
 
 void Level::playMusic(void)
 {
-	Audio::auPlay(0, 'm');
+	Audio::auPlay(levelTrack, 'm');
 }
+
+/*
+void Level::setBG(void)
+{
+	
+}
+*/
 
 const int Level::levelW(void)
 {

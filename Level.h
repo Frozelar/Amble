@@ -13,6 +13,8 @@ public:
 	static void moveLevel(void);
 	static void playMusic(void);
 
+	static int levelTrack;
+	static int levelBG;
 	static int LEVEL_UNITS;
 	static int LEVEL_W;
 	static int LEVEL_H;
