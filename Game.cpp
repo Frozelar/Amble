@@ -187,9 +187,16 @@ void Game::applyAI(void)
 {
 	for (int i = 0; i < things.size(); i++)
 	{
-		if (things[i] != NULL && things[i]->tgType != ThingType["temp"] && things[i]->tgType != ThingType["player"])
+		if (things[i] != NULL && things[i]->tgType != ThingType["temp"])
 		{
-			things[i]->tgApplyAI();
+			if (things[i]->tgType != ThingType["player"])
+			{
+				things[i]->tgApplyAI();
+			}
+			if (things[i]->tgHealth == 0)
+			{
+				destroyThing(i);
+			}
 		}
 	}
 }

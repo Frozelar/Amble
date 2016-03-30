@@ -38,13 +38,11 @@ bool Audio::auInit()
 		std::cout << Mix_GetError() << std::endl;
 		return false;
 	}
-	std::cout << "ERRRTGHTYJJY" << musicIdentifiers.size() << std::endl;
 	for (int i = 0; i < musicIdentifiers.size(); i++)
 	{
 		identifier = dir + musicIdentifiers[i] + ext;
 		music.resize(i + 1);
 		music[i] = Mix_LoadMUS(identifier.c_str());
-		std::cout << "EEEEEEEP:::: " << identifier << std::endl;
 	}
 	for (int i = 0; i < sfxIdentifiers.size(); i++)
 	{

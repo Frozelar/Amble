@@ -33,11 +33,11 @@ void Collectible::tgRender(void)
 		tgFrame = 0;
 	}
 	*/
-
 	Graphics::collectibleTextures[clType - 1][tgFrame]->txRect = tgGFXrect;
 	Graphics::collectibleTextures[clType - 1][tgFrame]->txRender();
 }
 
+/*
 void Collectible::clCollect(void)
 {
 	/*
@@ -50,12 +50,15 @@ void Collectible::clCollect(void)
 		Game::gScore += 5;
 		break;
 	}
-	*/
+	
+
+
 	delete Game::things[tgLevelUnit];
 	Game::things[tgLevelUnit] = NULL;
 }
+*/
 
-void Collectible::tgResolveCollision(Thing* thing, Direction dir)
+void Collectible::tgResolveCollision(Thing* thing, int dir)
 {
 	if (thing->tgType == Game::ThingType["player"])
 		tgHealth = 0;
@@ -63,8 +66,8 @@ void Collectible::tgResolveCollision(Thing* thing, Direction dir)
 
 void Collectible::tgApplyAI(void)
 {
-	if (tgHealth == 0)
-		clCollect();
+	// if (tgHealth == 0)
+	//	clCollect();
 }
 
 void Collectible::tgHandleVerticals(void)
@@ -72,4 +75,9 @@ void Collectible::tgHandleVerticals(void)
 	tgHitboxRect.y += Game::floatArray[tgVerticals++];
 	if (tgVerticals >= (int)Game::floatArray.size())
 		tgVerticals = 0;
+}
+
+int Collectible::tgGetSubtype(void)
+{
+	return clType;
 }

@@ -405,7 +405,6 @@ void LuaBridge::labInitValues(void)
 	lua_pop(L, 1);																		// 
 
 	lua_getglobal(L, "audioIdentifiers");												// audioIdentifiers[]
-	std::cout << "KIIIIIR: " << AudioIDLocations["total"] << std::endl;
 	for (int i = 0; i < AudioIDLocations["total"]; i++)
 	{
 		lua_pushnumber(L, i + 1);														// audioIdentifiers[], i
@@ -626,7 +625,6 @@ void LuaBridge::labInitValues(void)
 			lua_gettable(L, -2);									// things, specific thing
 			if (Game::things[i]->tgType == Game::ThingType["enemy"])
 			{
-				std::cout << "SUBTYOEEEETTY: " << Game::things[i]->tgGetSubtype() << std::endl;
 				lua_pushstring(L, "enSubtype");						// things, specific thing, "enSubtype"
 				lua_pushnumber(L, Game::things[i]->tgGetSubtype());	// things, specific thing, "enSubtype", subtype
 				lua_settable(L, -3);								// things, specific thing
@@ -711,6 +709,9 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pushstring(L, "tgSpeed");						// things table, specific thing, "tgSpeed"
 			lua_pushnumber(L, Game::things[i]->tgSpeed);		// things table, specific thing, "tgSpeed", tgSpeed
 			lua_settable(L, -3);								// things table, specific thing
+			lua_pushstring(L, "tgHealth");						// things table, specific thing, "tgHealth"
+			lua_pushnumber(L, Game::things[i]->tgHealth);		// things table, specific thing, "tgHealth", tgHealth
+			lua_settable(L, -3);								// things table, specific thing
 			// lua_pop(L, 2);
 			lua_pushstring(L, "tgHitbox");						// things table, specific thing, "tgHitbox"
 			lua_gettable(L, -2);								// things table, specific thing, tgHitbox
@@ -718,9 +719,9 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_pushnumber(L, Game::things[i]->tgHitboxRect.x);	// things table, specific thing, tgHitbox, "x", x
 			lua_settable(L, -3);								// things table, specific thing, tgHitbox
 			lua_pushstring(L, "y");								// things table, specific thing, tgHitbox, "y"
-			lua_pushnumber(L, Game::things[i]->tgHitboxRect.y);// things table, specific thing, tgHitbox, "y", y
+			lua_pushnumber(L, Game::things[i]->tgHitboxRect.y); // things table, specific thing, tgHitbox, "y", y
 			lua_settable(L, -3);								// things table, specific thing, tgHitbox
-			lua_pop(L, 3);										//
+			lua_pop(L, 1);										// things table, specific thing
 
 			/*
 			if (Game::things[i]->tgType == Game::ThingType["enemy"])
@@ -739,7 +740,7 @@ int LuaBridge::labHandleEnvironment(void)
 			{
 				// ?
 			}
-			else */ if (Game::things[i]->tgType == Game::ThingType["collectible"])
+			else if (Game::things[i]->tgType == Game::ThingType["collectible"])
 			{
 				// lua_getfield(L, -1, "clHandleAI");	// things table, specific thing, clHandleAI()
 				// lua_call(L, 0, 0);					// things table, specific thing
@@ -747,9 +748,26 @@ int LuaBridge::labHandleEnvironment(void)
 				{
 					lua_getfield(L, -1, "clCollect");		// things table, specific thing, clCollect()
 					lua_call(L, 0, 0);						// things table, specific thing
-					lua_pop(L, 2);							// 
 				}
 			}
+			*/
+			lua_pop(L, 2);										// 
+		}
+		else if (Game::things[i] == NULL)
+		{
+			lua_getglobal(L, "things");							// things table
+			lua_pushnumber(L, i + 1);							// things table, i
+			lua_gettable(L, -2);								// things table, specific thing
+			if (lua_type(L, -1) != LUA_TNUMBER)
+			{
+				lua_pop(L, 1);								// things table
+				lua_pushnumber(L, i + 1);					// things table, i
+				lua_pushnumber(L, -1);						// things table, i, -1
+				lua_settable(L, -3);						// things table
+				lua_pop(L, 1);								// 
+			}
+			else
+				lua_pop(L, 2);								// 
 		}
 	}
 	lua_getglobal(L, "handleEnvironment");
@@ -777,6 +795,10 @@ int LuaBridge::labHandleEnvironment(void)
 			else if (Game::things[i]->tgSpeed < 0)
 				Game::things[i]->tgDirection = LEFT;
 				*/
+			lua_pop(L, 1);										// things table, specific thing
+			lua_pushstring(L, "tgHealth");						// things table, specific thing, "tgHealth"
+			lua_gettable(L, -2);								// things table, specific thing, tgHealth
+			Game::things[i]->tgHealth = (int)lua_tonumber(L, -1);
 			lua_pop(L, 1);										// things table, specific thing
 			lua_pushstring(L, "tgFrame");						// things table, specific thing, "tgFrame"
 			lua_gettable(L, -2);								// things table, specific thing, tgFrame

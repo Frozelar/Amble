@@ -9,7 +9,7 @@ tileTypes = { "dirtBlock", "dirtWall" }
 TOTAL_TILE_TYPES = #tileTypes
 
 ENEMY_OFFSET = 100
-enemyTypes = { "dude" }
+enemyTypes = { "dude", "guy" }
 TOTAL_ENEMY_TYPES = #enemyTypes
 
 COLLECTIBLE_OFFSET = 200
@@ -21,7 +21,7 @@ graphicsIdentifiers = {
 	{ {"Underground", 1} }, -- backgrounds (# frames)
 	{ {"DirtBlock", 1}, {"DirtWall", 1} }, -- tiles (# frames (PER tile subidentifier))
 	{ {"" --[[ "Player" ]], 5} }, -- player states (# frame SETS (5 by default)
-	{ {"Dude", 5} }, -- enemies (# frame SETS (5 by default))
+	{ {"Dude", 5}, {"Guy", 5} }, -- enemies (# frame SETS (5 by default))
 	{ {"Bit", 4}, {"Byte", 4} }, -- collectibles (# frames)
 	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} } -- particles (# frames)
 }
@@ -213,7 +213,7 @@ function Particle:ptCycleFrames()
 	end
 end
 
-Thing = { tgType, tgVerticals, tgSpeed, tgHitbox, tgLevelUnit, tgFrame, tgFrameInterval, tgMaxFrames }
+Thing = { tgType, tgVerticals, tgSpeed, tgHitbox, tgLevelUnit, tgHealth, tgFrame, tgFrameInterval, tgMaxFrames }
 Thing.__index = Thing
 
 setmetatable(Thing, {
@@ -233,6 +233,7 @@ function Thing:new(levelUnit)
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgColliding = 0
+  self.tgHealth = 100
   -- self.tgMaxFrames = 0
   --[[
   local lx, ly, amt = self.tgLevelUnit, self.tgLevelUnit, 0
@@ -266,6 +267,7 @@ function Player:new(levelUnit)
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgColliding = 0
+  self.tgHealth = 100
   self.plJumps = 0
   self.plDashing = 0
   self.tgHitbox = Rectangle(0, 0, 0, 0)
@@ -331,6 +333,7 @@ function Tile:new(levelUnit)
   self.tgLevelUnit = levelUnit
   self.tgFrame = 1
   self.tgFrameInterval = 0
+  self.tgHealth = 100
   self.tiIsSolid = true
   self.tiSubtype = 1																-- NEED TO CHANGE THIS LATERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR~~~~~~~~~~~~~~~~~~~~~~
   self.tgHitbox = Rectangle(0, 0, 0, 0)
@@ -385,6 +388,7 @@ function Enemy:new(levelUnit)
   self.tgFrameInterval = 0
   self.tgMaxFrames = #entityFrames
   self.tgColliding = 0
+  self.tgHealth = 100
   self.enPower = 5
   self.enSubtype = -1
   self.enDashing = 0
@@ -453,6 +457,9 @@ function Enemy:enHandleAI()
 		end
 	end
 	]]
+  elseif enemyTypes[self.enSubtype] == "guy" then
+		self.tgSpeed = -DEFAULT_SPEED
+	
   end
 end
 
@@ -559,6 +566,7 @@ function Collectible:new(levelUnit)
   self.tgLevelUnit = levelUnit
   self.tgFrame = 1
   self.tgFrameInterval = 0
+  self.tgHealth = 100
   self.clSubtype = -1
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = DEFAULT_W
@@ -568,21 +576,17 @@ end
 function Collectible:clHandleAI()
 	self.tgVerticals = self.tgVerticals + 1
 	if self.tgVerticals > #floatArray then
-		self.tgVerticals = 0
+		self.tgVerticals = 1
 	end
 	self.tgHitbox.y = self.tgHitbox.y + floatArray[self.tgVerticals]
 end
 
 function Collectible:clCollect()
-  for i = 1, #things do
-    if things[i] ~= -1 and thingTypes[things[i].tgType] == "collectible" then
-      if collectibleTypes[things[i].clSubtype] == "cbit" then
-        points = points + 1
-      elseif collectibleTypes[things[i].clSubtype] == "cbyte" then
-        points = points + 5
-      end
+    if collectibleTypes[self.clSubtype] == "cbit" then
+      points = points + 1
+    elseif collectibleTypes[self.clSubtype] == "cbyte" then
+      points = points + 8
     end
-  end
 end
 
 function Collectible:clCycleFrames()
@@ -592,7 +596,7 @@ function Collectible:clCycleFrames()
 		self.tgFrameInterval = 0
 	end
 	if self.tgFrame >= #objectFrames then
-		self.tgFrame = 0
+		self.tgFrame = 1
 	end
 end
 
@@ -670,7 +674,6 @@ end
 
 function handleEnvironment()
 	totalParticles = #gParticles
-	--print("things: " .. #things)
 	for i = 1, #things do
 		if things[i] ~= -1 then
 			if things[i].tgType == "player" then
@@ -687,6 +690,9 @@ function handleEnvironment()
 			elseif things[i].tgType == "collectible" then
 				things[i]:clCycleFrames()
 				things[i]:clHandleAI()
+				if things[i].tgHealth == 0 then
+					things[i]:clCollect()
+				end
 				
 			end
 		end
