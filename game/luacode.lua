@@ -2,6 +2,8 @@ getmetatable('').__index = function(str, i)
 	return string.sub(str, i, i)
 end
 
+direction = { "left", "right", "up", "down" }
+
 thingTypes = { "player", "tile", "enemy", "collectible" }
 
 TILE_OFFSET = 10
@@ -11,6 +13,9 @@ TOTAL_TILE_TYPES = #tileTypes
 ENEMY_OFFSET = 100
 enemyTypes = { "dude", "guy" }
 TOTAL_ENEMY_TYPES = #enemyTypes
+enemyStats = { {100, 1}, {75, 5} }		-- order corresponds to enemyTypes; format = {health, power}
+HEALTH_STAT_SLOT = 1
+POWER_STAT_SLOT = 2
 
 COLLECTIBLE_OFFSET = 200
 collectibleTypes = { "cbit", "cbyte" }
@@ -35,7 +40,7 @@ TOTAL_TILE_SUBTYPES = #tileSubIdentifiers
 
 -- {name}
 audioIdentifiers = { 
-	{ "Boom" }, -- sfx
+	{ "Jump", "Hit", "Explode", "Collect" }, -- sfx
 	{ "Underground" } -- music 
 }
 
@@ -213,7 +218,7 @@ function Particle:ptCycleFrames()
 	end
 end
 
-Thing = { tgType, tgVerticals, tgSpeed, tgHitbox, tgLevelUnit, tgHealth, tgFrame, tgFrameInterval, tgMaxFrames }
+Thing = { tgType, tgVerticals, tgSpeed, tgHitbox, tgLevelUnit, tgHealth, tgFrame, tgFrameInterval, tgMaxFrames, tgColliding, tgColDir }
 Thing.__index = Thing
 
 setmetatable(Thing, {
@@ -232,7 +237,7 @@ function Thing:new(levelUnit)
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgFrame = 1
   self.tgFrameInterval = 0
-  self.tgColliding = 0
+  self.tgColliding = { -1, -1, -1, -1 }		-- index for each direction
   self.tgHealth = 100
   -- self.tgMaxFrames = 0
   --[[
@@ -266,8 +271,8 @@ function Player:new(levelUnit)
   self.tgLevelUnit = levelUnit
   self.tgFrame = 1
   self.tgFrameInterval = 0
-  self.tgColliding = 0
   self.tgHealth = 100
+  self.tgColliding = { -1, -1, -1, -1 }
   self.plJumps = 0
   self.plDashing = 0
   self.tgHitbox = Rectangle(0, 0, 0, 0)
@@ -334,6 +339,7 @@ function Tile:new(levelUnit)
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgHealth = 100
+  self.tgColliding = { -1, -1, -1, -1 }
   self.tiIsSolid = true
   self.tiSubtype = 1																-- NEED TO CHANGE THIS LATERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR~~~~~~~~~~~~~~~~~~~~~~
   self.tgHitbox = Rectangle(0, 0, 0, 0)
@@ -387,9 +393,9 @@ function Enemy:new(levelUnit)
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgMaxFrames = #entityFrames
-  self.tgColliding = 0
-  self.tgHealth = 100
-  self.enPower = 5
+  self.tgColliding = { -1, -1, -1, -1 }
+  self.tgHealth = -2
+  self.enPower = -2
   self.enSubtype = -1
   self.enDashing = 0
   self.enCooldown = 0
@@ -401,12 +407,13 @@ end
 function Enemy:enHandleAI()
   local checkrect = Rectangle(0, 0, 0, 0)
   local iscolliding = false
+  local t = enemyTypes[self.enSubtype]
   
   if self.enCooldown > 0 then
 	self.enCooldown = self.enCooldown - 1
   end
   
-  if enemyTypes[self.enSubtype] == "dude" then
+  if t == "dude" then
 	--if thingTypes[self.tgColliding] == "tile"
   
     if self.tgVerticals == 0 and self.tgDashing == 0 and self.enCooldown == 0 then
@@ -457,10 +464,22 @@ function Enemy:enHandleAI()
 		end
 	end
 	]]
-  elseif enemyTypes[self.enSubtype] == "guy" then
+  elseif t == "guy" then
 		self.tgSpeed = -DEFAULT_SPEED
 	
   end
+end
+
+function Enemy:enResolveCollision(direction)
+	local t = enemyTypes[self.enSubtype]
+	
+	if t == "dude" then
+		if self.tgColliding[direction] == gPlayerUnit then
+			things[gPlayerUnit].tgHealth = things[gPlayerUnit].tgHealth - self.enPower
+		end
+	elseif t == "guy" then
+		
+	end
 end
 
 function Enemy:enCycleFrames()
@@ -567,6 +586,7 @@ function Collectible:new(levelUnit)
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgHealth = 100
+  self.tgColliding = { -1, -1, -1, -1 }
   self.clSubtype = -1
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = DEFAULT_W
@@ -684,8 +704,28 @@ function handleEnvironment()
 				things[i]:tiHandleAI()
 				
 			elseif things[i].tgType == "enemy" then
+				if things[i].tgHealth == -2 or things[i].enPower == -2 then
+					things[i].tgHealth = enemyStats[things[i].enSubtype][HEALTH_STAT_SLOT]
+					things[i].enPower = enemyStats[things[i].enSubtype][POWER_STAT_SLOT]
+				end
+				
 				things[i]:enCycleFrames()
 				things[i]:enHandleAI()
+				for j = 1, #things[i].tgColliding do
+					if things[i].tgColliding[j] ~= -1 then
+						things[i]:enResolveCollision(j)
+					end
+				end
+				--[[
+				if things[gPlayerUnit].tgColliding ~= -1 and things[gPlayerUnit].tgColDir ~= -1 then
+				print(things[gPlayerUnit].tgColliding)
+					if thingTypes[things[things[gPlayerUnit].tgColliding].tgType] == "enemy" then
+						things[i].tgColliding = gPlayerUnit
+						things[i].tgColDir = invertDir(things[gPlayerUnit].tgColDir)
+						things[i]:enResolveCollision()
+					end
+				end
+				]]
 				
 			elseif things[i].tgType == "collectible" then
 				things[i]:clCycleFrames()
@@ -695,6 +735,30 @@ function handleEnvironment()
 				end
 				
 			end
+		end
+	end
+end
+
+function invertDir(dir)
+	if direction[dir] == "up" then
+		dir = 1
+		while direction[dir] ~= "down" do
+			dir = dir + 1
+		end
+	elseif direction[dir] == "down" then
+		dir = 1
+		while direction[dir] ~= "up" do
+			dir = dir + 1
+		end
+	elseif direction[dir] == "left" then
+		dir = 1
+		while direction[dir] ~= "right" do
+			dir = dir + 1
+		end
+	elseif direction[dir] == "right" then
+		dir = 1
+		while direction[dir] ~= "left" do
+			dir = dir + 1
 		end
 	end
 end

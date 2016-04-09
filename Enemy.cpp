@@ -19,21 +19,24 @@ Enemy::Enemy(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType[
 
 void Enemy::tgResolveCollision(Thing* thing, int dir)
 {
+	// tgColliding[dir].thing1 = Game::things[tgLevelUnit];
+	tgColliding[dir] = thing->tgLevelUnit;
+
 	if (thing->tgType == Game::ThingType["player"] || thing->tgType == Game::ThingType["enemy"])
 	{
 		if (dir == Game::Direction["right"] || dir == Game::Direction["left"])
 		{
-			thing->tgSpeed *= 0.5;
+			// thing->tgSpeed *= 0.5;
 		}
 		else if (thing->tgVerticals != 0)
 		{
-			thing->tgVerticals = (tgVerticals < 0 ? Game::jumpArray.size() - 25 : Game::gravityArray.size() - 1);
+			// thing->tgVerticals = (tgVerticals < 0 ? Game::jumpArray.size() - 25 : Game::gravityArray.size() - 1);
 		}
 		else
 			std::cout << "Collision error: " << tgLevelUnit << " " << thing->tgLevelUnit << std::endl;
 
-		if (thing->tgType == Game::ThingType["player"])
-			thing->tgHealth -= enPower;
+		// if (thing->tgType == Game::ThingType["player"])
+		// 	thing->tgHealth -= enPower;
 	}
 	/*
 	else if (thing->tgType == Game::ThingType["tile"])
@@ -95,6 +98,7 @@ void Enemy::tgApplyAI(void)
 	// Thing nextMove{ &tgHitboxRect, Game::ThingType["temp"], tgLevelUnit };
 	// int moveX = 0, moveY = 0;
 	// bool left = false, right = false, up = false, down = false;
+	bool collided = false;
 
 	tgHandleVerticals();
 
@@ -104,8 +108,18 @@ void Enemy::tgApplyAI(void)
 		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
 			for (int i = 0; i < Game::gColliding.size(); i++)
 				if (Game::gColliding[i] != NULL)
+				{
+					collided = true;
 					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgSpeed > 0 ? Game::Direction["right"] : Game::Direction["left"]));
+				}
 	}
+	if (!collided /* || (collided && tgSpeed > 0) */)
+		tgColliding[Game::Direction["left"]] = -1;
+	if (!collided /* || (collided && tgSpeed < 0) */)
+		tgColliding[Game::Direction["right"]] = -1;
+	if (collided)
+		collided = false;
+
 	if (tgVerticals == 0)
 	{
 		tgHitboxRect.y++;
@@ -117,12 +131,25 @@ void Enemy::tgApplyAI(void)
 	{
 		tgHitboxRect.y += (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]);
 		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+		{
 			for (int i = 0; i < Game::gColliding.size(); i++)
 				if (Game::gColliding[i] != NULL)
+				{
+					collided = true;
 					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgVerticals > 0 ? Game::Direction["down"] : Game::Direction["up"]));
+				}
+		}
 	}
+	if (!collided /* || (collided && tgVerticals > 0) */)
+		tgColliding[Game::Direction["up"]] = -1;
+	if (!collided /* || (collided && tgVerticals < 0) */)
+		tgColliding[Game::Direction["down"]] = -1;
 
-
+	/*
+	if (!Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, false))
+		for (int i = 0; i < tgColliding.size(); i++)
+			tgColliding[i] = -1;
+			*/
 
 	/*
 	tgHandleVerticals();

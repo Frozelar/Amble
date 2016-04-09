@@ -29,10 +29,11 @@ public:
 	// int tgFrameWaitCounter;
 	int tgLevelUnit;
 	int tgVerticals;
-	int tgColliding;
-	int tgColDir;
+	// int tgColliding;
+	// int tgColDir;
 	bool tgSelected;
 	// Direction tgDirection;
 	SDL_Rect tgHitboxRect;
 	SDL_Rect tgGFXrect;
+	std::vector<int> tgColliding;	// index for each direction
 };

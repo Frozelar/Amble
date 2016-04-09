@@ -22,5 +22,4 @@ public:
 	// the type of enemy
 	int enType = 0;
 	int enPower = 5;
-	bool enIsColliding = false;
 };

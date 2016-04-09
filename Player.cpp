@@ -144,7 +144,7 @@ void Player::plMove(void)
 	// int moveX = 0, moveY = 0;
 	// bool left = false, right = false, up = false, down = false;
 	// int left = 0, right = 0, up = 0, down = 0, lowest = 0;
-
+	bool collided = false;
 
 	if (tgVerticals == 0 && plOldVerticals != 0)
 	{
@@ -167,8 +167,27 @@ void Player::plMove(void)
 		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
 			for (int i = 0; i < Game::gColliding.size(); i++)
 				if (Game::gColliding[i] != NULL)
+				{
+					collided = true;
 					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgSpeed > 0 ? Game::Direction["right"] : Game::Direction["left"]));
+				}
 	}
+	/*
+	if (!collided)
+	{
+		tgColliding[Game::Direction["left"]] = -1;
+		tgColliding[Game::Direction["right"]] = -1;
+	}
+	else
+		collided = false;
+	*/
+	if (!collided /* || (collided && tgSpeed > 0) */)
+		tgColliding[Game::Direction["left"]] = -1;
+	if (!collided /* || (collided && tgSpeed < 0) */)
+		tgColliding[Game::Direction["right"]] = -1;
+	if (collided)
+		collided = false;
+
 	if (tgVerticals == 0)
 	{
 		tgHitboxRect.y++;
@@ -176,6 +195,7 @@ void Player::plMove(void)
 			tgVerticals++;
 		tgHitboxRect.y--;
 	}
+
 	if (tgVerticals != 0)
 	{
 		tgHitboxRect.y += (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]);
@@ -183,10 +203,33 @@ void Player::plMove(void)
 		{
 		for (int i = 0; i < Game::gColliding.size(); i++)
 			if (Game::gColliding[i] != NULL)
+			{
+				collided = true;
 				Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgVerticals > 0 ? Game::Direction["down"] : Game::Direction["up"]));
+			}
 		plJumps = 0;
 		}
 	}
+	/*
+	if (!collided)
+	{
+		tgColliding[Game::Direction["up"]] = -1;
+		tgColliding[Game::Direction["down"]] = -1;
+	}
+	else
+		collided = false;
+	*/
+	if (!collided /* || (collided && tgVerticals > 0) */)
+		tgColliding[Game::Direction["up"]] = -1;
+	if (!collided /* || (collided && tgVerticals < 0) */)
+		tgColliding[Game::Direction["down"]] = -1;
+
+	/*
+	if (!Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, false))
+		for (int i = 0; i < tgColliding.size(); i++)
+			tgColliding[i] = -1;
+			*/
+
 	// nextMove.tgHitboxRect = tgHitboxRect;
 
 	/*
@@ -342,6 +385,10 @@ void Player::plMove(void)
 
 void Player::tgResolveCollision(Thing* thing, int dir)
 {
+	int direction = dir;
+	// tgColliding[dir - 1] = thing->tgLevelUnit;
+	direction = invertDir(dir);
+	thing->tgColliding[direction/* - 1 */] = tgLevelUnit;
 	// ???
 }
 

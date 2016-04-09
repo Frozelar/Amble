@@ -60,6 +60,9 @@ void Collectible::clCollect(void)
 
 void Collectible::tgResolveCollision(Thing* thing, int dir)
 {
+	// tgColliding[dir].thing1 = Game::things[tgLevelUnit];
+	tgColliding[dir] = thing->tgLevelUnit;
+
 	if (thing->tgType == Game::ThingType["player"])
 		tgHealth = 0;
 }
@@ -68,6 +71,10 @@ void Collectible::tgApplyAI(void)
 {
 	// if (tgHealth == 0)
 	//	clCollect();
+
+	if (!Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, false))
+		for (int i = 0; i < tgColliding.size(); i++)
+			tgColliding[i] = -1;
 }
 
 void Collectible::tgHandleVerticals(void)

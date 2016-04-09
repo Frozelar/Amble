@@ -103,8 +103,8 @@ Game* Game::gGame;
 Game::Game()
 {
 	int num = 0;
-	Direction["none"] = num;
-	Direction["left"] = (++num);
+	//Direction["none"] = num;
+	Direction["left"] = (/*++*/num);
 	Direction["right"] = (++num);
 	Direction["up"] = (++num);
 	Direction["down"] = (++num);
@@ -134,7 +134,10 @@ bool Game::checkCollision(Thing* thingOne, Thing* thingTwo, int levelunit, bool 
 		for (int i = 0; i < Level::LEVEL_UNITS; i++)
 		{
 			if (gColliding[i] != NULL)
+			{
+				delete gColliding[i];
 				gColliding[i] = NULL;
+			}
 		}
 	}
 
@@ -183,22 +186,24 @@ bool Game::checkCollisionRects(SDL_Rect* rect1, SDL_Rect* rect2)
 		return false;
 }
 
-void Game::applyAI(void)
+bool Game::applyAI(void)
 {
 	for (int i = 0; i < things.size(); i++)
 	{
 		if (things[i] != NULL && things[i]->tgType != ThingType["temp"])
 		{
 			if (things[i]->tgType != ThingType["player"])
-			{
 				things[i]->tgApplyAI();
-			}
 			if (things[i]->tgHealth == 0)
 			{
-				destroyThing(i);
+				if (things[i]->tgType == ThingType["player"])
+					return false;
+				else
+					destroyThing(i);
 			}
 		}
 	}
+	return true;
 }
 
 void Game::centerCamera(void)

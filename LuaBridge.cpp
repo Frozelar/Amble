@@ -723,6 +723,29 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_settable(L, -3);								// things table, specific thing, tgHitbox
 			lua_pop(L, 1);										// things table, specific thing
 
+			if (Game::things[i]->tgType == Game::ThingType["tile"] || Game::things[i]->tgType == Game::ThingType["collectible"] || Game::things[i]->tgType == Game::ThingType["enemy"])
+			// if(Game::things[i]->tgType != Game::ThingType["temp"])
+			{
+				for (int j = 0; j < Game::things[i]->tgColliding.size(); j++)
+				{
+					//if (Game::things[i]->tgColliding[j] != -1)
+					//{
+						lua_pushstring(L, "tgColliding");						// things, specific thing, "tgColliding"
+						lua_gettable(L, -2);									// things, specific thing, tgColliding
+						lua_pushnumber(L, j + 1);								// things, specific thing, tgColliding, direction
+						lua_pushnumber(L, (Game::things[i]->tgColliding[j] == -1 ? -1 : Game::things[i]->tgColliding[j] + 1));
+																				// things, specific thing, tgColliding, direction, thing2->tgLevelUnit
+						lua_settable(L, -3);									// things, specific thing, tgColliding
+						lua_pop(L, 1);											// things, specific thing
+						/*
+						lua_pushstring(L, "tgColDir");					// things, specific thing, "tgColDir"
+						lua_pushnumber(L, j + 1);						// things, specific thing, "tgColDir", dir
+						lua_settable(L, -3);							// things, specific thing
+						*/
+					//}
+				}
+			}
+
 			/*
 			if (Game::things[i]->tgType == Game::ThingType["enemy"])
 			{
@@ -770,6 +793,7 @@ int LuaBridge::labHandleEnvironment(void)
 				lua_pop(L, 2);								// 
 		}
 	}
+
 	lua_getglobal(L, "handleEnvironment");
 	lua_call(L, 0, 0);
 	lua_getglobal(L, "points");									// points
@@ -952,7 +976,7 @@ int LuaBridge::labHandleEnvironment(void)
 		}
 	}
 	*/
-	
+
 	return 0;
 }
 

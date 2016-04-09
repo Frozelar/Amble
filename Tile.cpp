@@ -57,8 +57,12 @@ void Tile::tgResolveCollision(Thing* thing)
 
 void Tile::tgResolveCollision(Thing* thing, int dir)
 {
-	thing->tgColliding = tgType;
-	thing->tgColDir = dir;
+	// thing->tgColliding = tgType;
+	// thing->tgColDir = dir;
+
+	// tgColliding[dir].thing1 = Game::things[tgLevelUnit];
+	tgColliding[dir] = thing->tgLevelUnit;
+
 	if (tiIsSolid)
 	{
 		if (thing->tgType == Game::ThingType["player"] && dir == Game::Direction["right"])
@@ -144,7 +148,9 @@ void Tile::tgRender(void)
 
 void Tile::tgApplyAI(void)
 {
-
+	if (!Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, false))
+		for (int i = 0; i < tgColliding.size(); i++)
+			tgColliding[i] = -1;
 }
 
 int Tile::tgGetSubtype(void)

@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 			else
 				Game::gPlayer->plHandleEvent(Game::gEvent);
 		}
-		Game::applyAI();
+		quit = !Game::applyAI();
 		Game::gPlayer->plMove();
 		Level::moveLevel();
 		Graphics::gxRender();

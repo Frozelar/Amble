@@ -182,7 +182,7 @@ public:
 	// static Level gLevel;
 
 	static void centerCamera(void);
-	static void applyAI(void);
+	static bool applyAI(void);
 	// int type, int levelunit, int x (optional if levelunit is given), int y (optional if levelunit is given), int thingtype (use ONLY if offset is not used with the type)
 	static void newThing(int, int, int, int, int);
 	static void newParticle(SDL_Rect*, int, SDL_Point*, int, int);

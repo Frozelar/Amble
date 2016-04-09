@@ -16,6 +16,10 @@ Thing::Thing(SDL_Rect* box, int type, int unit)
 	}
 	*/
 
+	tgColliding.resize(Game::Direction["total"]/* - 1*/);
+	for (int i = 0; i < tgColliding.size(); i++)
+		tgColliding[i] = -1;
+
 	tgType = type;
 	tgLevelUnit = unit;
 	tgHealth = Game::DEFAULT_HEALTH;
@@ -24,8 +28,8 @@ Thing::Thing(SDL_Rect* box, int type, int unit)
 	// tgFrameWaitCounter = 0;
 	tgVerticals = 0;
 	tgSelected = 0;
-	tgColliding = 0;
-	tgColDir = 0;
+	// tgColliding = 0;
+	// tgColDir = 0;
 }
 
 Thing::~Thing()

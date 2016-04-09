@@ -33,9 +33,9 @@ struct Collision {
 	Thing* thing2 = NULL;
 };
 
-enum Direction;
+// enum Direction;
 
 bool init(void);
 void close(void);
 
-// Direction invertDir(Direction);
+int invertDir(int);

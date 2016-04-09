@@ -84,21 +84,15 @@ void close(void)
 	Game::gRenderer = NULL;
 }
 
-/*
-Direction invertDir(Direction dir)
+int invertDir(int dir)
 {
-	switch (dir)
-	{
-	case LEFT:
-		return RIGHT;
-	case RIGHT:
-		return LEFT;
-	case UP:
-		return DOWN;
-	case DOWN:
-		return UP;
-	default:
-		return dir;
-	}
+	if (dir == Game::Direction["up"])
+		return Game::Direction["down"];
+	else if (dir == Game::Direction["down"])
+		return Game::Direction["up"];
+	else if (dir == Game::Direction["left"])
+		return Game::Direction["right"];
+	else if (dir == Game::Direction["right"])
+		return Game::Direction["left"];
+	return -1;
 }
-*/
