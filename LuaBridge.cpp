@@ -852,6 +852,36 @@ int LuaBridge::labHandleEnvironment(void)
 		Graphics::bgState = (int)lua_tonumber(L, -1);
 	lua_pop(L, 2);												// 
 
+	lua_getglobal(L, "audioBuffer");								// audioBuffer
+	for (int i = 1; i <= 2; i++)	// only sfx and music
+	{
+		lua_pushnumber(L, i);										// audioBuffer, i
+		lua_gettable(L, -2);										// audioBuffer, (sfx or music)
+		for (int j = 1;; j++)
+		{
+			lua_pushnumber(L, j);									// audioBuffer, (sfx or music), j
+			lua_gettable(L, -2);									// audioBuffer, (sfx or music), (sfx track or music track or nil)
+			if (lua_isnil(L, -1))
+			{
+				lua_pop(L, 1);										// audioBuffer, (sfx or music)
+				break;
+			}
+			else
+			{
+				if (i == 1)
+					Audio::auPlay(Game::SoundEffectType[lua_tostring(L, -1)], 's');
+				else if (i == 2)
+					Audio::auPlay(Game::MusicType[lua_tostring(L, -1)], 'm');
+				lua_pop(L, 1);										// audioBuffer, (sfx or music)
+				lua_pushnumber(L, j);								// audioBuffer, (sfx or music), j
+				lua_pushnil(L);										// audioBuffer, (sfx or music), j, nil
+				lua_settable(L, -3);								// audioBuffer, (sfx or music)
+			}
+		}
+		lua_pop(L, 1);												// audioBuffer
+	}
+	lua_pop(L, 1);													//
+
 	lua_getglobal(L, "totalParticles");							// totalParticles
 	if (Game::particles.size() != (int)lua_tonumber(L, -1))
 	{

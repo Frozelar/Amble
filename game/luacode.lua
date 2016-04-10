@@ -14,8 +14,8 @@ ENEMY_OFFSET = 100
 enemyTypes = { "dude", "guy" }
 TOTAL_ENEMY_TYPES = #enemyTypes
 enemyStats = { {100, 1}, {75, 5} }		-- order corresponds to enemyTypes; format = {health, power}
-HEALTH_STAT_SLOT = 1
-POWER_STAT_SLOT = 2
+HEALTH_INDEX = 1
+POWER_INDEX = 2
 
 COLLECTIBLE_OFFSET = 200
 collectibleTypes = { "cbit", "cbyte" }
@@ -40,9 +40,16 @@ TOTAL_TILE_SUBTYPES = #tileSubIdentifiers
 
 -- {name}
 audioIdentifiers = { 
-	{ "Jump", "Hit", "Explode", "Collect" }, -- sfx
+	{ "Jump", "Explosion", "Collect", "Hurt", "Powerup", "Select", "Woosh", "Warp" }, -- sfx
 	{ "Underground" } -- music 
 }
+
+audioBuffer = {
+	{},	-- sfx
+	{}	-- music
+}
+SFX_INDEX = 1
+MUSIC_INDEX = 2
 
 -- {name, # frames}
 frameIdentifiers = {
@@ -476,6 +483,7 @@ function Enemy:enResolveCollision(direction)
 	if t == "dude" then
 		if self.tgColliding[direction] == gPlayerUnit then
 			things[gPlayerUnit].tgHealth = things[gPlayerUnit].tgHealth - self.enPower
+			playAudio(SFX_INDEX, "Hurt")
 		end
 	elseif t == "guy" then
 		
@@ -698,15 +706,18 @@ function handleEnvironment()
 		if things[i] ~= -1 then
 			if things[i].tgType == "player" then
 				things[i]:plCycleFrames()
-				
+				if things[i].tgVerticals == -2 then
+					playAudio(SFX_INDEX, "Jump")
+				end
+				print(things[i].tgVerticals)
 			elseif things[i].tgType == "tile" then
 				things[i]:tiCycleFrames()
 				things[i]:tiHandleAI()
 				
 			elseif things[i].tgType == "enemy" then
 				if things[i].tgHealth == -2 or things[i].enPower == -2 then
-					things[i].tgHealth = enemyStats[things[i].enSubtype][HEALTH_STAT_SLOT]
-					things[i].enPower = enemyStats[things[i].enSubtype][POWER_STAT_SLOT]
+					things[i].tgHealth = enemyStats[things[i].enSubtype][HEALTH_INDEX]
+					things[i].enPower = enemyStats[things[i].enSubtype][POWER_INDEX]
 				end
 				
 				things[i]:enCycleFrames()
@@ -761,6 +772,14 @@ function invertDir(dir)
 			dir = dir + 1
 		end
 	end
+end
+
+function playAudio(pType, pName)
+	local i = 1
+	while audioBuffer[pType][i] ~= nil do
+		i = i + 1
+	end
+	audioBuffer[pType][i] = pName
 end
 
 --[[
