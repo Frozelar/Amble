@@ -723,8 +723,8 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_settable(L, -3);								// things table, specific thing, tgHitbox
 			lua_pop(L, 1);										// things table, specific thing
 
-			if (Game::things[i]->tgType == Game::ThingType["tile"] || Game::things[i]->tgType == Game::ThingType["collectible"] || Game::things[i]->tgType == Game::ThingType["enemy"])
-			// if(Game::things[i]->tgType != Game::ThingType["temp"])
+			// if (Game::things[i]->tgType == Game::ThingType["tile"] || Game::things[i]->tgType == Game::ThingType["collectible"] || Game::things[i]->tgType == Game::ThingType["enemy"])
+			if(Game::things[i]->tgType != Game::ThingType["temp"])
 			{
 				for (int j = 0; j < Game::things[i]->tgColliding.size(); j++)
 				{

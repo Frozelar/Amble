@@ -325,6 +325,15 @@ function Player:plCycleFrames()
 	end
 end
 
+-- tile
+function Player:plResolveCollision(pDirection)
+	local col = self.tgColliding[pDirection]
+	
+	if things[col].tgType == "tile" then
+		-- print(pDirection .. " " .. col)
+	end
+end
+
 Tile = {tiIsSolid, tiSubtype}
 Tile.__index = Tile
 
@@ -348,7 +357,7 @@ function Tile:new(levelUnit)
   self.tgHealth = 100
   self.tgColliding = { -1, -1, -1, -1 }
   self.tiIsSolid = true
-  self.tiSubtype = 1																-- NEED TO CHANGE THIS LATERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR~~~~~~~~~~~~~~~~~~~~~~
+  self.tiSubtype = 1
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = DEFAULT_W
   self.tgHitbox.h = DEFAULT_H
@@ -477,6 +486,7 @@ function Enemy:enHandleAI()
   end
 end
 
+-- player, tile
 function Enemy:enResolveCollision(pDirection)
 	local t = enemyTypes[self.enSubtype]
 	local col = self.tgColliding[pDirection]
@@ -485,7 +495,7 @@ function Enemy:enResolveCollision(pDirection)
 		if col == gPlayerUnit then
 			things[gPlayerUnit].tgHealth = things[gPlayerUnit].tgHealth - self.enPower
 			playAudio(SFX_INDEX, "Hurt")
-			print(direction[pDirection] .. " " .. col)
+			--print(direction[pDirection] .. " " .. col)
 		end
 		if things[col].tgType == "tile" then
 			--print(direction[pDirection] .. " " .. col)
@@ -711,6 +721,13 @@ function handleEnvironment()
 		if things[i] ~= -1 then
 			if things[i].tgType == "player" then
 				things[i]:plCycleFrames()
+				
+				for j = 1, #things[i].tgColliding do
+					if things[i].tgColliding[j] ~= -1 then
+						things[i]:plResolveCollision(j)
+					end
+				end
+				
 				if things[i].tgVerticals == -2 then
 					playAudio(SFX_INDEX, "Jump")
 				end
