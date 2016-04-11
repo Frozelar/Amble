@@ -61,7 +61,9 @@ void Tile::tgResolveCollision(Thing* thing, int dir)
 	// thing->tgColDir = dir;
 
 	// tgColliding[dir].thing1 = Game::things[tgLevelUnit];
-	tgColliding[dir] = thing->tgLevelUnit;
+	// tgColliding[dir] = thing->tgLevelUnit;
+	//int direction = invertDir(dir);
+	thing->tgColliding[dir] = tgLevelUnit;
 
 	if (tiIsSolid)
 	{

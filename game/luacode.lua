@@ -477,13 +477,18 @@ function Enemy:enHandleAI()
   end
 end
 
-function Enemy:enResolveCollision(direction)
+function Enemy:enResolveCollision(pDirection)
 	local t = enemyTypes[self.enSubtype]
+	local col = self.tgColliding[pDirection]
 	
 	if t == "dude" then
-		if self.tgColliding[direction] == gPlayerUnit then
+		if col == gPlayerUnit then
 			things[gPlayerUnit].tgHealth = things[gPlayerUnit].tgHealth - self.enPower
 			playAudio(SFX_INDEX, "Hurt")
+			print(direction[pDirection] .. " " .. col)
+		end
+		if things[col].tgType == "tile" then
+			--print(direction[pDirection] .. " " .. col)
 		end
 	elseif t == "guy" then
 		
@@ -709,7 +714,7 @@ function handleEnvironment()
 				if things[i].tgVerticals == -2 then
 					playAudio(SFX_INDEX, "Jump")
 				end
-				print(things[i].tgVerticals)
+				
 			elseif things[i].tgType == "tile" then
 				things[i]:tiCycleFrames()
 				things[i]:tiHandleAI()

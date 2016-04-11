@@ -385,10 +385,10 @@ void Player::plMove(void)
 
 void Player::tgResolveCollision(Thing* thing, int dir)
 {
-	int direction = dir;
+	// int direction = dir;
 	// tgColliding[dir - 1] = thing->tgLevelUnit;
-	direction = invertDir(dir);
-	thing->tgColliding[direction/* - 1 */] = tgLevelUnit;
+	// direction = invertDir(dir);
+	thing->tgColliding[dir] = tgLevelUnit;
 	// ???
 }
 
