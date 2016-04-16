@@ -22,6 +22,7 @@ std::map<std::string, int> Game::BackgroundType;
 std::map<std::string, int> Game::MusicType;
 std::map<std::string, int> Game::SoundEffectType;
 std::map<std::string, int> Game::ParticleType;
+std::map<std::string, int> Game::GameState;
 
 // window width (in pixels)
 int Game::WINDOW_W = 800;
@@ -95,6 +96,8 @@ std::vector<Collision*> Game::gColliding;
 std::vector<Thing*> Game::things;
 int Game::gScore = 0;
 
+int Game::gState = 0;
+
 // const int Game::MAX_PARTICLES = 4096;
 std::vector<Particle*> Game::particles;
 
@@ -115,6 +118,10 @@ Game::Game()
 	ThingType["tile"] = (++num);
 	ThingType["enemy"] = (++num);
 	ThingType["collectible"] = (++num);
+
+	GameState["game"] = (num = 0);
+	GameState["menu"] = (++num);
+	GameState["title"] = (++num);
 }
 
 Game::~Game()

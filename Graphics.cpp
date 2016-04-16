@@ -7,6 +7,7 @@
 std::vector< std::vector<Texture*> > Graphics::backgroundTextures(Game::BackgroundType["total"]);
 int Graphics::bgState = 0;
 int Graphics::bgFrame = 0;
+Texture* Graphics::menuTexture;
 // Texture Graphics::tileTextures[TOTAL_TILE_TYPES][TOTAL_OBJECT_FRAME_TYPES];
 std::vector< std::vector<Texture*> > Graphics::tileTextures(Game::TileType["total"]);
 std::vector< std::vector<Texture*> > Graphics::playerTextures(Game::EntityFrameType["total"]);
@@ -44,6 +45,7 @@ Graphics::Graphics()
 
 Graphics::~Graphics()
 {
+	gxClose();
 }
 
 bool Graphics::gxInit(void)
@@ -77,6 +79,8 @@ bool Graphics::gxInit(void)
 		particleTextures[i].resize(TOTAL_OBJECT_FRAME_TYPES);
 	*/
 
+	menuTexture = new Texture();
+	menuTexture->txLoadF(dir + "Menu" + ext);
 	for (int i = 0; i < playerIdentifiers.size(); i++)
 	{
 		for (int j = 0; j < playerIdentifiers[i].size(); j++)
@@ -102,7 +106,6 @@ bool Graphics::gxInit(void)
 			// tileTextures[i].resize(j + 1);
 			tileTextures[i][j] = new Texture();
 			tileTextures[i][j]->txLoadF(dir + "ti" + tileIdentifiers[i][j] + ext);
-			std::cout << dir + "ti" + tileIdentifiers[i][j] + ext << std::endl;
 		}
 	}
 	for (int i = 0; i < collectibleIdentifiers.size(); i++)
@@ -284,5 +287,31 @@ void Graphics::gxRender(void)
 			}
 		}
 	}
+	if (Game::gState == Game::GameState["menu"])
+		Graphics::menuTexture->txRender();
+
 	SDL_RenderPresent(Game::gRenderer);
+}
+
+void Graphics::gxClose(void)
+{
+	delete menuTexture;
+	for (int i = 0; i < playerIdentifiers.size(); i++)
+		for (int j = 0; j < playerIdentifiers[i].size(); j++)
+			delete playerTextures[i][j];
+	for (int i = 0; i < enemyIdentifiers.size(); i++)
+		for (int j = 0; j < enemyIdentifiers[i].size(); j++)
+			delete enemyTextures[i][j];
+	for (int i = 0; i < tileIdentifiers.size(); i++)
+		for (int j = 0; j < tileIdentifiers[i].size(); j++)
+			delete tileTextures[i][j];
+	for (int i = 0; i < collectibleIdentifiers.size(); i++)
+		for (int j = 0; j < collectibleIdentifiers[i].size(); j++)
+			delete collectibleTextures[i][j];
+	for (int i = 0; i < particleIdentifiers.size(); i++)
+		for (int j = 0; j < particleIdentifiers[i].size(); j++)
+			delete particleTextures[i][j];
+	for (int i = 0; i < backgroundIdentifiers.size(); i++)
+		for (int j = 0; j < backgroundIdentifiers[i].size(); j++)
+			delete backgroundTextures[i][j];
 }

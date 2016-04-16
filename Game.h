@@ -134,6 +134,7 @@ public:
 	static std::map<std::string, int> MusicType;
 	static std::map<std::string, int> SoundEffectType;
 	static std::map<std::string, int> ParticleType;
+	static std::map<std::string, int> GameState;
 	static const int TILE_TYPE_OFFSET = 1000;
 	static const int ENEMY_TYPE_OFFSET = 2000;
 	static const int COLLECTIBLE_TYPE_OFFSET = 3000;
@@ -177,6 +178,7 @@ public:
 	static std::vector<Thing*> things;
 	static std::vector<Particle*> particles;
 	static int gScore;
+	static int gState;
 
 	// static Game gGame;
 	// static Level gLevel;

@@ -23,7 +23,7 @@ TOTAL_COLLECTIBLE_TYPES = #collectibleTypes
 
 -- {name, # frames or # frame sets}
 graphicsIdentifiers = { 
-	{ {"Underground", 1} }, -- backgrounds (# frames)
+	{ {"Title", 1}, {"Underground", 1}, {"Sky", 1}, {"Autumn", 1} }, -- backgrounds (# frames)
 	{ {"DirtBlock", 1}, {"DirtWall", 1} }, -- tiles (# frames (PER tile subidentifier))
 	{ {"" --[[ "Player" ]], 5} }, -- player states (# frame SETS (5 by default)
 	{ {"Dude", 5}, {"Guy", 5} }, -- enemies (# frame SETS (5 by default))
@@ -40,7 +40,7 @@ TOTAL_TILE_SUBTYPES = #tileSubIdentifiers
 
 -- {name}
 audioIdentifiers = { 
-	{ "Jump", "Explosion", "Collect", "Hurt", "Powerup", "Select", "Woosh", "Warp" }, -- sfx
+	{ "Jump", "Explosion", "Collect", "Hurt", "Powerup", "Select", "Whoosh", "Warp" }, -- sfx
 	{ "Underground" } -- music 
 }
 
@@ -630,6 +630,8 @@ function Collectible:clCollect()
     elseif collectibleTypes[self.clSubtype] == "cbyte" then
       points = points + 8
     end
+	
+	playAudio(SFX_INDEX, "Collect")
 end
 
 function Collectible:clCycleFrames()
@@ -730,6 +732,9 @@ function handleEnvironment()
 				
 				if things[i].tgVerticals == -2 then
 					playAudio(SFX_INDEX, "Jump")
+				end
+				if things[i].tgDashing == 2 or things[i].tgDashing == -2 then
+					playAudio(SFX_INDEX, "Whoosh")
 				end
 				
 			elseif things[i].tgType == "tile" then

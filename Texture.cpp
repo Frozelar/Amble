@@ -59,7 +59,7 @@ bool Texture::txLoadF(std::string path)
 	else
 	{
 		// set the color key
-		SDL_SetColorKey(imageSurface, SDL_TRUE, SDL_MapRGB(imageSurface->format, 0, 255, 255));
+		// SDL_SetColorKey(imageSurface, SDL_TRUE, SDL_MapRGB(imageSurface->format, 0, 255, 255));
 
 		// create the texture itself from the surface
 		createdTexture = SDL_CreateTextureFromSurface(Game::gRenderer, imageSurface);

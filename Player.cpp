@@ -46,6 +46,10 @@ void Player::plHandleEvent(SDL_Event* e)
 				// tgDirection = NO_DIRECTION;
 			}
 			break;
+		case SDLK_p:
+			if (Game::gState == Game::GameState["game"])
+				Game::gState = Game::GameState["menu"];
+			break;
 		}
 	}
 	else if (e->type == SDL_KEYDOWN && e->key.repeat == NULL)

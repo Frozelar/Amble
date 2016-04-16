@@ -6,6 +6,8 @@
 #include "LuaBridge.h"
 #include "Player.h"
 #include "Audio.h"
+#include "Menu.h"
+#include "LevelEditor.h"
 
 int main(int argc, char** argv)
 {
@@ -28,25 +30,43 @@ int main(int argc, char** argv)
 	// init();
 	// Level::generateLevel();
 	// Graphics::gxInit();
+
+	Game::gState = Game::GameState["game"];
 	while (!quit)
 	{
-		// labHandleEnvironment needs to be called before applyAI 
-		// since otherwise collectibles would be deleted before clCollect is called
-		LuaBridge::labHandleEnvironment();
-		while (SDL_PollEvent(Game::gEvent) != NULL)
+		if (Game::gState == Game::GameState["game"])
 		{
-			if (Game::gEvent->type == SDL_QUIT)
-				quit = true;
+			// labHandleEnvironment needs to be called before applyAI 
+			// since otherwise collectibles would be deleted before clCollect is called
+			LuaBridge::labHandleEnvironment();
+			while (SDL_PollEvent(Game::gEvent) != NULL)
+			{
+				if (Game::gEvent->type == SDL_QUIT)
+					quit = true;
+				else
+					Game::gPlayer->plHandleEvent(Game::gEvent);
+			}
+			if (!quit)
+				quit = !Game::applyAI();
 			else
-				Game::gPlayer->plHandleEvent(Game::gEvent);
+				Game::applyAI();
+			Game::gPlayer->plMove();
+			Level::moveLevel();
+			Graphics::gxRender();
 		}
-		if (!quit)
-			quit = !Game::applyAI();
-		else
-			Game::applyAI();
-		Game::gPlayer->plMove();
-		Level::moveLevel();
-		Graphics::gxRender();
+		else if (Game::gState == Game::GameState["title"] || Game::gState == Game::GameState["menu"])
+		{
+			if(!Menu::muInitialized)
+				Menu::muCreateMenu();
+			while (SDL_PollEvent(Game::gEvent) != NULL)
+			{
+				if (Game::gEvent->type == SDL_QUIT)
+					quit = true;
+				else
+					Menu::muHandleMenu(Game::gEvent);
+			}
+			Menu::muRender();
+		}
 	}
 
 	close();
