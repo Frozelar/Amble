@@ -71,11 +71,14 @@ void close(void)
 		}
 	}
 
+	delete Game::gGame;
 	LuaBridge::labClose();
 
 	Mix_CloseAudio();
 	Mix_Quit();
 	IMG_Quit();
+	TTF_CloseFont(Game::gFont);
+	Game::gFont = NULL;
 	TTF_Quit();
 	SDL_Quit();
 	SDL_DestroyRenderer(Game::gRenderer);

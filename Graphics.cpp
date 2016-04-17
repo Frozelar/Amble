@@ -7,7 +7,6 @@
 std::vector< std::vector<Texture*> > Graphics::backgroundTextures(Game::BackgroundType["total"]);
 int Graphics::bgState = 0;
 int Graphics::bgFrame = 0;
-Texture* Graphics::menuTexture;
 // Texture Graphics::tileTextures[TOTAL_TILE_TYPES][TOTAL_OBJECT_FRAME_TYPES];
 std::vector< std::vector<Texture*> > Graphics::tileTextures(Game::TileType["total"]);
 std::vector< std::vector<Texture*> > Graphics::playerTextures(Game::EntityFrameType["total"]);
@@ -51,8 +50,6 @@ Graphics::~Graphics()
 bool Graphics::gxInit(void)
 {
 	bool isAnimated = false;
-	std::string dir = "resources/";
-	std::string ext = ".png";
 
 	/*
 	Graphics::backgroundIdentifiers = { "Underground" };
@@ -79,15 +76,13 @@ bool Graphics::gxInit(void)
 		particleTextures[i].resize(TOTAL_OBJECT_FRAME_TYPES);
 	*/
 
-	menuTexture = new Texture();
-	menuTexture->txLoadF(dir + "Menu" + ext);
 	for (int i = 0; i < playerIdentifiers.size(); i++)
 	{
 		for (int j = 0; j < playerIdentifiers[i].size(); j++)
 		{
 			// playerTextures[i].resize(j + 1);		// should already be sized correctly from luabridge
 			playerTextures[i][j] = new Texture();
-			playerTextures[i][j]->txLoadF(dir + "pl" + playerIdentifiers[i][j] + ext);
+			playerTextures[i][j]->txLoadF(Game::rDir + "pl" + playerIdentifiers[i][j] + Game::rExt);
 		}
 	}
 	for (int i = 0; i < enemyIdentifiers.size(); i++)
@@ -96,7 +91,7 @@ bool Graphics::gxInit(void)
 		{
 			// enemyTextures[i].resize(j + 1);
 			enemyTextures[i][j] = new Texture();
-			enemyTextures[i][j]->txLoadF(dir + "en" + enemyIdentifiers[i][j] + ext);
+			enemyTextures[i][j]->txLoadF(Game::rDir + "en" + enemyIdentifiers[i][j] + Game::rExt);
 		}
 	}
 	for (int i = 0; i < tileIdentifiers.size(); i++)
@@ -105,7 +100,7 @@ bool Graphics::gxInit(void)
 		{
 			// tileTextures[i].resize(j + 1);
 			tileTextures[i][j] = new Texture();
-			tileTextures[i][j]->txLoadF(dir + "ti" + tileIdentifiers[i][j] + ext);
+			tileTextures[i][j]->txLoadF(Game::rDir + "ti" + tileIdentifiers[i][j] + Game::rExt);
 		}
 	}
 	for (int i = 0; i < collectibleIdentifiers.size(); i++)
@@ -114,7 +109,7 @@ bool Graphics::gxInit(void)
 		{
 			// collectibleTextures[i].resize(j + 1);
 			collectibleTextures[i][j] = new Texture();
-			collectibleTextures[i][j]->txLoadF(dir + "cl" + collectibleIdentifiers[i][j] + ext);
+			collectibleTextures[i][j]->txLoadF(Game::rDir + "cl" + collectibleIdentifiers[i][j] + Game::rExt);
 		}
 	}
 	for (int i = 0; i < particleIdentifiers.size(); i++)
@@ -123,7 +118,7 @@ bool Graphics::gxInit(void)
 		{
 			// particleTextures[i].resize(j + 1);
 			particleTextures[i][j] = new Texture();
-			particleTextures[i][j]->txLoadF(dir + "pt" + particleIdentifiers[i][j] + ext);
+			particleTextures[i][j]->txLoadF(Game::rDir + "pt" + particleIdentifiers[i][j] + Game::rExt);
 		}
 	}
 	for (int i = 0; i < backgroundIdentifiers.size(); i++)
@@ -132,7 +127,7 @@ bool Graphics::gxInit(void)
 		{
 			// backgroundTextures[i].resize(j + 1);
 			backgroundTextures[i][j] = new Texture();
-			backgroundTextures[i][j]->txLoadF(dir + "bg" + backgroundIdentifiers[i][j] + ext);
+			backgroundTextures[i][j]->txLoadF(Game::rDir + "bg" + backgroundIdentifiers[i][j] + Game::rExt);
 		}
 	}
 	bgState = 0;
@@ -261,13 +256,17 @@ bool Graphics::gxInit(void)
 	return true;
 }
 
-void Graphics::gxRender(void)
+void Graphics::gxRender(bool updateRenderer)
 {
 	SDL_Rect cameraRect{ 0 - Game::DEFAULT_W * Game::DEFAULT_H, 0 - Game::DEFAULT_W * Game::DEFAULT_H,
 		Game::WINDOW_W + Game::DEFAULT_W * Game::DEFAULT_H * 2, Game::WINDOW_H + Game::DEFAULT_W * Game::DEFAULT_H * 2 };
 	Thing camera{ &cameraRect, Game::ThingType["temp"], -1 };
-	SDL_SetRenderDrawColor(Game::gRenderer, 105, 105, 245, 255);
-	SDL_RenderClear(Game::gRenderer);
+
+	if (updateRenderer)
+	{
+		SDL_SetRenderDrawColor(Game::gRenderer, 105, 105, 245, 255);
+		SDL_RenderClear(Game::gRenderer);
+	}
 
 	bgState = Level::levelBG;
 	Graphics::backgroundTextures[bgState][bgFrame]->txRect.x = 0;
@@ -287,15 +286,13 @@ void Graphics::gxRender(void)
 			}
 		}
 	}
-	if (Game::gState == Game::GameState["menu"])
-		Graphics::menuTexture->txRender();
 
-	SDL_RenderPresent(Game::gRenderer);
+	if (updateRenderer)
+		SDL_RenderPresent(Game::gRenderer);
 }
 
 void Graphics::gxClose(void)
 {
-	delete menuTexture;
 	for (int i = 0; i < playerIdentifiers.size(); i++)
 		for (int j = 0; j < playerIdentifiers[i].size(); j++)
 			delete playerTextures[i][j];

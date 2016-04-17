@@ -164,6 +164,12 @@ public:
 	// static int TOTAL_FLOAT_ARRAY_UNITS;
 	static std::vector<int> floatArray;
 	static bool initialized;
+	static int gScore;
+	static int gState;
+	static std::string rDir;
+	static std::string rExt;
+	static SDL_Color textColor;
+	static SDL_Color highlightColor;
 	static TTF_Font* gFont;
 	static SDL_Window* gWindow;
 	static SDL_Renderer* gRenderer;
@@ -175,10 +181,9 @@ public:
 	static Game* gGame;
 	static Level* gLevel;
 	static LuaBridge* gLuaBridge;
+	static Menu* gMenu;
 	static std::vector<Thing*> things;
 	static std::vector<Particle*> particles;
-	static int gScore;
-	static int gState;
 
 	// static Game gGame;
 	// static Level gLevel;

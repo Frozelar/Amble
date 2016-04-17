@@ -58,6 +58,12 @@ void LuaBridge::labInitValues(void)
 	// lua_pcall(L, 0, 0, 0);
 	lua_register(L, "checkCollision", labCheckCollision);
 
+	lua_getglobal(L, "resourceDirectory");
+	Game::rDir = lua_tostring(L, -1);
+	lua_getglobal(L, "resourceExtension");
+	Game::rExt = lua_tostring(L, -1);
+	lua_pop(L, 2);
+
 	lua_getglobal(L, "WINDOW_W");
 	Game::WINDOW_W = lua_tonumber(L, -1);
 	lua_getglobal(L, "WINDOW_H");
@@ -97,6 +103,30 @@ void LuaBridge::labInitValues(void)
 	// lua_pushlightuserdata(L, pl);
 	// lua_settable(L, LUA_REGISTRYINDEX);
 	lua_pop(L, 14);
+
+	lua_getglobal(L, "textColor");						// textColor
+	for (int i = 0; i < 4; i++)
+	{
+		lua_pushnumber(L, i + 1);
+		lua_gettable(L, -(i + 2));
+	}													// textColor, r, g, b, a
+	Game::textColor.r = lua_tonumber(L, -4);
+	Game::textColor.g = lua_tonumber(L, -3);
+	Game::textColor.b = lua_tonumber(L, -2);
+	Game::textColor.a = lua_tonumber(L, -1);
+	lua_pop(L, 5);										// 
+
+	lua_getglobal(L, "highlightColor");					// highlightColor
+	for (int i = 0; i < 4; i++)
+	{
+		lua_pushnumber(L, i + 1);
+		lua_gettable(L, -(i + 2));
+	}													// highlightColor, r, g, b, a
+	Game::highlightColor.r = lua_tonumber(L, -4);
+	Game::highlightColor.g = lua_tonumber(L, -3);
+	Game::highlightColor.b = lua_tonumber(L, -2);
+	Game::highlightColor.a = lua_tonumber(L, -1);
+	lua_pop(L, 5);										// 
 
 	lua_getglobal(L, "frameIdentifiers");												// frameIdentifiers[]
 	for (int i = 0; i < FrameIDLocations["total"]; i++)
@@ -711,6 +741,9 @@ int LuaBridge::labHandleEnvironment(void)
 			lua_settable(L, -3);								// things table, specific thing
 			lua_pushstring(L, "tgHealth");						// things table, specific thing, "tgHealth"
 			lua_pushnumber(L, Game::things[i]->tgHealth);		// things table, specific thing, "tgHealth", tgHealth
+			lua_settable(L, -3);								// things table, specific thing
+			lua_pushstring(L, "tgDashing");						// things table, specific thing, "tgDashing"
+			lua_pushnumber(L, Game::things[i]->tgDashing);		// things table, specific thing, "tgDashing", tgDashing
 			lua_settable(L, -3);								// things table, specific thing
 			// lua_pop(L, 2);
 			lua_pushstring(L, "tgHitbox");						// things table, specific thing, "tgHitbox"

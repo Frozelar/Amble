@@ -27,6 +27,7 @@ Thing::Thing(SDL_Rect* box, int type, int unit)
 	tgFrame = 0;
 	// tgFrameWaitCounter = 0;
 	tgVerticals = 0;
+	tgDashing = 0;
 	tgSelected = 0;
 	// tgColliding = 0;
 	// tgColDir = 0;

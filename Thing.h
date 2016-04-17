@@ -29,6 +29,7 @@ public:
 	// int tgFrameWaitCounter;
 	int tgLevelUnit;
 	int tgVerticals;
+	int tgDashing;
 	// int tgColliding;
 	// int tgColDir;
 	bool tgSelected;

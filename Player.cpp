@@ -57,14 +57,14 @@ void Player::plHandleEvent(SDL_Event* e)
 		switch (e->key.keysym.sym)
 		{
 		case SDLK_w:
-			if (tgVerticals == 0 && plOldVerticals == 0 && plDashing == 0)
+			if (tgVerticals == 0 && plOldVerticals == 0 && tgDashing == 0)
 			{
 				plJumps++;
 				tgVerticals--;
 			}
-			else if ((plDashing == -1 || plDashing == 1))
+			else if ((tgDashing == -1 || tgDashing == 1))
 			{
-				plDashing += (plDashing < 0 ? -1 : 1);
+				tgDashing += (tgDashing < 0 ? -1 : 1);
 			}
 			else if (plJumps < 3 && (tgVerticals < -((int)Game::jumpArray.size() - 4) || (tgVerticals >= 1 && tgVerticals <= 8)))
 			{
@@ -111,30 +111,30 @@ void Player::tgHandleVerticals(void)
 
 void Player::plHandleDashing(void)
 {
-	if (tgVerticals == 0 && plOldVerticals > 0 && plDashing == 0 && tgSpeed != 0)
+	if (tgVerticals == 0 && plOldVerticals > 0 && tgDashing == 0 && tgSpeed != 0)
 	{
 		// plDashing == -1 || plDashing == 1 means the player CAN dash; other values (except 0) mean the player IS dashing
-		plDashing += (tgSpeed < 0 ? -1 : 1);
+		tgDashing += (tgSpeed < 0 ? -1 : 1);
 		plActionCounter++;
 	}
-	else if ((plDashing > 1 || plDashing < -1) && (plDashing < (int)Game::dashArray.size() && plDashing > -(int)Game::dashArray.size()))
+	else if ((tgDashing > 1 || tgDashing < -1) && (tgDashing < (int)Game::dashArray.size() && tgDashing > -(int)Game::dashArray.size()))
 	{
-		tgHitboxRect.x += (plDashing < 0 ? -Game::dashArray[-plDashing] : Game::dashArray[plDashing]);
-		if (plDashing == 2 || plDashing == -2)
+		tgHitboxRect.x += (tgDashing < 0 ? -Game::dashArray[-tgDashing] : Game::dashArray[tgDashing]);
+		if (tgDashing == 2 || tgDashing == -2)
 			tgHitboxRect.y -= 8;
-		plDashing += (plDashing < 0 ? -1 : 1);
+		tgDashing += (tgDashing < 0 ? -1 : 1);
 	}
-	else if ((plDashing >= (int)Game::dashArray.size() || plDashing <= -(int)Game::dashArray.size()))
+	else if ((tgDashing >= (int)Game::dashArray.size() || tgDashing <= -(int)Game::dashArray.size()))
 	{
-		plDashing = (tgSpeed < 0 ? -1 : 1);
+		tgDashing = (tgSpeed < 0 ? -1 : 1);
 		plActionCounter = 0;
 	}
-	else if ((plActionCounter >= 4 && (plDashing == 1 || plDashing == -1)))
+	else if ((plActionCounter >= 4 && (tgDashing == 1 || tgDashing == -1)))
 	{
-		plDashing = 0;
+		tgDashing = 0;
 		plActionCounter = 0;
 	}
-	else if (plDashing == 1 || plDashing == -1)
+	else if (tgDashing == 1 || tgDashing == -1)
 	{
 		plActionCounter++;
 	}
@@ -420,8 +420,8 @@ void Player::tgRender(void)
 	tgSyncTexture();
 
 	if ((plJumps < 3 && (tgVerticals < -((int)Game::jumpArray.size() - 4) || (tgVerticals >= 1 && tgVerticals <= 8))) || 
-		(plDashing == 1 || plDashing == -1))
-		Graphics::playerTextures[plState][tgFrame]->txColor(210, 180, 90);
+		(tgDashing == 1 || tgDashing == -1))
+		Graphics::playerTextures[plState][tgFrame]->txColor(Game::highlightColor.r, Game::highlightColor.g, Game::highlightColor.b);
 	else
 		Graphics::playerTextures[plState][tgFrame]->txColor(255, 255, 255);
 

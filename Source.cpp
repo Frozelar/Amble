@@ -23,6 +23,7 @@ int main(int argc, char** argv)
 	LuaBridge::labInitValues();
 	Game::gAudio = new Audio();
 	Game::gGraphics = new Graphics();
+	Game::gMenu = new Menu();
 	Level::playMusic();
 	// lua_State* S = luaL_newstate();
 	// luaL_openlibs(S);
@@ -63,7 +64,12 @@ int main(int argc, char** argv)
 				if (Game::gEvent->type == SDL_QUIT)
 					quit = true;
 				else
-					Menu::muHandleMenu(Game::gEvent);
+				{
+					if (!quit)
+						quit = !Menu::muHandleMenu(Game::gEvent);
+					else
+						Menu::muHandleMenu(Game::gEvent);
+				}
 			}
 			Menu::muRender();
 		}

@@ -26,7 +26,6 @@ public:
 	void tgResolveCollision(Thing*, int);
 
 	int plJumps = 0;
-	int plDashing = 0;
 	int plActionCounter = 0;
 	int plState = 0;
 	int plOldVerticals = 0;

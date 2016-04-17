@@ -10,14 +10,13 @@ public:
 
 	static bool gxInit(void);
 
-	static void gxRender(void);
+	static void gxRender(bool = true);
 
 	static void gxClose(void);
 
 	static std::vector< std::vector<Texture*> > backgroundTextures;
 	static int bgState;
 	static int bgFrame;
-	static Texture* menuTexture;
 	static std::vector< std::vector<Texture*> > tileTextures;
 	static std::vector< std::vector<Texture*> > playerTextures;
 	static std::vector< std::vector<Texture*> > collectibleTextures;

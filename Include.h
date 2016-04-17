@@ -27,6 +27,8 @@ class Game;
 class Particle;
 class Level;
 class LuaBridge;
+class Menu;
+class LevelEditor;
 
 struct Collision {
 	Thing* thing1 = NULL;

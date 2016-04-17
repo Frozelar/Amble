@@ -97,6 +97,10 @@ std::vector<Thing*> Game::things;
 int Game::gScore = 0;
 
 int Game::gState = 0;
+std::string Game::rDir = "resources/";
+std::string Game::rExt = ".png";
+SDL_Color Game::textColor = { 255, 255, 255, 255 };
+SDL_Color Game::highlightColor = { 255, 255, 255, 255 };
 
 // const int Game::MAX_PARTICLES = 4096;
 std::vector<Particle*> Game::particles;
@@ -126,6 +130,26 @@ Game::Game()
 
 Game::~Game()
 {
+	delete gEvent;
+	gEvent = NULL;
+	delete gAudio;
+	gAudio = NULL;
+	delete gGraphics;
+	gGraphics = NULL;
+	delete gPlayer;
+	gPlayer = NULL;
+	delete gLevel;
+	gLevel = NULL;
+	delete gLuaBridge;
+	gLuaBridge = NULL;
+	delete gMenu;
+	gMenu = NULL;
+	for (int i = 0; i < gColliding.size(); i++)
+		if (gColliding[i] != NULL)
+		{
+			delete gColliding[i];
+			gColliding[i] = NULL;
+		}
 }
 
 bool Game::checkCollision(Thing* thingOne, Thing* thingTwo, int levelunit, bool outputCollision)

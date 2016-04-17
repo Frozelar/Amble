@@ -2,6 +2,12 @@ getmetatable('').__index = function(str, i)
 	return string.sub(str, i, i)
 end
 
+resourceDirectory = "resources/"
+resourceExtension = ".png"
+
+textColor = { 255, 255, 255, 255 }  -- r, g, b, a
+highlightColor = { 210, 180, 90, 255 }
+
 direction = { "left", "right", "up", "down" }
 
 thingTypes = { "player", "tile", "enemy", "collectible" }
@@ -40,7 +46,7 @@ TOTAL_TILE_SUBTYPES = #tileSubIdentifiers
 
 -- {name}
 audioIdentifiers = { 
-	{ "Jump", "Explosion", "Collect", "Hurt", "Powerup", "Select", "Whoosh", "Warp" }, -- sfx
+	{ "Jump", "Explosion", "Collect", "Hurt", "Powerup", "Select", "Whoosh", "Warp", "Dash" }, -- sfx
 	{ "Underground" } -- music 
 }
 
@@ -246,6 +252,7 @@ function Thing:new(levelUnit)
   self.tgFrameInterval = 0
   self.tgColliding = { -1, -1, -1, -1 }		-- index for each direction
   self.tgHealth = 100
+  self.tgDashing = 0
   -- self.tgMaxFrames = 0
   --[[
   local lx, ly, amt = self.tgLevelUnit, self.tgLevelUnit, 0
@@ -258,7 +265,7 @@ function Thing:new(levelUnit)
 	]]
 end
 
-Player = {plJumps, plDashing}
+Player = {plJumps, tgDashing}
 Player.__index = Player
 
 setmetatable(Player, {
@@ -281,7 +288,7 @@ function Player:new(levelUnit)
   self.tgHealth = 100
   self.tgColliding = { -1, -1, -1, -1 }
   self.plJumps = 0
-  self.plDashing = 0
+  self.tgDashing = 0
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = PLAYER_W
   self.tgHitbox.h = PLAYER_H
@@ -355,6 +362,7 @@ function Tile:new(levelUnit)
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgHealth = 100
+  self.tgDashing = 0
   self.tgColliding = { -1, -1, -1, -1 }
   self.tiIsSolid = true
   self.tiSubtype = 1
@@ -411,6 +419,7 @@ function Enemy:new(levelUnit)
   self.tgMaxFrames = #entityFrames
   self.tgColliding = { -1, -1, -1, -1 }
   self.tgHealth = -2
+  self.tgDashing = 0
   self.enPower = -2
   self.enSubtype = -1
   self.enDashing = 0
@@ -609,6 +618,7 @@ function Collectible:new(levelUnit)
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgHealth = 100
+  self.tgDashing = 0
   self.tgColliding = { -1, -1, -1, -1 }
   self.clSubtype = -1
   self.tgHitbox = Rectangle(0, 0, 0, 0)
@@ -733,8 +743,8 @@ function handleEnvironment()
 				if things[i].tgVerticals == -2 then
 					playAudio(SFX_INDEX, "Jump")
 				end
-				if things[i].tgDashing == 2 or things[i].tgDashing == -2 then
-					playAudio(SFX_INDEX, "Whoosh")
+				if things[i].tgDashing == 3 or things[i].tgDashing == -3 then
+					playAudio(SFX_INDEX, "Dash")
 				end
 				
 			elseif things[i].tgType == "tile" then
