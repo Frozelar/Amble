@@ -166,6 +166,7 @@ public:
 	static bool initialized;
 	static int gScore;
 	static int gState;
+	static int gOldState;
 	static std::string rDir;
 	static std::string rExt;
 	static SDL_Color textColor;
@@ -195,6 +196,7 @@ public:
 	static void newParticle(SDL_Rect*, int, SDL_Point*, int, int);
 	static void destroyThing(int);
 	static void destroyParticle(int);
+	static void changeGameState(int);
 
 	// Thing* = first thing, Thing* = second thing (or NULL to check first thing and everything), int = level unit of first thing,
 	// bool = whether to output collision to gColliding; returns whether or not there was a collision

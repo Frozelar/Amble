@@ -9,7 +9,7 @@
 // const int LuaBridge::MAX_ARGS = 64;
 // void* LuaBridge::labStack[MAX_ARGS];
 
-bool LuaBridge::labChangedLevel = false;
+// bool LuaBridge::labChangedLevel = false;
 lua_State* LuaBridge::L;
 LuaBridge* Game::gLuaBridge;
 
@@ -44,7 +44,7 @@ LuaBridge::~LuaBridge()
 	
 }
 
-void LuaBridge::labInitValues(void)
+int LuaBridge::labInitValues(void)
 {
 	int max = 0;
 	int framenum = 0;
@@ -57,6 +57,10 @@ void LuaBridge::labInitValues(void)
 	std::cout << "0=no errors, 1=errors: " << error /* << " " << lua_tostring(L, -1) */ << std::endl;
 	// lua_pcall(L, 0, 0, 0);
 	lua_register(L, "checkCollision", labCheckCollision);
+
+	lua_getglobal(L, "totalLevels");
+	Level::totalLevels = lua_tonumber(L, -1);
+	lua_pop(L, 1);
 
 	lua_getglobal(L, "resourceDirectory");
 	Game::rDir = lua_tostring(L, -1);
@@ -556,6 +560,11 @@ void LuaBridge::labInitValues(void)
 	// lua_getglobal(L, "gBackground");	// gBackground
 	// lua_pushstring(L, "bgSetType");	// "bgSetType"
 	// lua_gettable(L, -2);				// bgSetType()
+	return 0;
+}
+
+int LuaBridge::labChangeLevel()
+{
 	lua_getglobal(L, "bgSetType");				// bgSetType()
 	lua_pushnumber(L, Graphics::bgState + 1);	// bgSetType(), bgState
 	lua_call(L, 1, 0);							// 
@@ -581,7 +590,7 @@ void LuaBridge::labInitValues(void)
 	lua_copy(L, -2, -1);											// things, things
 	std::cout << (int)lua_rawlen(L, -1) << " ";
 	std::cout << (int)lua_rawlen(L, -2);
-	lua_pop(L, 2);													// 
+	lua_pop(L, 2);													//
 	*/
 
 	/*
@@ -632,16 +641,12 @@ void LuaBridge::labInitValues(void)
 	}
 	lua_pop(L, 1);
 
-	if (labChangedLevel)
-	{
-		lua_pushnumber(L, (int)Level::LEVEL_W);		// levelW
-		lua_setglobal(L, "LEVEL_W");				//
-		lua_pushnumber(L, (int)Level::LEVEL_H);		// levelH
-		lua_setglobal(L, "LEVEL_H");				//
-		lua_pushnumber(L, (int)Level::LEVEL_UNITS); // levelUnits
-		lua_setglobal(L, "LEVEL_UNITS");			//
-		labChangedLevel = false;
-	}
+	lua_pushnumber(L, (int)Level::LEVEL_W);		// levelW
+	lua_setglobal(L, "LEVEL_W");				//
+	lua_pushnumber(L, (int)Level::LEVEL_H);		// levelH
+	lua_setglobal(L, "LEVEL_H");				//
+	lua_pushnumber(L, (int)Level::LEVEL_UNITS); // levelUnits
+	lua_setglobal(L, "LEVEL_UNITS");			//
 
 	lua_getglobal(L, "init");
 	lua_call(L, 0, 0);
@@ -676,8 +681,7 @@ void LuaBridge::labInitValues(void)
 			}
 		}
 	}
-	// lua_getglobal(L, "init");
-	// lua_call(L, 0, 0);
+	return 0;
 }
 
 /*
@@ -715,16 +719,6 @@ int LuaBridge::labHandleEnvironment(void)
 {
 	lua_pushnumber(L, Game::gScore);			// gScore
 	lua_setglobal(L, "points");					// 
-	if (labChangedLevel)
-	{
-		lua_pushnumber(L, (int)Level::levelW);		// levelW
-		lua_setglobal(L, "LEVEL_W");				//
-		lua_pushnumber(L, (int)Level::levelH);		// levelH
-		lua_setglobal(L, "LEVEL_H");				//
-		lua_pushnumber(L, (int)Level::LEVEL_UNITS); // levelUnits
-		lua_setglobal(L, "LEVEL_UNITS");			//
-		labChangedLevel = false;
-	}
 
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{

@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "Thing.h"
 #include "Tile.h"
+#include "Menu.h"
 // #include "Particle.h"
 
 std::map<std::string, int> Game::Direction;
@@ -97,6 +98,7 @@ std::vector<Thing*> Game::things;
 int Game::gScore = 0;
 
 int Game::gState = 0;
+int Game::gOldState = 0;
 std::string Game::rDir = "resources/";
 std::string Game::rExt = ".png";
 SDL_Color Game::textColor = { 255, 255, 255, 255 };
@@ -126,6 +128,7 @@ Game::Game()
 	GameState["game"] = (num = 0);
 	GameState["menu"] = (++num);
 	GameState["title"] = (++num);
+	GameState["editor"] = (++num);
 }
 
 Game::~Game()
@@ -324,4 +327,11 @@ void Game::destroyParticle(int num)
 {
 	delete particles[num];
 	particles[num] = NULL;
+}
+
+void Game::changeGameState(int newState)
+{
+	gOldState = gState;
+	if (Game::gState != newState && newState >= 0 && newState < GameState.size())
+		Game::gState = newState;
 }

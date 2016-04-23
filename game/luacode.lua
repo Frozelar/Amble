@@ -2,6 +2,8 @@ getmetatable('').__index = function(str, i)
 	return string.sub(str, i, i)
 end
 
+totalLevels = 2  -- INCLUDING title screen level!
+
 resourceDirectory = "resources/"
 resourceExtension = ".png"
 
@@ -47,7 +49,7 @@ TOTAL_TILE_SUBTYPES = #tileSubIdentifiers
 -- {name}
 audioIdentifiers = { 
 	{ "Jump", "Explosion", "Collect", "Hurt", "Powerup", "Select", "Whoosh", "Warp", "Dash" }, -- sfx
-	{ "Underground" } -- music 
+	{ "Title", "Underground" } -- music 
 }
 
 audioBuffer = {

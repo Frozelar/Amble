@@ -47,8 +47,7 @@ void Player::plHandleEvent(SDL_Event* e)
 			}
 			break;
 		case SDLK_p:
-			if (Game::gState == Game::GameState["game"])
-				Game::gState = Game::GameState["menu"];
+			Game::changeGameState(Game::GameState["menu"]);
 			break;
 		}
 	}

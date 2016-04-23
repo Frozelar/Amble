@@ -29,6 +29,9 @@ int Level::levelBG = 0;
 int Level::gLevelMovementsX = 0;
 int Level::gLevelMovementsY = 0;
 
+int Level::totalLevels = 0;
+int Level::currentLevel = 0;
+
 Level* Game::gLevel;
 
 Level::Level()
@@ -39,8 +42,9 @@ Level::~Level()
 {
 }
 
-bool Level::generateLevel(void)
+bool Level::generateLevel(int whichLevel)
 {
+	std::string ext = ".map";
 	int x = 0, y = 0;
 	int unitType = -1;
 	int unit = -1;
@@ -49,7 +53,13 @@ bool Level::generateLevel(void)
 	SDL_Rect playerRect{ 0, 0, Game::PLAYER_W, Game::PLAYER_H };
 	// bool isCharacter = false;
 
-	levelMap.open("resources/level000.map");
+	closeLevel();
+	if (whichLevel != 0)
+		levelMap.open(Game::rDir + "level" + std::to_string(whichLevel) + ext);
+	else
+		levelMap.open(Game::rDir + "title" + ext);
+	currentLevel = whichLevel;
+	std::cout << currentLevel << std::endl;
 
 	levelMap >> unitType;
 	Level::LEVEL_W = unitType;
@@ -100,7 +110,9 @@ bool Level::generateLevel(void)
 
 	levelMap.close();
 	Game::centerCamera();
-	LuaBridge::labChangedLevel = true;
+	LuaBridge::labChangeLevel();
+	Level::playMusic();
+	// LuaBridge::labChangedLevel = true;
 	return true;
 }
 
@@ -146,6 +158,19 @@ void Level::setBG(void)
 	
 }
 */
+
+void Level::closeLevel()
+{
+	for (int i = 0; i < Game::things.size(); i++)
+	{
+		if (Game::things[i] != NULL)
+		{
+			if (Game::things[i]->tgType != Game::ThingType["player"])
+				delete Game::things[i];
+			Game::things[i] = NULL;
+		}
+	}
+}
 
 const int Level::levelW(void)
 {

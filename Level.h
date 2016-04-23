@@ -9,7 +9,8 @@ public:
 
 	static const int levelW(void);
 	static const int levelH(void);
-	static bool generateLevel(void);
+	static bool generateLevel(int);
+	static void closeLevel(void);
 	static void moveLevel(void);
 	static void playMusic(void);
 
@@ -23,4 +24,7 @@ public:
 	static int LEVEL_PIXELS;
 	static int gLevelMovementsX;
 	static int gLevelMovementsY;
+	// including title screen level
+	static int totalLevels;
+	static int currentLevel;
 };

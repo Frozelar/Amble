@@ -17,6 +17,8 @@ public:
 	static std::vector< int > NumOptions;
 	static Texture* menuTexture;
 	static std::vector< std::string > muOptions;
-	static std::vector< Texture* > optionTextures;
+	static std::vector< std::string > ttOptions;
+	static std::vector< Texture* > muOptionTextures;
+	static std::vector< Texture* > ttOptionTextures;
 };
 

@@ -21,9 +21,10 @@ class LuaBridge
 public:
 	LuaBridge();
 	~LuaBridge();
-	static void labInitValues(void);
+	static int labInitValues(void);
 	// static int labCall(int);
 	static int labHandleEnvironment(void);
+	static int labChangeLevel(void);
 	static int labCheckCollision(lua_State*);
 	static int labClose(void);
 
@@ -33,7 +34,7 @@ public:
 
 	// static const int MAX_ARGS;
 	// static void* labStack[];
-	static bool labChangedLevel;
+	//static bool labChangedLevel;
 	static lua_State* L;
 	// static LuaBridge gLuaBridge;
 };
