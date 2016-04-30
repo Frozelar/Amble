@@ -172,6 +172,8 @@ public:
 	static SDL_Color textColor;
 	static SDL_Color highlightColor;
 	static TTF_Font* gFont;
+	static std::string gFontName;
+	static int gFontSize;
 	static SDL_Window* gWindow;
 	static SDL_Renderer* gRenderer;
 	static SDL_Event* gEvent;
@@ -197,6 +199,8 @@ public:
 	static void destroyThing(int);
 	static void destroyParticle(int);
 	static void changeGameState(int);
+	static void readCFG(bool = true);
+	static void writeCFG(void);
 
 	// Thing* = first thing, Thing* = second thing (or NULL to check first thing and everything), int = level unit of first thing,
 	// bool = whether to output collision to gColliding; returns whether or not there was a collision

@@ -14,6 +14,12 @@ public:
 
 	static void gxClose(void);
 
+	static void gxIncScale(bool = true);
+	static void gxToggleFullscreen(bool = true);
+
+	static bool isFullscreen;
+	static float GFX_SCALE;
+	static float GFX_MULT;
 	static std::vector< std::vector<Texture*> > backgroundTextures;
 	static int bgState;
 	static int bgFrame;

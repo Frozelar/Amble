@@ -3,7 +3,12 @@
 #include "Level.h"
 #include "Texture.h"
 #include "Thing.h"
+#include "Player.h"
+#include "Menu.h"
 
+bool Graphics::isFullscreen = false;
+float Graphics::GFX_SCALE = 1.0;
+float Graphics::GFX_MULT = 1.0;
 std::vector< std::vector<Texture*> > Graphics::backgroundTextures(Game::BackgroundType["total"]);
 int Graphics::bgState = 0;
 int Graphics::bgFrame = 0;
@@ -311,4 +316,105 @@ void Graphics::gxClose(void)
 	for (int i = 0; i < backgroundIdentifiers.size(); i++)
 		for (int j = 0; j < backgroundIdentifiers[i].size(); j++)
 			delete backgroundTextures[i][j];
+}
+
+void Graphics::gxIncScale(bool gfxscale)
+{
+	std::string font = Game::rDir + Game::gFontName;
+
+	if (gfxscale)
+	{
+		if (GFX_SCALE == 1.0)
+		{
+			GFX_SCALE = 2.0;
+			GFX_MULT = 2.0;
+		}
+		else if (GFX_SCALE == 2.0)
+		{
+			GFX_SCALE = 1.0;
+			GFX_MULT = 0.5;
+		}
+	}
+
+	Game::WINDOW_W *= GFX_MULT;
+	Game::WINDOW_H *= GFX_MULT;
+	Game::DEFAULT_W *= GFX_MULT;
+	Game::DEFAULT_H *= GFX_MULT;
+	Game::PLAYER_W *= GFX_MULT;
+	Game::PLAYER_H *= GFX_MULT;
+	Game::DEFAULT_ENEMY_W *= GFX_MULT;
+	Game::DEFAULT_ENEMY_H *= GFX_MULT;
+	Game::DEFAULT_SPEED *= GFX_MULT;
+	Game::DEFAULT_OFFSET *= GFX_MULT;
+
+	TTF_CloseFont(Game::gFont);
+	Game::gFont = TTF_OpenFont(font.c_str(), Game::gFontSize);
+
+	Game::gPlayer->tgHitboxRect.x *= GFX_MULT;
+	Game::gPlayer->tgHitboxRect.y *= GFX_MULT;
+	Game::gPlayer->tgHitboxRect.w *= GFX_MULT;
+	Game::gPlayer->tgHitboxRect.h *= GFX_MULT;
+	Game::gPlayer->tgGFXrect.x *= GFX_MULT;
+	Game::gPlayer->tgGFXrect.y *= GFX_MULT;
+	Game::gPlayer->tgGFXrect.w *= GFX_MULT;
+	Game::gPlayer->tgGFXrect.h *= GFX_MULT;
+	for (int i = 0; i < Game::things.size(); i++)
+	{
+		if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
+		{
+			Game::things[i]->tgHitboxRect.x *= GFX_MULT;
+			Game::things[i]->tgHitboxRect.y *= GFX_MULT;
+			Game::things[i]->tgHitboxRect.w *= GFX_MULT;
+			Game::things[i]->tgHitboxRect.h *= GFX_MULT;
+			Game::things[i]->tgGFXrect.x *= GFX_MULT;
+			Game::things[i]->tgGFXrect.y *= GFX_MULT;
+			Game::things[i]->tgGFXrect.w *= GFX_MULT;
+			Game::things[i]->tgGFXrect.h *= GFX_MULT;
+		}
+	}
+	for (int i = 0; i < Game::gravityArray.size(); i++)
+		Game::gravityArray[i] *= GFX_MULT;
+	for (int i = 0; i < Game::jumpArray.size(); i++)
+		Game::jumpArray[i] *= GFX_MULT;
+	for (int i = 0; i < Game::dashArray.size(); i++)
+		Game::dashArray[i] *= GFX_MULT;
+	for (int i = 0; i < Game::floatArray.size(); i++)
+		Game::floatArray[i] *= GFX_MULT;
+	Menu::menuTexture->txRect.x *= GFX_MULT;
+	Menu::menuTexture->txRect.y *= GFX_MULT;
+	Menu::menuTexture->txRect.w *= GFX_MULT;
+	Menu::menuTexture->txRect.h *= GFX_MULT;
+	for (int i = 0; i < Menu::muOptionTextures.size(); i++)
+	{
+		if (Menu::muOptionTextures[i] != NULL)
+		{
+			Menu::muOptionTextures[i]->txRect.x *= GFX_MULT;
+			Menu::muOptionTextures[i]->txRect.y *= GFX_MULT;
+			Menu::muOptionTextures[i]->txRect.w *= GFX_MULT;
+			Menu::muOptionTextures[i]->txRect.h *= GFX_MULT;
+		}
+	}
+	for (int i = 0; i < Menu::ttOptionTextures.size(); i++)
+	{
+		if (Menu::ttOptionTextures[i] != NULL)
+		{
+			Menu::ttOptionTextures[i]->txRect.x *= GFX_MULT;
+			Menu::ttOptionTextures[i]->txRect.y *= GFX_MULT;
+			Menu::ttOptionTextures[i]->txRect.w *= GFX_MULT;
+			Menu::ttOptionTextures[i]->txRect.h *= GFX_MULT;
+		}
+	}
+
+	Level::LEVEL_W_PIXELS *= GFX_MULT;
+	Level::LEVEL_H_PIXELS *= GFX_MULT;
+	Level::LEVEL_PIXELS *= GFX_MULT;
+
+	SDL_SetWindowSize(Game::gWindow, Game::WINDOW_W, Game::WINDOW_H);
+}
+
+void Graphics::gxToggleFullscreen(bool isfs)
+{
+	if(isfs)
+		isFullscreen = !isFullscreen;
+	SDL_SetWindowFullscreen(Game::gWindow, isFullscreen);
 }

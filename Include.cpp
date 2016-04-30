@@ -42,13 +42,15 @@ bool init(void)
 		return false;
 	}
 
-	Game::gFont = TTF_OpenFont("resources/AveriaSans-Regular.ttf", 18);
+	/*
+	Game::gFont = TTF_OpenFont(font.c_str(), Game::gFontSize);
 	if (Game::gFont == NULL)
 	{
 		std::cout << "Error opening the font:" << std::endl;
 		std::cout << TTF_GetError() << std::endl;
 		return false;
 	}
+	*/
 
 	for (int i = 0; i < (int)Game::things.size(); i++)
 	{
@@ -57,6 +59,18 @@ bool init(void)
 	}
 
 	return true;
+}
+
+bool initFont(void)
+{
+	std::string font = Game::rDir + Game::gFontName;
+	Game::gFont = TTF_OpenFont(font.c_str(), Game::gFontSize);
+	if (Game::gFont == NULL)
+	{
+		std::cout << "Error opening the font:" << std::endl;
+		std::cout << TTF_GetError() << std::endl;
+		return false;
+	}
 }
 
 void close(void)

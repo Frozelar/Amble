@@ -23,6 +23,7 @@ int main(int argc, char** argv)
 	// Game::gLuaBridge = new LuaBridge();
 	LuaBridge::labInitValues();
 	// LuaBridge::labChangeLevel();
+	initFont();
 	Game::gAudio = new Audio();
 	Game::gGraphics = new Graphics();
 	Game::gMenu = new Menu();
@@ -34,6 +35,7 @@ int main(int argc, char** argv)
 	// Level::generateLevel();
 	// Graphics::gxInit();
 
+	Game::readCFG();
 	Game::gState = Game::GameState["title"];
 	while (!quit)
 	{

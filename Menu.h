@@ -13,6 +13,7 @@ public:
 
 	static int muInitialized;
 	static int muMenu;
+	// static int muOldMenu;
 	static std::map< std::string, int > MenuID;
 	static std::vector< int > NumOptions;
 	static Texture* menuTexture;

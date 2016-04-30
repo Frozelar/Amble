@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Graphics.h"
 #include "Collectible.h"
 #include "Enemy.h"
 #include "Level.h"
@@ -86,6 +87,8 @@ std::vector<int> Game::dashArray;
 std::vector<int> Game::floatArray;
 
 TTF_Font* Game::gFont = NULL;
+std::string Game::gFontName = "";
+int Game::gFontSize = 0;
 
 bool Game::initialized = init();
 SDL_Window* Game::gWindow = SDL_CreateWindow("Hey There Guy", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Game::WINDOW_W, Game::WINDOW_H, SDL_WINDOW_SHOWN);
@@ -334,4 +337,40 @@ void Game::changeGameState(int newState)
 	gOldState = gState;
 	if (Game::gState != newState && newState >= 0 && newState < GameState.size())
 		Game::gState = newState;
+}
+
+void Game::readCFG(bool update)
+{
+	std::ifstream cfg;
+	cfg.open(Game::rDir + "config.cfg");
+	cfg >> Graphics::GFX_SCALE;
+	cfg >> Graphics::isFullscreen;
+
+	if (update)
+	{
+		if (Graphics::GFX_SCALE != 1.0)
+		{
+			if (Graphics::GFX_SCALE == 2.0)
+				Graphics::GFX_MULT = 2.0;
+			Graphics::gxIncScale(false);
+		}
+		if (Graphics::isFullscreen)
+			Graphics::gxToggleFullscreen(false);
+	}
+}
+
+void Game::writeCFG()
+{
+	std::ofstream cfg;
+	cfg.open(Game::rDir + "config.cfg");
+	cfg.clear();
+	if (Graphics::GFX_SCALE == 0.5)		// this is probably inefficient??
+	{
+		Graphics::GFX_SCALE = 1.0;
+		cfg << Graphics::GFX_SCALE << " ";
+		Graphics::GFX_SCALE = 0.5;
+	}
+	else
+		cfg << Graphics::GFX_SCALE << " ";
+	cfg << Graphics::isFullscreen << " ";
 }

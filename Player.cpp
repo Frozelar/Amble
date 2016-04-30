@@ -120,7 +120,7 @@ void Player::plHandleDashing(void)
 	{
 		tgHitboxRect.x += (tgDashing < 0 ? -Game::dashArray[-tgDashing] : Game::dashArray[tgDashing]);
 		if (tgDashing == 2 || tgDashing == -2)
-			tgHitboxRect.y -= 8;
+			tgHitboxRect.y -= Game::DEFAULT_H;
 		tgDashing += (tgDashing < 0 ? -1 : 1);
 	}
 	else if ((tgDashing >= (int)Game::dashArray.size() || tgDashing <= -(int)Game::dashArray.size()))

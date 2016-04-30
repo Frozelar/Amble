@@ -38,6 +38,7 @@ struct Collision {
 // enum Direction;
 
 bool init(void);
+bool initFont(void);
 void close(void);
 
 int invertDir(int);

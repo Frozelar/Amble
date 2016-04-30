@@ -95,7 +95,7 @@ bool Texture::txLoadT(std::string text, SDL_Color color)
 	txFree();
 
 	//Render text surface
-	SDL_Surface* textSurface = TTF_RenderText_Blended_Wrapped(Game::gFont, text.c_str(), color, 256);
+	SDL_Surface* textSurface = TTF_RenderText_Blended_Wrapped(Game::gFont, text.c_str(), color, 1024);
 	if (textSurface != NULL)
 	{
 		//Create texture from surface pixels

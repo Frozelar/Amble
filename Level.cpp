@@ -59,7 +59,6 @@ bool Level::generateLevel(int whichLevel)
 	else
 		levelMap.open(Game::rDir + "title" + ext);
 	currentLevel = whichLevel;
-	std::cout << currentLevel << std::endl;
 
 	levelMap >> unitType;
 	Level::LEVEL_W = unitType;

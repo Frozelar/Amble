@@ -6,6 +6,7 @@ totalLevels = 2  -- INCLUDING title screen level!
 
 resourceDirectory = "resources/"
 resourceExtension = ".png"
+font = {"AveriaSans-Regular.ttf", 36}
 
 textColor = { 255, 255, 255, 255 }  -- r, g, b, a
 highlightColor = { 210, 180, 90, 255 }
@@ -81,6 +82,8 @@ TOTAL_DASH_ARRAY_UNITS = #dashArray
 floatArray = { 0, 1, 1, 0, -1, -1, 0 }
 TOTAL_FLOAT_ARRAY_UNITS = #floatArray
 
+GFX_SCALE = 1.0
+GFX_MULT = 1.0
 WINDOW_W = 800
 WINDOW_H = 600
 DEFAULT_W = 8
@@ -451,8 +454,17 @@ function Enemy:enHandleAI()
       checkrect.y = checkrect.y - DEFAULT_H * 2
       iscolliding = checkCollision(checkrect, things[gPlayerUnit].tgHitbox)
       if iscolliding == true then
-        self.tgHitbox.y = self.tgHitbox.y - DEFAULT_H
-        self.tgDashing = self.tgDashing + 1
+		checkrect = self.tgHitbox
+		checkrect.y = checkrect.y - DEFAULT_H
+		if self.tgSpeed > 0 then
+			checkrect.x = checkrect.x + dashArray[self.tgDashing + 1]
+		elseif self.tgSpeed < 0 then
+			checkrect.x = checkrect.x - dashArray[self.tgDashing + 1]
+		end
+		if checkCollision(checkrect, nil) == false then
+			self.tgHitbox.y = self.tgHitbox.y - DEFAULT_H
+			self.tgDashing = self.tgDashing + 1
+		end
       end
 	end
     if self.tgDashing ~= 0 then
@@ -730,6 +742,7 @@ function init()
 end
 
 function handleEnvironment()
+print(GFX_SCALE)
 	totalParticles = #gParticles
 	for i = 1, #things do
 		if things[i] ~= -1 then
@@ -820,6 +833,47 @@ function playAudio(pType, pName)
 	end
 	audioBuffer[pType][i] = pName
 end
+
+function incGFXscale()
+	WINDOW_W = WINDOW_W * GFX_MULT
+	WINDOW_H = WINDOW_H * GFX_MULT
+	DEFAULT_W = DEFAULT_W * GFX_MULT
+	DEFAULT_H = DEFAULT_H * GFX_MULT
+	PLAYER_W = PLAYER_W * GFX_MULT
+	PLAYER_H = PLAYER_H * GFX_MULT
+	DEFAULT_ENEMY_W = DEFAULT_ENEMY_W * GFX_MULT
+	DEFAULT_ENEMY_H = DEFAULT_ENEMY_H * GFX_MULT
+	DEFAULT_OFFSET = DEFAULT_OFFSET * GFX_MULT
+	DEFAULT_SPEED = DEFAULT_SPEED * GFX_MULT
+	for i = 1, #jumpArray do
+		jumpArray[i] = jumpArray[i] * GFX_MULT
+	end
+	for i = 1, #gravityArray do
+		gravityArray[i] = gravityArray[i] * GFX_MULT
+	end
+	for i = 1, #dashArray do
+		dashArray[i] = dashArray[i] * GFX_MULT
+	end
+	for i = 1, #floatArray do
+		floatArray[i] = floatArray[i] * GFX_MULT
+	end
+	-- everything else should be handled in c++
+end
+
+--[[
+function checkCollision(thing1, thing2)
+	if thing2 == nil then
+		for i = 0, #things do
+			if things[i] ~= -1 then
+				if (thing1.x + thing1.w > things[i].tgHitbox.x or thing1.x < things[i].tgHitbox.x + things[i].tgHitbox.w) and 
+					(thins1.y + thing1.h > things[i].tgHitbox.y or thing1.y < things[i].tgHitbox.y + things[i].tgHitbox.h) then
+					
+				end
+			end
+		end
+	end
+end
+]]
 
 --[[
 function init()

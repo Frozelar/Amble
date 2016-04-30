@@ -66,7 +66,14 @@ int LuaBridge::labInitValues(void)
 	Game::rDir = lua_tostring(L, -1);
 	lua_getglobal(L, "resourceExtension");
 	Game::rExt = lua_tostring(L, -1);
-	lua_pop(L, 2);
+	lua_getglobal(L, "font");				// rDir, rExt, font table
+	lua_pushnumber(L, 1);					// rDir, rExt, font table, 1
+	lua_gettable(L, -2);					// rDir, rExt, font table, name
+	lua_pushnumber(L, 2);					// rDir, rExt, font table, name, 2
+	lua_gettable(L, -3);					// rDir, rExt, font table, name, size
+	Game::gFontName = lua_tostring(L, -2);
+	Game::gFontSize = lua_tonumber(L, -1);
+	lua_pop(L, 5);
 
 	lua_getglobal(L, "WINDOW_W");
 	Game::WINDOW_W = lua_tonumber(L, -1);
@@ -717,8 +724,19 @@ int LuaBridge::labCall(int funcID)
 
 int LuaBridge::labHandleEnvironment(void)
 {
-	lua_pushnumber(L, Game::gScore);			// gScore
-	lua_setglobal(L, "points");					// 
+	lua_pushnumber(L, Game::gScore);				// gScore
+	lua_setglobal(L, "points");						// 
+	lua_getglobal(L, "GFX_SCALE");					// GFX_SCALE
+	if (lua_tonumber(L, -1) != Graphics::GFX_SCALE)
+	{
+		lua_pushnumber(L, Graphics::GFX_SCALE);		// GFX_SCALE (lua), GFX_SCALE (c++)
+		lua_setglobal(L, "GFX_SCALE");				// GFX_SCALE (lua)
+		lua_pushnumber(L, Graphics::GFX_MULT);		// GFX_SCALE (lua), GFX_MULT (c++)
+		lua_setglobal(L, "GFX_MULT");				// GFX_SCALE (lua)
+		lua_getglobal(L, "incGFXscale");			// GFX_SCALE (lua), incGFXscale()
+		lua_call(L, 0, 0);							// GFX_SCALE (lua)
+	}
+	lua_pop(L, 1);									// 
 
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{
@@ -820,12 +838,16 @@ int LuaBridge::labHandleEnvironment(void)
 				lua_pop(L, 2);								// 
 		}
 	}
-
 	lua_getglobal(L, "handleEnvironment");
 	lua_call(L, 0, 0);
+
 	lua_getglobal(L, "points");									// points
-	Game::gScore = (int)lua_tonumber(L, -1);					// points
+	Game::gScore = (int)lua_tonumber(L, -1);					
 	lua_pop(L, 1);												// 
+	lua_getglobal(L, "GFX_SCALE");								// GFX_SCALE
+	Graphics::GFX_SCALE = lua_tonumber(L, -1);
+	lua_pop(L, 1);												//
+
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{
 		if (Game::things[i] != NULL)
@@ -1041,16 +1063,26 @@ int LuaBridge::labCheckCollision(lua_State* L)
 {
 	SDL_Rect t1;
 	SDL_Rect t2;
+	bool collided = false;
 	t1.x = lua_getfield(L, 1, "x"); t1.y = lua_getfield(L, 1, "y");
 	t1.w = lua_getfield(L, 1, "w"); t1.h = lua_getfield(L, 1, "h");
-	t2.x = lua_getfield(L, 2, "x"); t2.y = lua_getfield(L, 2, "y");
-	t2.w = lua_getfield(L, 2, "w"); t2.h = lua_getfield(L, 2, "h");
-
-	if ((t1.x + t1.w > t2.x || t1.x < t2.x + t2.w) && (t1.y + t1.h > t2.y && t1.y < t2.y + t2.h))
-		lua_pushboolean(L, true);
-	else
-		lua_pushboolean(L, false);
-
+	if (lua_type(L, 2) != LUA_TNIL) {
+		t2.x = lua_getfield(L, 2, "x"); t2.y = lua_getfield(L, 2, "y");
+		t2.w = lua_getfield(L, 2, "w"); t2.h = lua_getfield(L, 2, "h");
+		if ((t1.x + t1.w > t2.x || t1.x < t2.x + t2.w) && (t1.y + t1.h > t2.y && t1.y < t2.y + t2.h))
+			collided = true;
+	}
+	else {
+		for (int i = 0; i < Game::things.size(); i++) {
+			if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["temp"]) {
+				t2.x = Game::things[i]->tgHitboxRect.x; t2.y = Game::things[i]->tgHitboxRect.y;
+				t2.w = Game::things[i]->tgHitboxRect.w; t2.h = Game::things[i]->tgHitboxRect.h;
+				if ((t1.x + t1.w > t2.x || t1.x < t2.x + t2.w) && (t1.y + t1.h > t2.y && t1.y < t2.y + t2.h))
+					collided = true;
+			}
+		}
+	}
+	lua_pushboolean(L, collided);
 	return 1;
 }
 
