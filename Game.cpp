@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Graphics.h"
+#include "Audio.h"
 #include "Collectible.h"
 #include "Enemy.h"
 #include "Level.h"
@@ -345,6 +346,8 @@ void Game::readCFG(bool update)
 	cfg.open(Game::rDir + "config.cfg");
 	cfg >> Graphics::GFX_SCALE;
 	cfg >> Graphics::isFullscreen;
+	cfg >> Audio::volume[0];
+	cfg >> Audio::volume[1];
 
 	if (update)
 	{
@@ -356,6 +359,8 @@ void Game::readCFG(bool update)
 		}
 		if (Graphics::isFullscreen)
 			Graphics::gxToggleFullscreen(false);
+		Audio::auIncVolume(Audio::MUSIC_VOL, false);
+		Audio::auIncVolume(Audio::SFX_VOL, false);
 	}
 }
 
@@ -364,13 +369,8 @@ void Game::writeCFG()
 	std::ofstream cfg;
 	cfg.open(Game::rDir + "config.cfg");
 	cfg.clear();
-	if (Graphics::GFX_SCALE == 0.5)		// this is probably inefficient??
-	{
-		Graphics::GFX_SCALE = 1.0;
-		cfg << Graphics::GFX_SCALE << " ";
-		Graphics::GFX_SCALE = 0.5;
-	}
-	else
-		cfg << Graphics::GFX_SCALE << " ";
+	cfg << Graphics::GFX_SCALE << " ";
 	cfg << Graphics::isFullscreen << " ";
+	cfg << Audio::volume[0] << " ";
+	cfg << Audio::volume[1] << " ";
 }

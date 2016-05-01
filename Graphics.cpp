@@ -404,6 +404,13 @@ void Graphics::gxIncScale(bool gfxscale)
 			Menu::ttOptionTextures[i]->txRect.h *= GFX_MULT;
 		}
 	}
+	for (int i = 0; i < Menu::muMiscTextures.size(); i++)
+	{
+		Menu::muMiscTextures[i]->txRect.x *= GFX_MULT;
+		Menu::muMiscTextures[i]->txRect.y *= GFX_MULT;
+		Menu::muMiscTextures[i]->txRect.w *= GFX_MULT;
+		Menu::muMiscTextures[i]->txRect.h *= GFX_MULT;
+	}
 
 	Level::LEVEL_W_PIXELS *= GFX_MULT;
 	Level::LEVEL_H_PIXELS *= GFX_MULT;

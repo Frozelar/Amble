@@ -21,5 +21,7 @@ public:
 	static std::vector< std::string > ttOptions;
 	static std::vector< Texture* > muOptionTextures;
 	static std::vector< Texture* > ttOptionTextures;
+	static std::vector< Texture* > muMiscTextures;
+
 };
 
