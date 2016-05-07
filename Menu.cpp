@@ -4,12 +4,14 @@
 #include "Graphics.h"
 #include "Audio.h"
 #include "Texture.h"
+#include "Player.h"
 
 Menu* Game::gMenu;
 
 int Menu::muMenu = 0;
 // int Menu::muOldMenu = 0;
 int Menu::muInitialized = false;
+bool Menu::muIsMapping = false;
 std::map<std::string, int> Menu::MenuID;
 std::vector< int > Menu::NumOptions;
 Texture* Menu::menuTexture;
@@ -17,11 +19,12 @@ std::vector<std::string> Menu::muOptions = { "Resume", "Settings", "Return to Ti
 	"Graphics", "Audio", "Controls", "Return", "",
 	"Window Size", "Toggle Fullscreen", "Return", "",
 	"Music", "Sound Effects", "Return", "",
-	"Left", "Right", "Up", "Down", "Jump", "Return", "" };
+	"Left", "Right", "Up", "Down", "Jump", "Pause", "Return", "" };
 std::vector<std::string> Menu::ttOptions = { "Play Game", "Menu", "Level Editor", "Quit" };
 std::vector< Texture* > Menu::muOptionTextures;
 std::vector< Texture* > Menu::ttOptionTextures;
 std::vector< Texture* > Menu::muMiscTextures;	// sfx, volume
+const int Menu::MISC_BUTTON_INDEX = 2;
 
 Menu::Menu()
 {
@@ -36,7 +39,7 @@ Menu::Menu()
 	NumOptions[MenuID["settings"]] = 4;
 	NumOptions[MenuID["graphics"]] = 3;
 	NumOptions[MenuID["audio"]] = 3;
-	NumOptions[MenuID["controls"]] = 6;
+	NumOptions[MenuID["controls"]] = 7;
 
 	menuTexture = new Texture();
 	menuTexture->txLoadF(Game::rDir + "Menu" + Game::rExt);
@@ -45,9 +48,12 @@ Menu::Menu()
 	menuTexture->txRect.x = (Game::WINDOW_W - menuTexture->txRect.w) / 2;
 	menuTexture->txRect.y = (Game::WINDOW_H - menuTexture->txRect.h) / 2;
 
-	muMiscTextures.resize(2);
+	muMiscTextures.resize(3);
 	for (int i = 0; i < muMiscTextures.size(); i++)
 		muMiscTextures[i] = new Texture(0, 0, 0, 0);
+	muMiscTextures[MISC_BUTTON_INDEX]->txLoadT("Press Button", Game::textColor);
+	muMiscTextures[MISC_BUTTON_INDEX]->txRect.x = (Game::WINDOW_W - muMiscTextures[MISC_BUTTON_INDEX]->txRect.w) / 2;
+	muMiscTextures[MISC_BUTTON_INDEX]->txRect.y = (Game::WINDOW_H - muMiscTextures[MISC_BUTTON_INDEX]->txRect.h) / 2;
 
 	for (int i = 0; i < muOptions.size(); i++)
 	{
@@ -66,8 +72,8 @@ Menu::Menu()
 				muOptionTextures[i]->txRect.y = muOptionTextures[i - 1]->txRect.y + muOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H;
 			if (muOptions[i] == "Music" || muOptions[i] == "Sound Effects")
 			{
-				muMiscTextures[(muOptions[i] == "Sound Effects" ? Audio::SFX_VOL : Audio::MUSIC_VOL)]->txRect.x = muOptionTextures[i]->txRect.x + muOptionTextures[i]->txRect.w + Game::DEFAULT_W;
-				muMiscTextures[(muOptions[i] == "Sound Effects" ? Audio::SFX_VOL : Audio::MUSIC_VOL)]->txRect.y = muOptionTextures[i]->txRect.y;
+				muMiscTextures[(muOptions[i] == "Sound Effects" ? Audio::SFX_VOL_INDEX : Audio::MUSIC_VOL_INDEX)]->txRect.x = muOptionTextures[i]->txRect.x + muOptionTextures[i]->txRect.w + Game::DEFAULT_W;
+				muMiscTextures[(muOptions[i] == "Sound Effects" ? Audio::SFX_VOL_INDEX : Audio::MUSIC_VOL_INDEX)]->txRect.y = muOptionTextures[i]->txRect.y;
 			}
 		}
 		else
@@ -122,18 +128,23 @@ bool Menu::muHandleMenu(SDL_Event* e)
 	SDL_GetMouseState(&mouse.x, &mouse.y);
 	for (int i = 0; i < muMenu; i++)
 		menuPos += NumOptions[i] + 1;
+
+	if (muIsMapping)
+	{
+		if (e->type == SDL_KEYUP && e->key.repeat == NULL)
+			muMapButton("", e->key.keysym.sym);
+		return true;
+	}
 	if (Game::gState == Game::GameState["menu"])
 	{
 		if (e->type == SDL_KEYUP && e->key.repeat == NULL)
 		{
-			switch (e->key.keysym.sym)
+			if (e->key.keysym.sym == Game::gPlayer->plControls.pause)
 			{
-			case SDLK_p:
 				muMenu = MenuID["pause"];
 				Game::changeGameState(Game::gOldState);
 				muInitialized = false;
 				Game::writeCFG();
-				break;
 			}
 		}
 		else if (e->type == SDL_MOUSEMOTION)
@@ -202,13 +213,17 @@ bool Menu::muHandleMenu(SDL_Event* e)
 							}
 							else if (muOptions[i] == "Audio")
 							{
-								muMiscTextures[Audio::SFX_VOL]->txRect.w = 0; muMiscTextures[Audio::SFX_VOL]->txRect.h = 0;
-								muMiscTextures[Audio::MUSIC_VOL]->txRect.w = 0; muMiscTextures[Audio::MUSIC_VOL]->txRect.h = 0;
-								muMiscTextures[Audio::SFX_VOL]->txLoadT(std::to_string(Audio::volume[Audio::SFX_VOL]), Game::textColor);
-								muMiscTextures[Audio::MUSIC_VOL]->txLoadT(std::to_string(Audio::volume[Audio::MUSIC_VOL]), Game::textColor);
-								Menu::muMiscTextures[Audio::SFX_VOL]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::SFX_VOL]->txRect.h *= Graphics::GFX_MULT;
-								Menu::muMiscTextures[Audio::MUSIC_VOL]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::MUSIC_VOL]->txRect.h *= Graphics::GFX_MULT;
+								muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.w = 0; muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.h = 0;
+								muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.w = 0; muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.h = 0;
+								muMiscTextures[Audio::SFX_VOL_INDEX]->txLoadT(std::to_string(Audio::volume[Audio::SFX_VOL_INDEX]), Game::textColor);
+								muMiscTextures[Audio::MUSIC_VOL_INDEX]->txLoadT(std::to_string(Audio::volume[Audio::MUSIC_VOL_INDEX]), Game::textColor);
+								Menu::muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.h *= Graphics::GFX_MULT;
+								Menu::muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.h *= Graphics::GFX_MULT;
 								muMenu = MenuID["audio"];
+							}
+							else if (muOptions[i] == "Controls")
+							{
+								muMenu = MenuID["controls"];
 							}
 							else if (muOptions[i] == "Return")
 							{
@@ -232,24 +247,33 @@ bool Menu::muHandleMenu(SDL_Event* e)
 						{
 							if (muOptions[i] == "Music")
 							{
-								Audio::auIncVolume(Audio::MUSIC_VOL);
-								muMiscTextures[Audio::MUSIC_VOL]->txRect.w = 0; muMiscTextures[Audio::MUSIC_VOL]->txRect.h = 0;
-								muMiscTextures[Audio::MUSIC_VOL]->txLoadT(std::to_string(Audio::volume[Audio::MUSIC_VOL]), Game::textColor);
-								Menu::muMiscTextures[Audio::MUSIC_VOL]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::MUSIC_VOL]->txRect.h *= Graphics::GFX_MULT;
+								Audio::auIncVolume(Audio::MUSIC_VOL_INDEX);
+								muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.w = 0; muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.h = 0;
+								muMiscTextures[Audio::MUSIC_VOL_INDEX]->txLoadT(std::to_string(Audio::volume[Audio::MUSIC_VOL_INDEX]), Game::textColor);
+								Menu::muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.h *= Graphics::GFX_MULT;
 							}
 							else if (muOptions[i] == "Sound Effects")
 							{
-								Audio::auIncVolume(Audio::SFX_VOL);
-								muMiscTextures[Audio::SFX_VOL]->txRect.w = 0; muMiscTextures[Audio::SFX_VOL]->txRect.h = 0;
-								muMiscTextures[Audio::SFX_VOL]->txLoadT(std::to_string(Audio::volume[Audio::SFX_VOL]), Game::textColor);
-								muMiscTextures[Audio::SFX_VOL]->txRect.w *= Graphics::GFX_MULT; muMiscTextures[Audio::SFX_VOL]->txRect.h *= Graphics::GFX_MULT;
+								Audio::auIncVolume(Audio::SFX_VOL_INDEX);
+								muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.w = 0; muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.h = 0;
+								muMiscTextures[Audio::SFX_VOL_INDEX]->txLoadT(std::to_string(Audio::volume[Audio::SFX_VOL_INDEX]), Game::textColor);
+								muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.w *= Graphics::GFX_MULT; muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.h *= Graphics::GFX_MULT;
 							}
 							else if (muOptions[i] == "Return")
 								muMenu -= 2;
 						}
 						else if (muMenu == MenuID["controls"])
 						{
-
+							if (muOptions[i] == "Return")
+							{
+								muMenu -= 3;
+							}
+							else
+							{
+								if(!muIsMapping)
+									muIsMapping = true;
+								muMapButton(muOptions[i], e->key.keysym.sym);
+							}
 						}
 					}
 				}
@@ -315,9 +339,11 @@ void Menu::muRender(void)
 				muOptionTextures[i]->txRender();
 		if (muMenu == MenuID["audio"])
 		{
-			muMiscTextures[Audio::SFX_VOL]->txRender();
-			muMiscTextures[Audio::MUSIC_VOL]->txRender();
+			muMiscTextures[Audio::SFX_VOL_INDEX]->txRender();
+			muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRender();
 		}
+		if (muIsMapping)
+			muMiscTextures[MISC_BUTTON_INDEX]->txRender();
 	}
 	else if (Game::gState == Game::GameState["title"])
 	{
@@ -327,4 +353,28 @@ void Menu::muRender(void)
 	SDL_RenderPresent(Game::gRenderer);
 	// if(Game::gState == Game::GameState["menu"])
 	//	Graphics::menuTexture->txRender();
+}
+
+void Menu::muMapButton(std::string button, int newmap)
+{
+	static std::string b = "";
+	static int m = -1;
+	if(button != "")
+		b = button;
+	m = newmap;
+
+	if (b == "Left")
+		Game::gPlayer->plControls.left = m;
+	else if (b == "Right")
+		Game::gPlayer->plControls.right = m;
+	else if (b == "Up")
+		Game::gPlayer->plControls.up = m;
+	else if (b == "Down")
+		Game::gPlayer->plControls.down = m;
+	else if (b == "Jump")
+		Game::gPlayer->plControls.jump = m;
+	else if (b == "Pause")
+		Game::gPlayer->plControls.pause = m;
+	if(button == "")
+		muIsMapping = false;
 }

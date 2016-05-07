@@ -30,4 +30,5 @@ public:
 	int plState = 0;
 	int plOldVerticals = 0;
 	SDL_Rect plOldHitboxRect;
+	ControlScheme plControls;
 };

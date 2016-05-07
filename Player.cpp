@@ -24,38 +24,36 @@ void Player::plHandleEvent(SDL_Event* e)
 {
 	if (e->type == SDL_KEYUP && e->key.repeat == NULL)
 	{
-		switch (e->key.keysym.sym)
+		if (e->key.keysym.sym == plControls.jump)
 		{
-		case SDLK_w:
 			if (-tgVerticals < (int)Game::jumpArray.size() - 8 && tgVerticals < 0)
 				tgVerticals = -((int)Game::jumpArray.size() - 8);
-			break;
-		case SDLK_a:
+		}
+		else if (e->key.keysym.sym == plControls.left)
+		{
 			if (tgSpeed < 0)
 			{
 				tgSpeed = 0;
 				// tgDirection = NO_DIRECTION;
 			}
-			break;
-		case SDLK_s:
-			break;
-		case SDLK_d:
+		}
+		else if (e->key.keysym.sym == plControls.right)
+		{
 			if (tgSpeed > 0)
 			{
 				tgSpeed = 0;
 				// tgDirection = NO_DIRECTION;
 			}
-			break;
-		case SDLK_p:
+		}
+		else if(e->key.keysym.sym == plControls.pause)
+		{
 			Game::changeGameState(Game::GameState["menu"]);
-			break;
 		}
 	}
 	else if (e->type == SDL_KEYDOWN && e->key.repeat == NULL)
 	{
-		switch (e->key.keysym.sym)
+		if (e->key.keysym.sym == plControls.jump)
 		{
-		case SDLK_w:
 			if (tgVerticals == 0 && plOldVerticals == 0 && tgDashing == 0)
 			{
 				plJumps++;
@@ -70,19 +68,16 @@ void Player::plHandleEvent(SDL_Event* e)
 				plJumps++;
 				tgVerticals = -1;
 			}
-			break;
-		case SDLK_a:
+		}
+		else if (e->key.keysym.sym == plControls.left)
+		{
 			tgSpeed = -Game::DEFAULT_SPEED;
 			// tgDirection = LEFT;
-			break;
-		case SDLK_s:
-			// tgSpeed = DEFAULT_SPEED;
-			// tgDirection = DOWN;
-			break;
-		case SDLK_d:
+		}
+		else if (e->key.keysym.sym == plControls.right)
+		{
 			tgSpeed = Game::DEFAULT_SPEED;
 			// tgDirection = RIGHT;
-			break;
 		}
 	}
 }

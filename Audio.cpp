@@ -4,8 +4,8 @@
 Audio* Game::gAudio;
 
 int Audio::volume[2] = { 100, 100 };	// sfx, music
-const int Audio::SFX_VOL = 0;
-const int Audio::MUSIC_VOL = 1;
+const int Audio::SFX_VOL_INDEX = 0;
+const int Audio::MUSIC_VOL_INDEX = 1;
 std::vector<Mix_Music*> Audio::music;// (Game::MusicType["total"]);
 std::vector<Mix_Chunk*> Audio::sfx;// (Game::SoundEffectType["total"]);
 std::vector<std::string> Audio::musicIdentifiers;
@@ -73,11 +73,11 @@ void Audio::auIncVolume(int what, bool incvol)
 		else
 			volume[what] += 10;
 	}
-	if (what == SFX_VOL)
+	if (what == SFX_VOL_INDEX)
 		for (int i = 0; i < sfx.size(); i++)
 			Mix_VolumeChunk(sfx[i], volume[what]);
 			// sfx[i]->volume = volume[what];
-	else if (what == MUSIC_VOL)
+	else if (what == MUSIC_VOL_INDEX)
 		// Mix_Volume(-1, volume[what]);
 		Mix_VolumeMusic(volume[what]);
 }

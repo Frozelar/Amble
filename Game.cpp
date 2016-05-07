@@ -348,6 +348,12 @@ void Game::readCFG(bool update)
 	cfg >> Graphics::isFullscreen;
 	cfg >> Audio::volume[0];
 	cfg >> Audio::volume[1];
+	cfg >> Game::gPlayer->plControls.left;
+	cfg >> Game::gPlayer->plControls.right;
+	cfg >> Game::gPlayer->plControls.up;
+	cfg >> Game::gPlayer->plControls.down;
+	cfg >> Game::gPlayer->plControls.jump;
+	cfg >> Game::gPlayer->plControls.pause;
 
 	if (update)
 	{
@@ -359,8 +365,8 @@ void Game::readCFG(bool update)
 		}
 		if (Graphics::isFullscreen)
 			Graphics::gxToggleFullscreen(false);
-		Audio::auIncVolume(Audio::MUSIC_VOL, false);
-		Audio::auIncVolume(Audio::SFX_VOL, false);
+		Audio::auIncVolume(Audio::MUSIC_VOL_INDEX, false);
+		Audio::auIncVolume(Audio::SFX_VOL_INDEX, false);
 	}
 }
 
@@ -373,4 +379,10 @@ void Game::writeCFG()
 	cfg << Graphics::isFullscreen << " ";
 	cfg << Audio::volume[0] << " ";
 	cfg << Audio::volume[1] << " ";
+	cfg << Game::gPlayer->plControls.left << " ";
+	cfg << Game::gPlayer->plControls.right << " ";
+	cfg << Game::gPlayer->plControls.up << " ";
+	cfg << Game::gPlayer->plControls.down << " ";
+	cfg << Game::gPlayer->plControls.jump << " ";
+	cfg << Game::gPlayer->plControls.pause << " ";
 }

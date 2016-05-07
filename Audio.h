@@ -12,8 +12,8 @@ public:
 	static void auIncVolume(int, bool = true);
 
 	static int volume[2];
-	static const int SFX_VOL;
-	static const int MUSIC_VOL;
+	static const int SFX_VOL_INDEX;
+	static const int MUSIC_VOL_INDEX;
 	static std::vector<Mix_Music*> music;
 	static std::vector<Mix_Chunk*> sfx;
 	static std::vector<std::string> musicIdentifiers;

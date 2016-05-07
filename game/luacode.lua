@@ -742,7 +742,6 @@ function init()
 end
 
 function handleEnvironment()
-print(GFX_SCALE)
 	totalParticles = #gParticles
 	for i = 1, #things do
 		if things[i] ~= -1 then
