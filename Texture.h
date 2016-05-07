@@ -20,7 +20,7 @@ public:
 	bool txLoadF(std::string);
 
 	//Creates image from font string
-	bool txLoadT(std::string textureText, SDL_Color textColor);
+	bool txLoadT(std::string textureText, TTF_Font* textFont, SDL_Color textColor);
 
 	// free everything
 	void txFree(void);

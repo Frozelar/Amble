@@ -87,9 +87,11 @@ std::vector<int> Game::gravityArray;
 std::vector<int> Game::dashArray;
 std::vector<int> Game::floatArray;
 
-TTF_Font* Game::gFont = NULL;
-std::string Game::gFontName = "";
-int Game::gFontSize = 0;
+Font Game::gHeadingFont;
+Font Game::gBodyFont;
+// Font Game::gFont = NULL;
+// std::string Game::gFontName = "";
+// int Game::gFontSize = 0;
 
 bool Game::initialized = init();
 SDL_Window* Game::gWindow = SDL_CreateWindow("Hey There Guy", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Game::WINDOW_W, Game::WINDOW_H, SDL_WINDOW_SHOWN);

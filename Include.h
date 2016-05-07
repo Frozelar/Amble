@@ -30,6 +30,12 @@ class LuaBridge;
 class Menu;
 class LevelEditor;
 
+struct Font {
+	TTF_Font* font;
+	std::string name;
+	int size;
+};
+
 struct Collision {
 	Thing* thing1 = NULL;
 	Thing* thing2 = NULL;

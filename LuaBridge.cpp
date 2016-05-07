@@ -66,14 +66,23 @@ int LuaBridge::labInitValues(void)
 	Game::rDir = lua_tostring(L, -1);
 	lua_getglobal(L, "resourceExtension");
 	Game::rExt = lua_tostring(L, -1);
-	lua_getglobal(L, "font");				// rDir, rExt, font table
-	lua_pushnumber(L, 1);					// rDir, rExt, font table, 1
-	lua_gettable(L, -2);					// rDir, rExt, font table, name
-	lua_pushnumber(L, 2);					// rDir, rExt, font table, name, 2
-	lua_gettable(L, -3);					// rDir, rExt, font table, name, size
-	Game::gFontName = lua_tostring(L, -2);
-	Game::gFontSize = lua_tonumber(L, -1);
-	lua_pop(L, 5);
+	lua_pop(L, 2);
+	lua_getglobal(L, "heading_font");		// font table
+	lua_pushnumber(L, 1);					// font table, 1
+	lua_gettable(L, -2);					// font table, name
+	lua_pushnumber(L, 2);					// font table, name, 2
+	lua_gettable(L, -3);					// font table, name, size
+	Game::gHeadingFont.name = lua_tostring(L, -2);
+	Game::gHeadingFont.size = lua_tonumber(L, -1);
+	lua_pop(L, 3);
+	lua_getglobal(L, "body_font");			// font table
+	lua_pushnumber(L, 1);					// font table, 1
+	lua_gettable(L, -2);					// font table, name
+	lua_pushnumber(L, 2);					// font table, name, 2
+	lua_gettable(L, -3);					// font table, name, size
+	Game::gBodyFont.name = lua_tostring(L, -2);
+	Game::gBodyFont.size = lua_tonumber(L, -1);
+	lua_pop(L, 3);
 
 	lua_getglobal(L, "WINDOW_W");
 	Game::WINDOW_W = lua_tonumber(L, -1);

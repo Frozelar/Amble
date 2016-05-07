@@ -63,11 +63,14 @@ bool init(void)
 
 bool initFont(void)
 {
-	std::string font = Game::rDir + Game::gFontName;
-	Game::gFont = TTF_OpenFont(font.c_str(), Game::gFontSize);
-	if (Game::gFont == NULL)
+	std::string hfont = Game::rDir + Game::gHeadingFont.name;
+	std::string bfont = Game::rDir + Game::gBodyFont.name;
+
+	Game::gHeadingFont.font = TTF_OpenFont(hfont.c_str(), Game::gHeadingFont.size);
+	Game::gBodyFont.font = TTF_OpenFont(bfont.c_str(), Game::gBodyFont.size);
+	if (Game::gHeadingFont.font == NULL || Game::gBodyFont.font == NULL)
 	{
-		std::cout << "Error opening the font:" << std::endl;
+		std::cout << "Error opening font: " << std::endl;
 		std::cout << TTF_GetError() << std::endl;
 		return false;
 	}
@@ -91,8 +94,10 @@ void close(void)
 	Mix_CloseAudio();
 	Mix_Quit();
 	IMG_Quit();
-	TTF_CloseFont(Game::gFont);
-	Game::gFont = NULL;
+	TTF_CloseFont(Game::gHeadingFont.font);
+	TTF_CloseFont(Game::gBodyFont.font);
+	Game::gHeadingFont.font = NULL;
+	Game::gBodyFont.font = NULL;
 	TTF_Quit();
 	SDL_Quit();
 	SDL_DestroyRenderer(Game::gRenderer);

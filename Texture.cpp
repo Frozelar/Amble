@@ -89,13 +89,13 @@ bool Texture::txLoadF(std::string path)
 	return success;
 }
 
-bool Texture::txLoadT(std::string text, SDL_Color color)
+bool Texture::txLoadT(std::string text, TTF_Font* font, SDL_Color color)
 {
 	//Get rid of preexisting texture
 	txFree();
 
 	//Render text surface
-	SDL_Surface* textSurface = TTF_RenderText_Blended_Wrapped(Game::gFont, text.c_str(), color, 1024);
+	SDL_Surface* textSurface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), color, 1024);
 	if (textSurface != NULL)
 	{
 		//Create texture from surface pixels

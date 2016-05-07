@@ -6,7 +6,8 @@ totalLevels = 2  -- INCLUDING title screen level!
 
 resourceDirectory = "resources/"
 resourceExtension = ".png"
-font = {"AveriaSans-Regular.ttf", 36}
+heading_font = {"AveriaSans-Regular.ttf", 36}
+body_font = {"AveriaSans-Regular.ttf", 18}
 
 textColor = { 255, 255, 255, 255 }  -- r, g, b, a
 highlightColor = { 210, 180, 90, 255 }

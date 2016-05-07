@@ -171,9 +171,8 @@ public:
 	static std::string rExt;
 	static SDL_Color textColor;
 	static SDL_Color highlightColor;
-	static TTF_Font* gFont;
-	static std::string gFontName;
-	static int gFontSize;
+	static Font gHeadingFont;
+	static Font gBodyFont;
 	static SDL_Window* gWindow;
 	static SDL_Renderer* gRenderer;
 	static SDL_Event* gEvent;

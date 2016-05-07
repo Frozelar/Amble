@@ -320,7 +320,8 @@ void Graphics::gxClose(void)
 
 void Graphics::gxIncScale(bool gfxscale)
 {
-	std::string font = Game::rDir + Game::gFontName;
+	std::string hfont = Game::rDir + Game::gHeadingFont.name;
+	std::string bfont = Game::rDir + Game::gBodyFont.name;
 
 	if (gfxscale)
 	{
@@ -347,8 +348,10 @@ void Graphics::gxIncScale(bool gfxscale)
 	Game::DEFAULT_SPEED *= GFX_MULT;
 	Game::DEFAULT_OFFSET *= GFX_MULT;
 
-	TTF_CloseFont(Game::gFont);
-	Game::gFont = TTF_OpenFont(font.c_str(), Game::gFontSize);
+	TTF_CloseFont(Game::gHeadingFont.font);
+	TTF_CloseFont(Game::gBodyFont.font);
+	Game::gHeadingFont.font = TTF_OpenFont(hfont.c_str(), Game::gHeadingFont.size);
+	Game::gBodyFont.font = TTF_OpenFont(bfont.c_str(), Game::gBodyFont.size);
 
 	Game::gPlayer->tgHitboxRect.x *= GFX_MULT;
 	Game::gPlayer->tgHitboxRect.y *= GFX_MULT;
