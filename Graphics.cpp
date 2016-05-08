@@ -322,6 +322,7 @@ void Graphics::gxIncScale(bool gfxscale)
 {
 	std::string hfont = Game::rDir + Game::gHeadingFont.name;
 	std::string bfont = Game::rDir + Game::gBodyFont.name;
+	std::string tfont = Game::rDir + Game::gTitleFont.name;
 
 	if (gfxscale)
 	{
@@ -350,8 +351,10 @@ void Graphics::gxIncScale(bool gfxscale)
 
 	TTF_CloseFont(Game::gHeadingFont.font);
 	TTF_CloseFont(Game::gBodyFont.font);
+	TTF_CloseFont(Game::gTitleFont.font);
 	Game::gHeadingFont.font = TTF_OpenFont(hfont.c_str(), Game::gHeadingFont.size);
 	Game::gBodyFont.font = TTF_OpenFont(bfont.c_str(), Game::gBodyFont.size);
+	Game::gTitleFont.font = TTF_OpenFont(tfont.c_str(), Game::gTitleFont.size);
 
 	Game::gPlayer->tgHitboxRect.x *= GFX_MULT;
 	Game::gPlayer->tgHitboxRect.y *= GFX_MULT;
@@ -383,6 +386,11 @@ void Graphics::gxIncScale(bool gfxscale)
 		Game::dashArray[i] *= GFX_MULT;
 	for (int i = 0; i < Game::floatArray.size(); i++)
 		Game::floatArray[i] *= GFX_MULT;
+
+	Menu::ttTitleTexture->txRect.x *= GFX_MULT;
+	Menu::ttTitleTexture->txRect.y *= GFX_MULT;
+	Menu::ttTitleTexture->txRect.w *= GFX_MULT;
+	Menu::ttTitleTexture->txRect.h *= GFX_MULT;
 	Menu::menuTexture->txRect.x *= GFX_MULT;
 	Menu::menuTexture->txRect.y *= GFX_MULT;
 	Menu::menuTexture->txRect.w *= GFX_MULT;

@@ -18,6 +18,7 @@ public:
 	// static int muOldMenu;
 	static std::map< std::string, int > MenuID;
 	static std::vector< int > NumOptions;
+	static Texture* ttTitleTexture;
 	static Texture* menuTexture;
 	static std::vector< std::string > muOptions;
 	static std::vector< std::string > ttOptions;

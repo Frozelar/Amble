@@ -58,6 +58,10 @@ int LuaBridge::labInitValues(void)
 	// lua_pcall(L, 0, 0, 0);
 	lua_register(L, "checkCollision", labCheckCollision);
 
+	lua_getglobal(L, "game_title");
+	Game::gameTitle = lua_tostring(L, -1);
+	lua_pop(L, 1);
+
 	lua_getglobal(L, "totalLevels");
 	Level::totalLevels = lua_tonumber(L, -1);
 	lua_pop(L, 1);
@@ -72,17 +76,52 @@ int LuaBridge::labInitValues(void)
 	lua_gettable(L, -2);					// font table, name
 	lua_pushnumber(L, 2);					// font table, name, 2
 	lua_gettable(L, -3);					// font table, name, size
-	Game::gHeadingFont.name = lua_tostring(L, -2);
-	Game::gHeadingFont.size = lua_tonumber(L, -1);
-	lua_pop(L, 3);
+	for (int i = 2; i < 6; i++)
+	{
+		lua_pushnumber(L, i + 1);
+		lua_gettable(L, -(i + 2));
+	}										// font table, name, size, r, g, b, a
+	Game::gHeadingFont.name = lua_tostring(L, -6);
+	Game::gHeadingFont.size = lua_tonumber(L, -5);
+	Game::gHeadingFont.color.r = lua_tonumber(L, -4);
+	Game::gHeadingFont.color.g = lua_tonumber(L, -3);
+	Game::gHeadingFont.color.b = lua_tonumber(L, -2);
+	Game::gHeadingFont.color.a = lua_tonumber(L, -1);
+	lua_pop(L, 7);
 	lua_getglobal(L, "body_font");			// font table
 	lua_pushnumber(L, 1);					// font table, 1
 	lua_gettable(L, -2);					// font table, name
 	lua_pushnumber(L, 2);					// font table, name, 2
 	lua_gettable(L, -3);					// font table, name, size
-	Game::gBodyFont.name = lua_tostring(L, -2);
-	Game::gBodyFont.size = lua_tonumber(L, -1);
-	lua_pop(L, 3);
+	for (int i = 2; i < 6; i++)
+	{
+		lua_pushnumber(L, i + 1);
+		lua_gettable(L, -(i + 2));
+	}										// font table, name, size, r, g, b, a
+	Game::gBodyFont.name = lua_tostring(L, -6);
+	Game::gBodyFont.size = lua_tonumber(L, -5);
+	Game::gBodyFont.color.r = lua_tonumber(L, -4);
+	Game::gBodyFont.color.g = lua_tonumber(L, -3);
+	Game::gBodyFont.color.b = lua_tonumber(L, -2);
+	Game::gBodyFont.color.a = lua_tonumber(L, -1);
+	lua_pop(L, 7);
+	lua_getglobal(L, "title_font");			// font table
+	lua_pushnumber(L, 1);					// font table, 1
+	lua_gettable(L, -2);					// font table, name
+	lua_pushnumber(L, 2);					// font table, name, 2
+	lua_gettable(L, -3);					// font table, name, size
+	for (int i = 2; i < 6; i++)
+	{
+		lua_pushnumber(L, i + 1);
+		lua_gettable(L, -(i + 2));
+	}										// font table, name, size, r, g, b, a
+	Game::gTitleFont.name = lua_tostring(L, -6);
+	Game::gTitleFont.size = lua_tonumber(L, -5);
+	Game::gTitleFont.color.r = lua_tonumber(L, -4);
+	Game::gTitleFont.color.g = lua_tonumber(L, -3);
+	Game::gTitleFont.color.b = lua_tonumber(L, -2);
+	Game::gTitleFont.color.a = lua_tonumber(L, -1);
+	lua_pop(L, 7);
 
 	lua_getglobal(L, "WINDOW_W");
 	Game::WINDOW_W = lua_tonumber(L, -1);
@@ -124,6 +163,7 @@ int LuaBridge::labInitValues(void)
 	// lua_settable(L, LUA_REGISTRYINDEX);
 	lua_pop(L, 14);
 
+	/*
 	lua_getglobal(L, "textColor");						// textColor
 	for (int i = 0; i < 4; i++)
 	{
@@ -135,6 +175,7 @@ int LuaBridge::labInitValues(void)
 	Game::textColor.b = lua_tonumber(L, -2);
 	Game::textColor.a = lua_tonumber(L, -1);
 	lua_pop(L, 5);										// 
+	*/
 
 	lua_getglobal(L, "highlightColor");					// highlightColor
 	for (int i = 0; i < 4; i++)

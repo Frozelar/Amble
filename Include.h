@@ -32,6 +32,7 @@ class LevelEditor;
 
 struct Font {
 	TTF_Font* font;
+	SDL_Color color;
 	std::string name;
 	int size;
 };

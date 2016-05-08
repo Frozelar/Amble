@@ -87,8 +87,11 @@ std::vector<int> Game::gravityArray;
 std::vector<int> Game::dashArray;
 std::vector<int> Game::floatArray;
 
+std::string Game::gameTitle = "";
+
 Font Game::gHeadingFont;
 Font Game::gBodyFont;
+Font Game::gTitleFont;
 // Font Game::gFont = NULL;
 // std::string Game::gFontName = "";
 // int Game::gFontSize = 0;
@@ -107,7 +110,7 @@ int Game::gState = 0;
 int Game::gOldState = 0;
 std::string Game::rDir = "resources/";
 std::string Game::rExt = ".png";
-SDL_Color Game::textColor = { 255, 255, 255, 255 };
+// SDL_Color Game::textColor = { 255, 255, 255, 255 };
 SDL_Color Game::highlightColor = { 255, 255, 255, 255 };
 
 // const int Game::MAX_PARTICLES = 4096;

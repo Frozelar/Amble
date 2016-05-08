@@ -2,14 +2,17 @@ getmetatable('').__index = function(str, i)
 	return string.sub(str, i, i)
 end
 
+game_title = "Amble"
+
 totalLevels = 2  -- INCLUDING title screen level!
 
 resourceDirectory = "resources/"
 resourceExtension = ".png"
-heading_font = {"AveriaSans-Regular.ttf", 36}
-body_font = {"AveriaSans-Regular.ttf", 18}
+title_font = {"AveriaSans-Regular.ttf", 72, math.random(0, 255), math.random(0, 255), 0, 255}
+heading_font = {"AveriaSans-Regular.ttf", 36, 255, 255, 255, 255}	-- name, size, r, g, b, a
+body_font = {"AveriaSans-Regular.ttf", 18, 255, 255, 255, 255}
 
-textColor = { 255, 255, 255, 255 }  -- r, g, b, a
+-- textColor = { 255, 255, 255, 255 }  -- r, g, b, a
 highlightColor = { 210, 180, 90, 255 }
 
 direction = { "left", "right", "up", "down" }
