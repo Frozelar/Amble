@@ -329,37 +329,38 @@ int LuaBridge::labInitValues(void)
 				}
 				else if (i == GFXIDLocations["tiles"])
 				{
-					// int m = 0;
+					int m = 0;
 					Graphics::tileTextures.resize((j + 1) * Graphics::tileSubIdentifiers.size());
 					// Graphics::tileTextures[j].resize(framenum);
 					Graphics::tileIdentifiers.resize((j + 1) * Graphics::tileSubIdentifiers.size());
 					// Graphics::tileIdentifiers[j].resize(framenum);
 					for (int k = 0; k < Graphics::tileSubIdentifiers.size(); k++)
 					{
+						m = j * Game::TileSubType.size() - j;
 						// for (int l = 0; l < framenum; l++)
 						// {
 						if (framenum > 1)
 						{
 							for (int l = 0; l < framenum; l++ /* , m++ */)
 							{
-								Graphics::tileTextures[j + k].resize(framenum);
-								Graphics::tileIdentifiers[j + k].resize(framenum);
+								Graphics::tileTextures[/*j*/m + k].resize(framenum);
+								Graphics::tileIdentifiers[m + k].resize(framenum);
 								// frames.resize(k + m + 1);
 								// frames[k + m] = identifier + Graphics::tileSubIdentifiers[k] + (char)(l + 1);
 								frame << identifier << Graphics::tileSubIdentifiers[k] << (l + 1);
-								Graphics::tileIdentifiers[j + k][l] = frame.str();
+								Graphics::tileIdentifiers[m + k][l] = frame.str();
 								// frames[k] = frame.str();
 								frame.str(std::string());
 							}
 						}
 						else
 						{
-							Graphics::tileTextures[j + k].resize(framenum);
-							Graphics::tileIdentifiers[j + k].resize(framenum);
+							Graphics::tileTextures[/*j*/m + k].resize(framenum);
+							Graphics::tileIdentifiers[m + k].resize(framenum);
 							// frames.resize(k + 1);
 							// frames[k] = identifier + Graphics::tileSubIdentifiers[k] /* + (char)(l + 1) */;
 							frame << identifier << Graphics::tileSubIdentifiers[k];
-							Graphics::tileIdentifiers[j + k][0] = frame.str();
+							Graphics::tileIdentifiers[m + k][0] = frame.str();
 							// frames[k] = frame.str();
 							frame.str(std::string());
 						}

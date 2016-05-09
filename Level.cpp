@@ -54,10 +54,12 @@ bool Level::generateLevel(int whichLevel)
 	// bool isCharacter = false;
 
 	closeLevel();
-	if (whichLevel != 0)
+	if (whichLevel > 0)
 		levelMap.open(Game::rDir + "level" + std::to_string(whichLevel) + ext);
-	else
+	else if (whichLevel == 0)
 		levelMap.open(Game::rDir + "title" + ext);
+	else if (whichLevel == -1)
+		levelMap.open(Game::rDir + "output" + ext);
 	currentLevel = whichLevel;
 
 	levelMap >> unitType;
@@ -72,9 +74,9 @@ bool Level::generateLevel(int whichLevel)
 	Game::gColliding.resize(Level::LEVEL_UNITS);
 
 	levelMap >> unitType;
-	levelBG = unitType - Game::OFFSET["BACKGROUND"] - 1;
+	levelBG = unitType /* - Game::OFFSET["BACKGROUND"] */ - 1;
 	levelMap >> unitType;
-	levelTrack = unitType - Game::OFFSET["MUSIC"] - 1;
+	levelTrack = unitType /* - Game::OFFSET["MUSIC"] */ - 1;
 
 	for (int i = 0, j = 0; i < Level::LEVEL_PIXELS;)
 	{

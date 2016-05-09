@@ -144,8 +144,8 @@ Game::Game()
 	OFFSET["TILE"] = 1000;
 	OFFSET["ENEMY"] = 2000;
 	OFFSET["COLLECTIBLE"] = 3000;
-	OFFSET["BACKGROUND"] = 4000;
-	OFFSET["MUSIC"] = 5000;
+	// OFFSET["BACKGROUND"] = 4000;
+	// OFFSET["MUSIC"] = 5000;
 }
 
 Game::~Game()
@@ -319,11 +319,11 @@ void Game::newThing(int type = -1, int levelunit = -1, int x = -1, int y = -1, i
 			things[levelunit] = gPlayer;
 		}
 		else if (type == ThingType["tile"])
-			things[levelunit] = new Tile(NULL, type, levelunit);
+			things[levelunit] = new Tile(NULL, thingtype, levelunit);
 		else if (type == ThingType["enemy"])
-			things[levelunit] = new Enemy(NULL, type, levelunit);
+			things[levelunit] = new Enemy(NULL, thingtype, levelunit);
 		else if (type == ThingType["collectible"])
-			things[levelunit] = new Collectible(NULL, type, levelunit);
+			things[levelunit] = new Collectible(NULL, thingtype, levelunit);
 	}
 }
 

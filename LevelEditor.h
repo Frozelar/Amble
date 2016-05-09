@@ -13,5 +13,7 @@ public:
 
 	static bool leHandleEnvironment(SDL_Event*);
 	static void leRender(void);
+	static bool leSave(void);
+	static bool leOpen(void);
 };
 
