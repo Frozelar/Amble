@@ -18,6 +18,7 @@ public:
 	void tgResolveCollision(Thing*, int);
 
 	int tgGetSubtype(void);
+	void tgSetSubtype(int);
 
 	// the type of enemy
 	int enType = 0;

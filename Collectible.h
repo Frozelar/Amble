@@ -14,6 +14,7 @@ public:
 	void tgApplyAI(void);
 	void tgHandleVerticals(void);
 	int tgGetSubtype(void);
+	void tgSetSubtype(int);
 
 	int clType = 0;
 };

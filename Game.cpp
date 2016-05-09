@@ -55,7 +55,7 @@ int Game::DEFAULT_ENEMY_W = 8;
 int Game::DEFAULT_ENEMY_H = 8;
 
 // default offset value for graphics
-int Game::DEFAULT_OFFSET = 2;
+int Game::DEFAULT_GFX_OFFSET = 2;
 
 // the default speed for movement
 int Game::DEFAULT_SPEED = 2;
@@ -68,6 +68,8 @@ int Game::DEFAULT_SPEED = 2;
 
 // default value for health (more or less just for debugging)
 const int Game::DEFAULT_HEALTH = 100;
+
+std::map< std::string, int > Game::OFFSET;
 
 /*
 // const int Game::TOTAL_JUMP_ARRAY_UNITS = 32;
@@ -138,6 +140,12 @@ Game::Game()
 	GameState["menu"] = (++num);
 	GameState["title"] = (++num);
 	GameState["editor"] = (++num);
+
+	OFFSET["TILE"] = 1000;
+	OFFSET["ENEMY"] = 2000;
+	OFFSET["COLLECTIBLE"] = 3000;
+	OFFSET["BACKGROUND"] = 4000;
+	OFFSET["MUSIC"] = 5000;
 }
 
 Game::~Game()
@@ -286,12 +294,12 @@ void Game::newThing(int type = -1, int levelunit = -1, int x = -1, int y = -1, i
 			gPlayer->tgLevelUnit = levelunit;
 			things[levelunit] = gPlayer;
 		}
-		else if (type > TILE_TYPE_OFFSET && type < ENEMY_TYPE_OFFSET)
-			things[levelunit] = new Tile(NULL, type - TILE_TYPE_OFFSET, levelunit);
-		else if (type > ENEMY_TYPE_OFFSET && type < COLLECTIBLE_TYPE_OFFSET)
-			things[levelunit] = new Enemy(NULL, type - ENEMY_TYPE_OFFSET, levelunit);
-		else if (type > COLLECTIBLE_TYPE_OFFSET)
-			things[levelunit] = new Collectible(NULL, type - COLLECTIBLE_TYPE_OFFSET, levelunit);
+		else if (type > OFFSET["TILE"] && type < OFFSET["ENEMY"])
+			things[levelunit] = new Tile(NULL, type - OFFSET["TILE"], levelunit);
+		else if (type > OFFSET["ENEMY"] && type < OFFSET["COLLECTIBLE"])
+			things[levelunit] = new Enemy(NULL, type - OFFSET["ENEMY"], levelunit);
+		else if (type > OFFSET["COLLECTIBLE"])
+			things[levelunit] = new Collectible(NULL, type - OFFSET["COLLECTIBLE"], levelunit);
 		/*
 		else if (type > TILE_TYPE_OFFSET && type < TILE_TYPE_OFFSET + TileType["total"])
 			things[levelunit] = new Tile(NULL, type - TILE_TYPE_OFFSET, levelunit);
@@ -303,18 +311,18 @@ void Game::newThing(int type = -1, int levelunit = -1, int x = -1, int y = -1, i
 	}
 	else if (levelunit > -1 && type > -1 && thingtype > -1)
 	{
-		if (thingtype == ThingType["player"])
+		if (type == ThingType["player"])
 		{
 			gPlayer->tgHitboxRect.x = x;
 			gPlayer->tgHitboxRect.y = y;
 			gPlayer->tgLevelUnit = levelunit;
 			things[levelunit] = gPlayer;
 		}
-		else if (thingtype == ThingType["tile"])
+		else if (type == ThingType["tile"])
 			things[levelunit] = new Tile(NULL, type, levelunit);
-		else if (thingtype == ThingType["enemy"])
+		else if (type == ThingType["enemy"])
 			things[levelunit] = new Enemy(NULL, type, levelunit);
-		else if (thingtype == ThingType["collectible"])
+		else if (type == ThingType["collectible"])
 			things[levelunit] = new Collectible(NULL, type, levelunit);
 	}
 }
@@ -353,12 +361,12 @@ void Game::readCFG(bool update)
 	cfg >> Graphics::isFullscreen;
 	cfg >> Audio::volume[0];
 	cfg >> Audio::volume[1];
-	cfg >> Game::gPlayer->plControls.left;
-	cfg >> Game::gPlayer->plControls.right;
-	cfg >> Game::gPlayer->plControls.up;
-	cfg >> Game::gPlayer->plControls.down;
-	cfg >> Game::gPlayer->plControls.jump;
-	cfg >> Game::gPlayer->plControls.pause;
+	cfg >> Game::gPlayer->plControls["left"];
+	cfg >> Game::gPlayer->plControls["right"];
+	cfg >> Game::gPlayer->plControls["up"];
+	cfg >> Game::gPlayer->plControls["down"];
+	cfg >> Game::gPlayer->plControls["jump"];
+	cfg >> Game::gPlayer->plControls["pause"];
 
 	if (update)
 	{
@@ -384,10 +392,10 @@ void Game::writeCFG()
 	cfg << Graphics::isFullscreen << " ";
 	cfg << Audio::volume[0] << " ";
 	cfg << Audio::volume[1] << " ";
-	cfg << Game::gPlayer->plControls.left << " ";
-	cfg << Game::gPlayer->plControls.right << " ";
-	cfg << Game::gPlayer->plControls.up << " ";
-	cfg << Game::gPlayer->plControls.down << " ";
-	cfg << Game::gPlayer->plControls.jump << " ";
-	cfg << Game::gPlayer->plControls.pause << " ";
+	cfg << Game::gPlayer->plControls["left"] << " ";
+	cfg << Game::gPlayer->plControls["right"] << " ";
+	cfg << Game::gPlayer->plControls["up"] << " ";
+	cfg << Game::gPlayer->plControls["down"] << " ";
+	cfg << Game::gPlayer->plControls["jump"] << " ";
+	cfg << Game::gPlayer->plControls["pause"] << " ";
 }

@@ -159,3 +159,8 @@ int Tile::tgGetSubtype(void)
 {
 	return tiType;
 }
+
+void Tile::tgSetSubtype(int newst)
+{
+	tiType = newst;
+}

@@ -151,7 +151,7 @@ bool Menu::muHandleMenu(SDL_Event* e)
 	{
 		if (e->type == SDL_KEYUP && e->key.repeat == NULL)
 		{
-			if (e->key.keysym.sym == Game::gPlayer->plControls.pause)
+			if (e->key.keysym.sym == Game::gPlayer->plControls["pause"])
 			{
 				muMenu = MenuID["pause"];
 				Game::changeGameState(Game::gOldState);
@@ -377,17 +377,17 @@ void Menu::muMapButton(std::string button, int newmap)
 	m = newmap;
 
 	if (b == "Left")
-		Game::gPlayer->plControls.left = m;
+		Game::gPlayer->plControls["left"] = m;
 	else if (b == "Right")
-		Game::gPlayer->plControls.right = m;
+		Game::gPlayer->plControls["right"] = m;
 	else if (b == "Up")
-		Game::gPlayer->plControls.up = m;
+		Game::gPlayer->plControls["up"] = m;
 	else if (b == "Down")
-		Game::gPlayer->plControls.down = m;
+		Game::gPlayer->plControls["down"] = m;
 	else if (b == "Jump")
-		Game::gPlayer->plControls.jump = m;
+		Game::gPlayer->plControls["jump"] = m;
 	else if (b == "Pause")
-		Game::gPlayer->plControls.pause = m;
+		Game::gPlayer->plControls["pause"] = m;
 	if(button == "")
 		muIsMapping = false;
 }

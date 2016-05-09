@@ -135,11 +135,12 @@ public:
 	static std::map<std::string, int> SoundEffectType;
 	static std::map<std::string, int> ParticleType;
 	static std::map<std::string, int> GameState;
-	static const int TILE_TYPE_OFFSET = 1000;
-	static const int ENEMY_TYPE_OFFSET = 2000;
-	static const int COLLECTIBLE_TYPE_OFFSET = 3000;
-	static const int BACKGROUND_TYPE_OFFSET = 4000;
-	static const int MUSIC_TYPE_OFFSET = 5000;
+	// static const int TILE_TYPE_OFFSET = 1000;
+	// static const int ENEMY_TYPE_OFFSET = 2000;
+	// static const int COLLECTIBLE_TYPE_OFFSET = 3000;
+	// static const int BACKGROUND_TYPE_OFFSET = 4000;
+	// static const int MUSIC_TYPE_OFFSET = 5000;
+	static std::map< std::string, int > OFFSET;
 	static int WINDOW_W;
 	static int WINDOW_H;
 	static int DEFAULT_W;
@@ -149,7 +150,7 @@ public:
 	static int PLAYER_H;
 	static int DEFAULT_ENEMY_W;
 	static int DEFAULT_ENEMY_H;
-	static int DEFAULT_OFFSET;
+	static int DEFAULT_GFX_OFFSET;
 	static int DEFAULT_SPEED;
 	// static const int TOTAL_COLLISIONS;
 	// static const int TOTAL_DIRECTIONS;
@@ -185,6 +186,7 @@ public:
 	static Game* gGame;
 	static Level* gLevel;
 	static LuaBridge* gLuaBridge;
+	static LevelEditor* gLevelEditor;
 	static Menu* gMenu;
 	static std::vector<Thing*> things;
 	static std::vector<Particle*> particles;

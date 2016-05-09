@@ -30,5 +30,6 @@ public:
 	int plState = 0;
 	int plOldVerticals = 0;
 	SDL_Rect plOldHitboxRect;
-	ControlScheme plControls;
+	// ControlScheme plControls;
+	std::map< std::string, int > plControls;
 };

@@ -53,10 +53,10 @@ void Thing::tgSyncTexture(void)
 {
 	if (tgType != Game::ThingType["tile"])
 	{
-		tgGFXrect.x = tgHitboxRect.x - Game::DEFAULT_OFFSET;
-		tgGFXrect.y = tgHitboxRect.y - Game::DEFAULT_OFFSET;
-		tgGFXrect.w = tgHitboxRect.w + Game::DEFAULT_OFFSET * 2;
-		tgGFXrect.h = tgHitboxRect.h + Game::DEFAULT_OFFSET * 2;
+		tgGFXrect.x = tgHitboxRect.x - Game::DEFAULT_GFX_OFFSET;
+		tgGFXrect.y = tgHitboxRect.y - Game::DEFAULT_GFX_OFFSET;
+		tgGFXrect.w = tgHitboxRect.w + Game::DEFAULT_GFX_OFFSET * 2;
+		tgGFXrect.h = tgHitboxRect.h + Game::DEFAULT_GFX_OFFSET * 2;
 	}
 	else // if (tgType == Game::ThingType["tile"])
 	{
@@ -112,4 +112,9 @@ void Thing::tgApplyAI(void)
 int Thing::tgGetSubtype(void)
 {
 	return -1;
+}
+
+void Thing::tgSetSubtype(int newst)
+{
+	std::cout << "Error: Setting subtype of a thing: " << newst << std::endl;
 }

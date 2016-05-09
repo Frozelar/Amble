@@ -42,6 +42,7 @@ struct Collision {
 	Thing* thing2 = NULL;
 };
 
+/*
 struct ControlScheme {
 	int up = SDLK_w;
 	int left = SDLK_a;
@@ -50,6 +51,7 @@ struct ControlScheme {
 	int jump = SDLK_SPACE;
 	int pause = SDLK_p;
 };
+*/
 
 // enum Direction;
 

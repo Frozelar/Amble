@@ -10,10 +10,10 @@ Collectible::Collectible(SDL_Rect* box, int subtype, int unit) : Thing(box, Game
 	tgHitboxRect.h = Game::DEFAULT_ENEMY_H;
 	tgHitboxRect.x = (box == NULL ? ((unit - ((unit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W) : box->x);
 	tgHitboxRect.y = (box == NULL ? ((unit / Level::LEVEL_W) * Game::DEFAULT_H) : box->y);
-	tgGFXrect.x = tgHitboxRect.x - Game::DEFAULT_OFFSET;
-	tgGFXrect.y = tgHitboxRect.y - Game::DEFAULT_OFFSET;
-	tgGFXrect.w = Game::DEFAULT_ENEMY_W + Game::DEFAULT_OFFSET * 2;
-	tgGFXrect.h = Game::DEFAULT_ENEMY_H + Game::DEFAULT_OFFSET * 2;
+	tgGFXrect.x = tgHitboxRect.x - Game::DEFAULT_GFX_OFFSET;
+	tgGFXrect.y = tgHitboxRect.y - Game::DEFAULT_GFX_OFFSET;
+	tgGFXrect.w = Game::DEFAULT_ENEMY_W + Game::DEFAULT_GFX_OFFSET * 2;
+	tgGFXrect.h = Game::DEFAULT_ENEMY_H + Game::DEFAULT_GFX_OFFSET * 2;
 	clType = subtype;
 }
 
@@ -87,4 +87,9 @@ void Collectible::tgHandleVerticals(void)
 int Collectible::tgGetSubtype(void)
 {
 	return clType;
+}
+
+void Collectible::tgSetSubtype(int newst)
+{
+	clType = newst;
 }

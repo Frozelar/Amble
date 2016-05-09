@@ -135,8 +135,8 @@ int LuaBridge::labInitValues(void)
 	Game::PLAYER_W = lua_tonumber(L, -1);
 	lua_getglobal(L, "PLAYER_H");
 	Game::PLAYER_H = lua_tonumber(L, -1);
-	lua_getglobal(L, "DEFAULT_OFFSET");
-	Game::DEFAULT_OFFSET = lua_tonumber(L, -1);
+	lua_getglobal(L, "DEFAULT_GFX_OFFSET");
+	Game::DEFAULT_GFX_OFFSET = lua_tonumber(L, -1);
 	lua_getglobal(L, "DEFAULT_ENEMY_W");
 	Game::DEFAULT_ENEMY_W = lua_tonumber(L, -1);
 	lua_getglobal(L, "DEFAULT_ENEMY_H");

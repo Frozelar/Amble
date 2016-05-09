@@ -30,6 +30,7 @@ int main(int argc, char** argv)
 	// Level::playMusic();
 	// lua_State* S = luaL_newstate();
 	// luaL_openlibs(S);
+	Game::gLevelEditor = new LevelEditor();
 
 	// init();
 	// Level::generateLevel();
@@ -44,6 +45,7 @@ int main(int argc, char** argv)
 			if (needtoinitlevel)
 			{
 				Level::generateLevel(Level::currentLevel + 1);	// may need to change later?
+				Game::centerCamera();
 				// LuaBridge::labChangeLevel();  <--- moved to generateLevel
 				// Level::playMusic();
 				needtoinitlevel = false;
@@ -87,10 +89,27 @@ int main(int argc, char** argv)
 		}
 		else if (Game::gState == Game::GameState["editor"])
 		{
-
+			if (needtoinitlevel)
+			{
+				Level::generateLevel(Level::currentLevel + 1);	// may need to change later?
+				needtoinitlevel = false;
+			}
+			while (SDL_PollEvent(Game::gEvent) != NULL)
+			{
+				if (Game::gEvent->type == SDL_QUIT)
+					quit = true;
+				else
+				{
+					if (!quit)
+						quit = !LevelEditor::leHandleEnvironment(Game::gEvent);
+					else
+						LevelEditor::leHandleEnvironment(Game::gEvent);
+				}
+			}
+			LevelEditor::leRender();
 		}
 
-		if (!needtoinitlevel && (Game::gState == Game::GameState["editor"] || Game::gState == Game::GameState["title"]))
+		if (!needtoinitlevel && (/* Game::gState == Game::GameState["editor"] || */ Game::gState == Game::GameState["title"]))
 			needtoinitlevel = true;
 	}
 

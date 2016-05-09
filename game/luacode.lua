@@ -8,7 +8,7 @@ totalLevels = 2  -- INCLUDING title screen level!
 
 resourceDirectory = "resources/"
 resourceExtension = ".png"
-title_font = {"AveriaSans-Regular.ttf", 72, math.random(0, 255), math.random(0, 255), 0, 255}
+title_font = {"AveriaSans-Regular.ttf", 72, math.random(0, 255), math.random(0, 255), math.random(0, 51), 255}
 heading_font = {"AveriaSans-Regular.ttf", 36, 255, 255, 255, 255}	-- name, size, r, g, b, a
 body_font = {"AveriaSans-Regular.ttf", 18, 255, 255, 255, 255}
 
@@ -19,18 +19,18 @@ direction = { "left", "right", "up", "down" }
 
 thingTypes = { "player", "tile", "enemy", "collectible" }
 
-TILE_OFFSET = 10
+-- TILE_OFFSET = 10
 tileTypes = { "dirtBlock", "dirtWall" }
 TOTAL_TILE_TYPES = #tileTypes
 
-ENEMY_OFFSET = 100
+-- ENEMY_OFFSET = 100
 enemyTypes = { "dude", "guy" }
 TOTAL_ENEMY_TYPES = #enemyTypes
 enemyStats = { {100, 1}, {75, 5} }		-- order corresponds to enemyTypes; format = {health, power}
 HEALTH_INDEX = 1
 POWER_INDEX = 2
 
-COLLECTIBLE_OFFSET = 200
+-- COLLECTIBLE_OFFSET = 200
 collectibleTypes = { "cbit", "cbyte" }
 TOTAL_COLLECTIBLE_TYPES = #collectibleTypes
 
@@ -96,7 +96,7 @@ PLAYER_W = 8
 PLAYER_H = 16
 DEFAULT_ENEMY_W = 8
 DEFAULT_ENEMY_H = 8
-DEFAULT_OFFSET = 2
+DEFAULT_GFX_OFFSET = 2
 DEFAULT_SPEED = 2
 DEFAULT_COOLDOWN = 128
 
@@ -846,7 +846,7 @@ function incGFXscale()
 	PLAYER_H = PLAYER_H * GFX_MULT
 	DEFAULT_ENEMY_W = DEFAULT_ENEMY_W * GFX_MULT
 	DEFAULT_ENEMY_H = DEFAULT_ENEMY_H * GFX_MULT
-	DEFAULT_OFFSET = DEFAULT_OFFSET * GFX_MULT
+	DEFAULT_GFX_OFFSET = DEFAULT_GFX_OFFSET * GFX_MULT
 	DEFAULT_SPEED = DEFAULT_SPEED * GFX_MULT
 	for i = 1, #jumpArray do
 		jumpArray[i] = jumpArray[i] * GFX_MULT

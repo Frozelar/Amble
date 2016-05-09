@@ -15,6 +15,7 @@ public:
 	void tgRender(void);
 	void tgApplyAI(void);
 	int tgGetSubtype(void);
+	void tgSetSubtype(int);
 
 	int tiType = 0;
 	bool tiIsSolid = true;

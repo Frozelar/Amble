@@ -72,9 +72,9 @@ bool Level::generateLevel(int whichLevel)
 	Game::gColliding.resize(Level::LEVEL_UNITS);
 
 	levelMap >> unitType;
-	levelBG = unitType - Game::BACKGROUND_TYPE_OFFSET - 1;
+	levelBG = unitType - Game::OFFSET["BACKGROUND"] - 1;
 	levelMap >> unitType;
-	levelTrack = unitType - Game::MUSIC_TYPE_OFFSET - 1;
+	levelTrack = unitType - Game::OFFSET["MUSIC"] - 1;
 
 	for (int i = 0, j = 0; i < Level::LEVEL_PIXELS;)
 	{
@@ -108,7 +108,7 @@ bool Level::generateLevel(int whichLevel)
 	}
 
 	levelMap.close();
-	Game::centerCamera();
+	// Game::centerCamera();
 	LuaBridge::labChangeLevel();
 	Level::playMusic();
 	// LuaBridge::labChangedLevel = true;

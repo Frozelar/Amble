@@ -7,6 +7,11 @@ public:
 	LevelEditor();
 	~LevelEditor();
 
-	static void leHandleEnvironment(void);
+	// static ControlScheme leControls;
+	static std::map< std::string, int > leControls;
+	static Thing* mouseThing;
+
+	static bool leHandleEnvironment(SDL_Event*);
+	static void leRender(void);
 };
 

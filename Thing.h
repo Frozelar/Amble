@@ -21,6 +21,7 @@ public:
 	void tgSyncTexture(void);
 
 	virtual int tgGetSubtype(void);
+	virtual void tgSetSubtype(int);
 
 	int tgType;
 	int tgHealth;

@@ -5,6 +5,7 @@
 #include "Thing.h"
 #include "Player.h"
 #include "Menu.h"
+#include "LevelEditor.h"
 
 bool Graphics::isFullscreen = false;
 float Graphics::GFX_SCALE = 1.0;
@@ -347,7 +348,7 @@ void Graphics::gxIncScale(bool gfxscale)
 	Game::DEFAULT_ENEMY_W *= GFX_MULT;
 	Game::DEFAULT_ENEMY_H *= GFX_MULT;
 	Game::DEFAULT_SPEED *= GFX_MULT;
-	Game::DEFAULT_OFFSET *= GFX_MULT;
+	Game::DEFAULT_GFX_OFFSET *= GFX_MULT;
 
 	TTF_CloseFont(Game::gHeadingFont.font);
 	TTF_CloseFont(Game::gBodyFont.font);
@@ -422,6 +423,14 @@ void Graphics::gxIncScale(bool gfxscale)
 		Menu::muMiscTextures[i]->txRect.w *= GFX_MULT;
 		Menu::muMiscTextures[i]->txRect.h *= GFX_MULT;
 	}
+	LevelEditor::mouseThing->tgHitboxRect.x *= GFX_MULT;
+	LevelEditor::mouseThing->tgHitboxRect.y *= GFX_MULT;
+	LevelEditor::mouseThing->tgHitboxRect.w *= GFX_MULT;
+	LevelEditor::mouseThing->tgHitboxRect.h *= GFX_MULT;
+	LevelEditor::mouseThing->tgGFXrect.x *= GFX_MULT;
+	LevelEditor::mouseThing->tgGFXrect.y *= GFX_MULT;
+	LevelEditor::mouseThing->tgGFXrect.w *= GFX_MULT;
+	LevelEditor::mouseThing->tgGFXrect.h *= GFX_MULT;
 
 	Level::LEVEL_W_PIXELS *= GFX_MULT;
 	Level::LEVEL_H_PIXELS *= GFX_MULT;
