@@ -19,24 +19,24 @@ Player::Player(SDL_Rect* box, int unit) : Thing(box, Game::ThingType["player"], 
 	tgHitboxRect.y = tgGFXrect.y + Game::DEFAULT_GFX_OFFSET;
 	plOldHitboxRect = tgHitboxRect;
 
-	plControls["left"] = SDLK_a;
-	plControls["right"] = SDLK_d;
-	plControls["up"] = SDLK_w;
-	plControls["down"] = SDLK_s;
-	plControls["jump"] = SDLK_SPACE;
-	plControls["pause"] = SDLK_p;
+	plControls["Left"] = SDLK_a;
+	plControls["Right"] = SDLK_d;
+	plControls["Up"] = SDLK_w;
+	plControls["Down"] = SDLK_s;
+	plControls["Jump"] = SDLK_SPACE;
+	plControls["Pause"] = SDLK_p;
 }
 
 void Player::plHandleEvent(SDL_Event* e)
 {
 	if (e->type == SDL_KEYUP && e->key.repeat == NULL)
 	{
-		if (e->key.keysym.sym == plControls["jump"])
+		if (e->key.keysym.sym == plControls["Jump"])
 		{
 			if (-tgVerticals < (int)Game::jumpArray.size() - 8 && tgVerticals < 0)
 				tgVerticals = -((int)Game::jumpArray.size() - 8);
 		}
-		else if (e->key.keysym.sym == plControls["left"])
+		else if (e->key.keysym.sym == plControls["Left"])
 		{
 			if (tgSpeed < 0)
 			{
@@ -44,7 +44,7 @@ void Player::plHandleEvent(SDL_Event* e)
 				// tgDirection = NO_DIRECTION;
 			}
 		}
-		else if (e->key.keysym.sym == plControls["right"])
+		else if (e->key.keysym.sym == plControls["Right"])
 		{
 			if (tgSpeed > 0)
 			{
@@ -52,14 +52,14 @@ void Player::plHandleEvent(SDL_Event* e)
 				// tgDirection = NO_DIRECTION;
 			}
 		}
-		else if(e->key.keysym.sym == plControls["pause"])
+		else if(e->key.keysym.sym == plControls["Pause"])
 		{
 			Game::changeGameState(Game::GameState["menu"]);
 		}
 	}
 	else if (e->type == SDL_KEYDOWN && e->key.repeat == NULL)
 	{
-		if (e->key.keysym.sym == plControls["jump"])
+		if (e->key.keysym.sym == plControls["Jump"])
 		{
 			if (tgVerticals == 0 && plOldVerticals == 0 && tgDashing == 0)
 			{
@@ -76,12 +76,12 @@ void Player::plHandleEvent(SDL_Event* e)
 				tgVerticals = -1;
 			}
 		}
-		else if (e->key.keysym.sym == plControls["left"])
+		else if (e->key.keysym.sym == plControls["Left"])
 		{
 			tgSpeed = -Game::DEFAULT_SPEED;
 			// tgDirection = LEFT;
 		}
-		else if (e->key.keysym.sym == plControls["right"])
+		else if (e->key.keysym.sym == plControls["Right"])
 		{
 			tgSpeed = Game::DEFAULT_SPEED;
 			// tgDirection = RIGHT;

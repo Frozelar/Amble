@@ -9,6 +9,7 @@
 #include "Thing.h"
 #include "Tile.h"
 #include "Menu.h"
+#include "LevelEditor.h"
 // #include "Particle.h"
 
 std::map<std::string, int> Game::Direction;
@@ -361,12 +362,26 @@ void Game::readCFG(bool update)
 	cfg >> Graphics::isFullscreen;
 	cfg >> Audio::volume[0];
 	cfg >> Audio::volume[1];
-	cfg >> Game::gPlayer->plControls["left"];
-	cfg >> Game::gPlayer->plControls["right"];
-	cfg >> Game::gPlayer->plControls["up"];
-	cfg >> Game::gPlayer->plControls["down"];
-	cfg >> Game::gPlayer->plControls["jump"];
-	cfg >> Game::gPlayer->plControls["pause"];
+	cfg >> Game::gPlayer->plControls["Left"];
+	cfg >> Game::gPlayer->plControls["Right"];
+	cfg >> Game::gPlayer->plControls["Up"];
+	cfg >> Game::gPlayer->plControls["Down"];
+	cfg >> Game::gPlayer->plControls["Jump"];
+	cfg >> Game::gPlayer->plControls["Pause"];
+	cfg >> LevelEditor::leControls["Up"];
+	cfg >> LevelEditor::leControls["Down"];
+	cfg >> LevelEditor::leControls["Left"];
+	cfg >> LevelEditor::leControls["Right"];
+	cfg >> LevelEditor::leControls["Place"];
+	cfg >> LevelEditor::leControls["Delete"];
+	cfg >> LevelEditor::leControls["Type Up"];
+	cfg >> LevelEditor::leControls["Type Down"];
+	cfg >> LevelEditor::leControls["Subtype Up"];
+	cfg >> LevelEditor::leControls["Subtype Down"];
+	cfg >> LevelEditor::leControls["Undo"];
+	cfg >> LevelEditor::leControls["Redo"];
+	cfg >> LevelEditor::leControls["Save"];
+	cfg >> LevelEditor::leControls["Open"];
 
 	if (update)
 	{
@@ -392,10 +407,24 @@ void Game::writeCFG()
 	cfg << Graphics::isFullscreen << " ";
 	cfg << Audio::volume[0] << " ";
 	cfg << Audio::volume[1] << " ";
-	cfg << Game::gPlayer->plControls["left"] << " ";
-	cfg << Game::gPlayer->plControls["right"] << " ";
-	cfg << Game::gPlayer->plControls["up"] << " ";
-	cfg << Game::gPlayer->plControls["down"] << " ";
-	cfg << Game::gPlayer->plControls["jump"] << " ";
-	cfg << Game::gPlayer->plControls["pause"] << " ";
+	cfg << Game::gPlayer->plControls["Left"] << " ";
+	cfg << Game::gPlayer->plControls["Right"] << " ";
+	cfg << Game::gPlayer->plControls["Up"] << " ";
+	cfg << Game::gPlayer->plControls["Down"] << " ";
+	cfg << Game::gPlayer->plControls["Jump"] << " ";
+	cfg << Game::gPlayer->plControls["Pause"] << " ";
+	cfg << LevelEditor::leControls["Up"] << " ";
+	cfg << LevelEditor::leControls["Down"] << " ";
+	cfg << LevelEditor::leControls["Left"] << " ";
+	cfg << LevelEditor::leControls["Right"] << " ";
+	cfg << LevelEditor::leControls["Place"] << " ";
+	cfg << LevelEditor::leControls["Delete"] << " ";
+	cfg << LevelEditor::leControls["Type Up"] << " ";
+	cfg << LevelEditor::leControls["Type Down"] << " ";
+	cfg << LevelEditor::leControls["Subtype Up"] << " ";
+	cfg << LevelEditor::leControls["Subtype Down"] << " ";
+	cfg << LevelEditor::leControls["Undo"] << " ";
+	cfg << LevelEditor::leControls["Redo"] << " ";
+	cfg << LevelEditor::leControls["Save"] << " ";
+	cfg << LevelEditor::leControls["Open"] << " ";
 }

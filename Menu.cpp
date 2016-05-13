@@ -5,6 +5,7 @@
 #include "Audio.h"
 #include "Texture.h"
 #include "Player.h"
+#include "LevelEditor.h"
 
 Menu* Game::gMenu;
 
@@ -17,14 +18,15 @@ std::vector< int > Menu::NumOptions;
 Texture* Menu::ttTitleTexture;
 Texture* Menu::menuTexture;
 std::vector<std::string> Menu::muOptions = { "Resume", "Settings", "Return to Title", "Quit", "",
-	"Graphics", "Audio", "Controls", "Return", "",
+	"Graphics", "Audio", "Game Controls", "Editor Controls", "Return", "",
 	"Window Size", "Toggle Fullscreen", "Return", "",
 	"Music", "Sound Effects", "Return", "",
-	"Left", "Right", "Up", "Down", "Jump", "Pause", "Return", "" };
+	"Left", "Right", "Up", "Down", "Jump", "Pause", "Return", "", 
+	"Left", "Right", "Up", "Down", "Place", "Delete", "Type Up", "Type Down", "Subtype Up", "Subtype Down", "Undo", "Redo", "Save", "Open", "Return", "" };
 std::vector<std::string> Menu::ttOptions = { "Play Game", "Menu", "Level Editor", "Quit" };
 std::vector< Texture* > Menu::muOptionTextures;
 std::vector< Texture* > Menu::ttOptionTextures;
-std::vector< Texture* > Menu::muMiscTextures;	// sfx, volume
+std::vector< Texture* > Menu::muMiscTextures;	// "Sound Effects", "Music", "Press Button"
 const int Menu::MISC_BUTTON_INDEX = 2;
 
 Menu::Menu()
@@ -35,15 +37,17 @@ Menu::Menu()
 	MenuID["settings"] = (++num);
 	MenuID["graphics"] = (++num);
 	MenuID["audio"] = (++num);
-	MenuID["controls"] = (++num);
+	MenuID["gmcontrols"] = (++num);
+	MenuID["lecontrols"] = (++num);
 	NumOptions.resize(MenuID.size());
 	NumOptions[MenuID["pause"]] = 4;
-	NumOptions[MenuID["settings"]] = 4;
+	NumOptions[MenuID["settings"]] = 5;
 	NumOptions[MenuID["graphics"]] = 3;
 	NumOptions[MenuID["audio"]] = 3;
-	NumOptions[MenuID["controls"]] = 7;
+	NumOptions[MenuID["gmcontrols"]] = 7;
+	NumOptions[MenuID["lecontrols"]] = 15;
 
-	for (int i = 0; i < MenuID["controls"]; i++)
+	for (int i = 0; i < MenuID["gmcontrols"]; i++)
 		controlMenuPos += NumOptions[i] + 1;
 
 	ttTitleTexture = new Texture(0, 0, 0, 0);
@@ -73,15 +77,31 @@ Menu::Menu()
 			muOptionTextures[i] = new Texture(0, 0, 0, 0);
 			if (muOptions[i] == "Music" || muOptions[i] == "Sound Effects")
 				muOptionTextures[i]->txLoadT(muOptions[i] + ": ", Game::gHeadingFont.font, Game::gHeadingFont.color);
-			else if (i >= controlMenuPos && i < controlMenuPos + NumOptions[MenuID["controls"]])
+			else if (i >= controlMenuPos && i <= controlMenuPos + NumOptions[MenuID["gmcontrols"]] + NumOptions[MenuID["lecontrols"]])	// assumes that lecontrols follows gmcontrols in menu order!!
 				muOptionTextures[i]->txLoadT(muOptions[i], Game::gBodyFont.font, Game::gBodyFont.color);
 			else
 				muOptionTextures[i]->txLoadT(muOptions[i], Game::gHeadingFont.font, Game::gHeadingFont.color);
-			muOptionTextures[i]->txRect.x = menuTexture->txRect.x + Game::DEFAULT_W;
 			if (i == 0 || muOptions[i - 1] == "")
+			{
+				muOptionTextures[i]->txRect.x = menuTexture->txRect.x + Game::DEFAULT_W;
 				muOptionTextures[i]->txRect.y = menuTexture->txRect.y + Game::DEFAULT_H;
+			}
 			else
-				muOptionTextures[i]->txRect.y = muOptionTextures[i - 1]->txRect.y + muOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H;
+			{
+				if (muOptionTextures[i - 1]->txRect.y + muOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H + muOptionTextures[i]->txRect.h >= menuTexture->txRect.y + menuTexture->txRect.h)
+				{
+					muOptionTextures[i]->txRect.x = menuTexture->txRect.x + menuTexture->txRect.w - muOptionTextures[i]->txRect.w - Game::DEFAULT_W;
+					muOptionTextures[i]->txRect.y = menuTexture->txRect.y + Game::DEFAULT_H;
+				}
+				else
+				{
+					if (muOptionTextures[i - 1]->txRect.x > menuTexture->txRect.x + Game::DEFAULT_W)
+						muOptionTextures[i]->txRect.x = menuTexture->txRect.x + menuTexture->txRect.w - muOptionTextures[i]->txRect.w - Game::DEFAULT_W;
+					else
+						muOptionTextures[i]->txRect.x = menuTexture->txRect.x + Game::DEFAULT_W;
+					muOptionTextures[i]->txRect.y = muOptionTextures[i - 1]->txRect.y + muOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H;
+				}
+			}
 			if (muOptions[i] == "Music" || muOptions[i] == "Sound Effects")
 			{
 				muMiscTextures[(muOptions[i] == "Sound Effects" ? Audio::SFX_VOL_INDEX : Audio::MUSIC_VOL_INDEX)]->txRect.x = muOptionTextures[i]->txRect.x + muOptionTextures[i]->txRect.w + Game::DEFAULT_W;
@@ -143,15 +163,15 @@ bool Menu::muHandleMenu(SDL_Event* e)
 
 	if (muIsMapping)
 	{
-		if (e->type == SDL_KEYUP && e->key.repeat == NULL)
-			muMapButton("", e->key.keysym.sym);
+		if ((e->type == SDL_KEYUP || e->type == SDL_MOUSEBUTTONUP) && e->key.repeat == NULL)
+			muMapButton(muMenu, "", e->key.keysym.sym);
 		return true;
 	}
 	if (Game::gState == Game::GameState["menu"])
 	{
 		if (e->type == SDL_KEYUP && e->key.repeat == NULL)
 		{
-			if (e->key.keysym.sym == Game::gPlayer->plControls["pause"])
+			if (e->key.keysym.sym == Game::gPlayer->plControls["Pause"])
 			{
 				muMenu = MenuID["pause"];
 				Game::changeGameState(Game::gOldState);
@@ -233,9 +253,13 @@ bool Menu::muHandleMenu(SDL_Event* e)
 								Menu::muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.h *= Graphics::GFX_MULT;
 								muMenu = MenuID["audio"];
 							}
-							else if (muOptions[i] == "Controls")
+							else if (muOptions[i] == "Game Controls")
 							{
-								muMenu = MenuID["controls"];
+								muMenu = MenuID["gmcontrols"];
+							}
+							else if (muOptions[i] == "Editor Controls")
+							{
+								muMenu = MenuID["lecontrols"];
 							}
 							else if (muOptions[i] == "Return")
 							{
@@ -274,17 +298,26 @@ bool Menu::muHandleMenu(SDL_Event* e)
 							else if (muOptions[i] == "Return")
 								muMenu -= 2;
 						}
-						else if (muMenu == MenuID["controls"])
+						else if (muMenu == MenuID["gmcontrols"])
 						{
 							if (muOptions[i] == "Return")
-							{
 								muMenu -= 3;
-							}
 							else
 							{
 								if(!muIsMapping)
 									muIsMapping = true;
-								muMapButton(muOptions[i], e->key.keysym.sym);
+								muMapButton(muMenu, muOptions[i], e->key.keysym.sym);
+							}
+						}
+						else if (muMenu == MenuID["lecontrols"])
+						{
+							if (muOptions[i] == "Return")
+								muMenu -= 4;
+							else
+							{
+								if (!muIsMapping)
+									muIsMapping = true;
+								muMapButton(muMenu, muOptions[i], e->key.keysym.sym);
 							}
 						}
 					}
@@ -368,26 +401,17 @@ void Menu::muRender(void)
 	//	Graphics::menuTexture->txRender();
 }
 
-void Menu::muMapButton(std::string button, int newmap)
+void Menu::muMapButton(int menu, std::string button, int newmap)
 {
 	static std::string b = "";
 	static int m = -1;
 	if(button != "")
 		b = button;
 	m = newmap;
-
-	if (b == "Left")
-		Game::gPlayer->plControls["left"] = m;
-	else if (b == "Right")
-		Game::gPlayer->plControls["right"] = m;
-	else if (b == "Up")
-		Game::gPlayer->plControls["up"] = m;
-	else if (b == "Down")
-		Game::gPlayer->plControls["down"] = m;
-	else if (b == "Jump")
-		Game::gPlayer->plControls["jump"] = m;
-	else if (b == "Pause")
-		Game::gPlayer->plControls["pause"] = m;
+	if (menu == MenuID["gmcontrols"])
+		Game::gPlayer->plControls[b] = m;
+	else if (menu == MenuID["lecontrols"])
+		LevelEditor::leControls[b] = m;
 	if(button == "")
 		muIsMapping = false;
 }

@@ -10,7 +10,7 @@ public:
 	static void muCreateMenu(void);
 	static bool muHandleMenu(SDL_Event*);
 	static void muRender(void);
-	static void muMapButton(std::string, int);
+	static void muMapButton(int, std::string, int);
 
 	static int muInitialized;
 	static int muMenu;
