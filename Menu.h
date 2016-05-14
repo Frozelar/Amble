@@ -11,6 +11,8 @@ public:
 	static bool muHandleMenu(SDL_Event*);
 	static void muRender(void);
 	static void muMapButton(int, std::string, int);
+	static void muUpdateButtons(void);
+	static int muGetMenuPos(std::string);
 
 	static int muInitialized;
 	static int muMenu;
@@ -25,6 +27,8 @@ public:
 	static std::vector< Texture* > muOptionTextures;
 	static std::vector< Texture* > ttOptionTextures;
 	static std::vector< Texture* > muMiscTextures;
+	static std::vector< Texture* > muGmControlTextures;
+	static std::vector< Texture* > muLeControlTextures;
 	static const int MISC_BUTTON_INDEX;
 };
 

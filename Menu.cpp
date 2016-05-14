@@ -22,11 +22,13 @@ std::vector<std::string> Menu::muOptions = { "Resume", "Settings", "Return to Ti
 	"Window Size", "Toggle Fullscreen", "Return", "",
 	"Music", "Sound Effects", "Return", "",
 	"Left", "Right", "Up", "Down", "Jump", "Pause", "Return", "", 
-	"Left", "Right", "Up", "Down", "Place", "Delete", "Type Up", "Type Down", "Subtype Up", "Subtype Down", "Undo", "Redo", "Save", "Open", "Return", "" };
+	"Left", "Right", "Up", "Down", "Place", "Delete", "Type Up", "Type Down", "Subtype Up", "Subtype Down", "Save", "Open", "Set Width", "Set Height", "Return", "" };
 std::vector<std::string> Menu::ttOptions = { "Play Game", "Menu", "Level Editor", "Quit" };
 std::vector< Texture* > Menu::muOptionTextures;
 std::vector< Texture* > Menu::ttOptionTextures;
 std::vector< Texture* > Menu::muMiscTextures;	// "Sound Effects", "Music", "Press Button"
+std::vector< Texture* > Menu::muGmControlTextures;
+std::vector< Texture* > Menu::muLeControlTextures;
 const int Menu::MISC_BUTTON_INDEX = 2;
 
 Menu::Menu()
@@ -47,8 +49,7 @@ Menu::Menu()
 	NumOptions[MenuID["gmcontrols"]] = 7;
 	NumOptions[MenuID["lecontrols"]] = 15;
 
-	for (int i = 0; i < MenuID["gmcontrols"]; i++)
-		controlMenuPos += NumOptions[i] + 1;
+	controlMenuPos = muGetMenuPos("gmcontrols");
 
 	ttTitleTexture = new Texture(0, 0, 0, 0);
 	ttTitleTexture->txLoadT(Game::gameTitle, Game::gTitleFont.font, Game::gTitleFont.color);
@@ -66,8 +67,8 @@ Menu::Menu()
 	for (int i = 0; i < muMiscTextures.size(); i++)
 		muMiscTextures[i] = new Texture(0, 0, 0, 0);
 	muMiscTextures[MISC_BUTTON_INDEX]->txLoadT("Press Button", Game::gHeadingFont.font, Game::gHeadingFont.color);
-	muMiscTextures[MISC_BUTTON_INDEX]->txRect.x = (Game::WINDOW_W - muMiscTextures[MISC_BUTTON_INDEX]->txRect.w) / 2;
-	muMiscTextures[MISC_BUTTON_INDEX]->txRect.y = (Game::WINDOW_H - muMiscTextures[MISC_BUTTON_INDEX]->txRect.h) / 2;
+	muMiscTextures[MISC_BUTTON_INDEX]->txRect.x = Game::DEFAULT_W;
+	muMiscTextures[MISC_BUTTON_INDEX]->txRect.y = Game::DEFAULT_H;
 
 	for (int i = 0; i < muOptions.size(); i++)
 	{
@@ -90,13 +91,13 @@ Menu::Menu()
 			{
 				if (muOptionTextures[i - 1]->txRect.y + muOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H + muOptionTextures[i]->txRect.h >= menuTexture->txRect.y + menuTexture->txRect.h)
 				{
-					muOptionTextures[i]->txRect.x = menuTexture->txRect.x + menuTexture->txRect.w - muOptionTextures[i]->txRect.w - Game::DEFAULT_W;
+					muOptionTextures[i]->txRect.x = menuTexture->txRect.x + menuTexture->txRect.w / 2; // menuTexture->txRect.x + menuTexture->txRect.w - muOptionTextures[i]->txRect.w - Game::DEFAULT_W;
 					muOptionTextures[i]->txRect.y = menuTexture->txRect.y + Game::DEFAULT_H;
 				}
 				else
 				{
 					if (muOptionTextures[i - 1]->txRect.x > menuTexture->txRect.x + Game::DEFAULT_W)
-						muOptionTextures[i]->txRect.x = menuTexture->txRect.x + menuTexture->txRect.w - muOptionTextures[i]->txRect.w - Game::DEFAULT_W;
+						muOptionTextures[i]->txRect.x = menuTexture->txRect.x + menuTexture->txRect.w / 2; // menuTexture->txRect.x + menuTexture->txRect.w - muOptionTextures[i]->txRect.w - Game::DEFAULT_W;
 					else
 						muOptionTextures[i]->txRect.x = menuTexture->txRect.x + Game::DEFAULT_W;
 					muOptionTextures[i]->txRect.y = muOptionTextures[i - 1]->txRect.y + muOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H;
@@ -122,6 +123,13 @@ Menu::Menu()
 		else
 			ttOptionTextures[i]->txRect.y = ttOptionTextures[i - 1]->txRect.y + ttOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H;
 	}
+
+	muGmControlTextures.resize(Game::gPlayer->plControls.size());
+	muLeControlTextures.resize(LevelEditor::leControls.size());
+	for (int i = 0; i < muGmControlTextures.size(); i++)
+		muGmControlTextures[i] = new Texture(0, 0, 0, 0);
+	for (int i = 0; i < muLeControlTextures.size(); i++)
+		muLeControlTextures[i] = new Texture(0, 0, 0, 0);
 }
 
 Menu::~Menu()
@@ -387,6 +395,16 @@ void Menu::muRender(void)
 			muMiscTextures[Audio::SFX_VOL_INDEX]->txRender();
 			muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRender();
 		}
+		else if (muMenu == MenuID["gmcontrols"] && !muIsMapping)
+		{
+			for (int i = 0; i < muGmControlTextures.size(); i++)
+				muGmControlTextures[i]->txRender();
+		}
+		else if (muMenu == MenuID["lecontrols"] && !muIsMapping)
+		{
+			for (int i = 0; i < muLeControlTextures.size(); i++)
+				muLeControlTextures[i]->txRender();
+		}
 		if (muIsMapping)
 			muMiscTextures[MISC_BUTTON_INDEX]->txRender();
 	}
@@ -414,4 +432,45 @@ void Menu::muMapButton(int menu, std::string button, int newmap)
 		LevelEditor::leControls[b] = m;
 	if(button == "")
 		muIsMapping = false;
+	muUpdateButtons();
+}
+
+void Menu::muUpdateButtons()
+{
+	int controlMenuPos = muGetMenuPos("gmcontrols");
+	for (int i = 0; i < muGmControlTextures.size(); i++)
+	{
+		muGmControlTextures[i]->txRect = { 0, 0, 0, 0 };
+		if(Game::gPlayer->plControls[muOptions[controlMenuPos]] == SDL_BUTTON_LEFT)
+			muGmControlTextures[i]->txLoadT("LCLICK", Game::gBodyFont.font, Game::highlightColor);
+		else if(Game::gPlayer->plControls[muOptions[controlMenuPos]] == SDL_BUTTON_RIGHT)
+			muGmControlTextures[i]->txLoadT("RCLICK", Game::gBodyFont.font, Game::highlightColor);
+		else
+			muGmControlTextures[i]->txLoadT(SDL_GetKeyName(Game::gPlayer->plControls[muOptions[controlMenuPos]]), Game::gBodyFont.font, Game::highlightColor);
+		muGmControlTextures[i]->txRect.x = muOptionTextures[controlMenuPos]->txRect.x + muOptionTextures[controlMenuPos]->txRect.w + Game::DEFAULT_W;
+		muGmControlTextures[i]->txRect.y = muOptionTextures[controlMenuPos]->txRect.y;
+		controlMenuPos++;
+	}
+	controlMenuPos += 2;
+	for (int i = 0; i < muLeControlTextures.size(); i++)
+	{
+		muLeControlTextures[i]->txRect = { 0, 0, 0, 0 };
+		if (LevelEditor::leControls[muOptions[controlMenuPos]] == SDL_BUTTON_LEFT)
+			muLeControlTextures[i]->txLoadT("LCLICK", Game::gBodyFont.font, Game::highlightColor);
+		else if (LevelEditor::leControls[muOptions[controlMenuPos]] == SDL_BUTTON_RIGHT)
+			muLeControlTextures[i]->txLoadT("RCLICK", Game::gBodyFont.font, Game::highlightColor);
+		else
+			muLeControlTextures[i]->txLoadT(SDL_GetKeyName(LevelEditor::leControls[muOptions[controlMenuPos]]), Game::gBodyFont.font, Game::highlightColor);
+		muLeControlTextures[i]->txRect.x = muOptionTextures[controlMenuPos]->txRect.x + muOptionTextures[controlMenuPos]->txRect.w + Game::DEFAULT_W;
+		muLeControlTextures[i]->txRect.y = muOptionTextures[controlMenuPos]->txRect.y;
+		controlMenuPos++;
+	}
+}
+
+int Menu::muGetMenuPos(std::string whichmenu)
+{
+	int whichmenupos = 0;
+	for (int i = 0; i < MenuID[whichmenu]; i++)
+		whichmenupos += NumOptions[i] + 1;
+	return whichmenupos;
 }

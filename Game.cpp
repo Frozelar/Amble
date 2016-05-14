@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Texture.h"
 #include "Graphics.h"
 #include "Audio.h"
 #include "Collectible.h"
@@ -358,32 +359,20 @@ void Game::changeGameState(int newState)
 
 void Game::readCFG(bool update)
 {
+	int controlMenuPos = Menu::muGetMenuPos("gmcontrols");
 	std::ifstream cfg;
 	cfg.open(Game::rDir + "config.cfg");
 	cfg >> Graphics::GFX_SCALE;
 	cfg >> Graphics::isFullscreen;
 	cfg >> Audio::volume[0];
 	cfg >> Audio::volume[1];
-	cfg >> Game::gPlayer->plControls["Left"];
-	cfg >> Game::gPlayer->plControls["Right"];
-	cfg >> Game::gPlayer->plControls["Up"];
-	cfg >> Game::gPlayer->plControls["Down"];
-	cfg >> Game::gPlayer->plControls["Jump"];
-	cfg >> Game::gPlayer->plControls["Pause"];
-	cfg >> LevelEditor::leControls["Up"];
-	cfg >> LevelEditor::leControls["Down"];
-	cfg >> LevelEditor::leControls["Left"];
-	cfg >> LevelEditor::leControls["Right"];
-	cfg >> LevelEditor::leControls["Place"];
-	cfg >> LevelEditor::leControls["Delete"];
-	cfg >> LevelEditor::leControls["Type Up"];
-	cfg >> LevelEditor::leControls["Type Down"];
-	cfg >> LevelEditor::leControls["Subtype Up"];
-	cfg >> LevelEditor::leControls["Subtype Down"];
-	cfg >> LevelEditor::leControls["Undo"];
-	cfg >> LevelEditor::leControls["Redo"];
-	cfg >> LevelEditor::leControls["Save"];
-	cfg >> LevelEditor::leControls["Open"];
+
+	for (int i = controlMenuPos; i < controlMenuPos + Menu::NumOptions[Menu::MenuID["gmcontrols"]] - 1; i++)
+		cfg >> Game::gPlayer->plControls[Menu::muOptions[i]];
+	controlMenuPos = Menu::muGetMenuPos("lecontrols");
+	for (int i = controlMenuPos; i < controlMenuPos + Menu::NumOptions[Menu::MenuID["lecontrols"]] - 1; i++)
+		cfg >> LevelEditor::leControls[Menu::muOptions[i]];
+
 
 	if (update)
 	{
@@ -398,10 +387,12 @@ void Game::readCFG(bool update)
 		Audio::auIncVolume(Audio::MUSIC_VOL_INDEX, false);
 		Audio::auIncVolume(Audio::SFX_VOL_INDEX, false);
 	}
+	Menu::muUpdateButtons();
 }
 
 void Game::writeCFG()
 {
+	int controlMenuPos = Menu::muGetMenuPos("gmcontrols");
 	std::ofstream cfg;
 	cfg.open(Game::rDir + "config.cfg");
 	cfg.clear();
@@ -409,24 +400,10 @@ void Game::writeCFG()
 	cfg << Graphics::isFullscreen << " ";
 	cfg << Audio::volume[0] << " ";
 	cfg << Audio::volume[1] << " ";
-	cfg << Game::gPlayer->plControls["Left"] << " ";
-	cfg << Game::gPlayer->plControls["Right"] << " ";
-	cfg << Game::gPlayer->plControls["Up"] << " ";
-	cfg << Game::gPlayer->plControls["Down"] << " ";
-	cfg << Game::gPlayer->plControls["Jump"] << " ";
-	cfg << Game::gPlayer->plControls["Pause"] << " ";
-	cfg << LevelEditor::leControls["Up"] << " ";
-	cfg << LevelEditor::leControls["Down"] << " ";
-	cfg << LevelEditor::leControls["Left"] << " ";
-	cfg << LevelEditor::leControls["Right"] << " ";
-	cfg << LevelEditor::leControls["Place"] << " ";
-	cfg << LevelEditor::leControls["Delete"] << " ";
-	cfg << LevelEditor::leControls["Type Up"] << " ";
-	cfg << LevelEditor::leControls["Type Down"] << " ";
-	cfg << LevelEditor::leControls["Subtype Up"] << " ";
-	cfg << LevelEditor::leControls["Subtype Down"] << " ";
-	cfg << LevelEditor::leControls["Undo"] << " ";
-	cfg << LevelEditor::leControls["Redo"] << " ";
-	cfg << LevelEditor::leControls["Save"] << " ";
-	cfg << LevelEditor::leControls["Open"] << " ";
+
+	for (int i = controlMenuPos; i < controlMenuPos + Menu::NumOptions[Menu::MenuID["gmcontrols"]] - 1; i++)
+		cfg << Game::gPlayer->plControls[Menu::muOptions[i]] << " ";
+	controlMenuPos = Menu::muGetMenuPos("lecontrols");
+	for (int i = controlMenuPos; i < controlMenuPos + Menu::NumOptions[Menu::MenuID["lecontrols"]] - 1; i++)
+		cfg << LevelEditor::leControls[Menu::muOptions[i]] << " ";
 }

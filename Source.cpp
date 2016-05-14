@@ -26,11 +26,11 @@ int main(int argc, char** argv)
 	initFont();
 	Game::gAudio = new Audio();
 	Game::gGraphics = new Graphics();
+	Game::gLevelEditor = new LevelEditor();
 	Game::gMenu = new Menu();
 	// Level::playMusic();
 	// lua_State* S = luaL_newstate();
 	// luaL_openlibs(S);
-	Game::gLevelEditor = new LevelEditor();
 
 	// init();
 	// Level::generateLevel();

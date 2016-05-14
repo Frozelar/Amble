@@ -423,6 +423,20 @@ void Graphics::gxIncScale(bool gfxscale)
 		Menu::muMiscTextures[i]->txRect.w *= GFX_MULT;
 		Menu::muMiscTextures[i]->txRect.h *= GFX_MULT;
 	}
+	for (int i = 0; i < Menu::muGmControlTextures.size(); i++)
+	{
+		Menu::muGmControlTextures[i]->txRect.x *= GFX_MULT;
+		Menu::muGmControlTextures[i]->txRect.y *= GFX_MULT;
+		Menu::muGmControlTextures[i]->txRect.w *= GFX_MULT;
+		Menu::muGmControlTextures[i]->txRect.h *= GFX_MULT;
+	}
+	for (int i = 0; i < Menu::muLeControlTextures.size(); i++)
+	{
+		Menu::muLeControlTextures[i]->txRect.x *= GFX_MULT;
+		Menu::muLeControlTextures[i]->txRect.y *= GFX_MULT;
+		Menu::muLeControlTextures[i]->txRect.w *= GFX_MULT;
+		Menu::muLeControlTextures[i]->txRect.h *= GFX_MULT;
+	}
 	LevelEditor::mouseThing->tgHitboxRect.x *= GFX_MULT;
 	LevelEditor::mouseThing->tgHitboxRect.y *= GFX_MULT;
 	LevelEditor::mouseThing->tgHitboxRect.w *= GFX_MULT;

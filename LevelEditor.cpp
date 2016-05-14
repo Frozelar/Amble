@@ -32,12 +32,14 @@ LevelEditor::LevelEditor()
 	leControls["Right"] = SDLK_d;
 	leControls["Place"] = SDL_BUTTON_LEFT;
 	leControls["Delete"] = SDL_BUTTON_RIGHT;
-	leControls["Subtype Up"] = SDLK_COLON;
-	leControls["Subtype Down"] = SDLK_QUOTE;
+	leControls["Subtype Up"] = SDLK_QUOTE;
+	leControls["Subtype Down"] = SDLK_SEMICOLON;
 	leControls["Type Up"] = SDLK_RIGHTBRACKET;
 	leControls["Type Down"] = SDLK_LEFTBRACKET;
 	leControls["Save"] = SDLK_q;
 	leControls["Open"] = SDLK_e;
+	leControls["Set Width"] = SDLK_COMMA;
+	leControls["Set Height"] = SDLK_PERIOD;
 	leMsgs["saved"] = num;
 	leMsgs["opened"] = ++num;
 	leMsgTextures.resize(leMsgs.size());
@@ -188,7 +190,6 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 		}
 		else if (e->key.keysym.sym == leControls["Subtype Up"])
 		{
-			std::cout << mouseThing->tgGetSubtype();
 			if (mouseThing != NULL && 
 				((mouseThing->tgType == Game::ThingType["collectible"] && mouseThing->tgGetSubtype() < Game::CollectibleType.size() - 1) ||
 				(mouseThing->tgType == Game::ThingType["enemy"] && mouseThing->tgGetSubtype() < Game::EnemyType.size() - 1) ||
