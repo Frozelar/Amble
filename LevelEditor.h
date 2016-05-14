@@ -18,6 +18,8 @@ public:
 	static int leLvlMoveX, leLvlMoveY;
 	static int leTotMoveX, leTotMoveY;
 	static int DEFAULT_LVL_MOVE;
+	static int leTakingInput;
+	static Texture* leInputTexture;
 
 	// static bool leInitLevel(void);
 	static bool leEnter(void);
@@ -27,5 +29,7 @@ public:
 	static void leRender(void);
 	static bool leSave(void);
 	static bool leOpen(void);
+	static void leAcceptInput(SDL_Event*);
+	static void leChangeDimensions(int, int);
 };
 

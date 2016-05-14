@@ -267,7 +267,7 @@ void Graphics::gxRender(bool updateRenderer)
 	SDL_Rect cameraRect{ 0 - Game::DEFAULT_W * Game::DEFAULT_H, 0 - Game::DEFAULT_W * Game::DEFAULT_H,
 		Game::WINDOW_W + Game::DEFAULT_W * Game::DEFAULT_H * 2, Game::WINDOW_H + Game::DEFAULT_W * Game::DEFAULT_H * 2 };
 	Thing camera{ &cameraRect, Game::ThingType["temp"], -1 };
-
+	
 	if (updateRenderer)
 	{
 		SDL_SetRenderDrawColor(Game::gRenderer, 105, 105, 245, 255);
@@ -281,7 +281,7 @@ void Graphics::gxRender(bool updateRenderer)
 	Graphics::backgroundTextures[bgState][bgFrame]->txRect.h = Game::WINDOW_H;
 	Graphics::backgroundTextures[bgState][bgFrame]->txRender();
 	// gPlayer->tgRender();
-	for (int i = 0; i < Level::LEVEL_UNITS; i++)
+	for (int i = 0; i < Game::things.size(); i++)
 	{
 		if (Game::things[i] != NULL)
 		{
@@ -455,6 +455,14 @@ void Graphics::gxIncScale(bool gfxscale)
 	LevelEditor::DEFAULT_LVL_MOVE *= GFX_MULT;
 	LevelEditor::leTotMoveX *= GFX_MULT;
 	LevelEditor::leTotMoveY *= GFX_MULT;
+	LevelEditor::leInputTexture->txRect.x *= GFX_MULT;
+	LevelEditor::leInputTexture->txRect.y *= GFX_MULT;
+	LevelEditor::leInputTexture->txRect.w *= GFX_MULT;
+	LevelEditor::leInputTexture->txRect.h *= GFX_MULT;
+	LevelEditor::level.x *= GFX_MULT;
+	LevelEditor::level.y *= GFX_MULT;
+	LevelEditor::level.w *= GFX_MULT;
+	LevelEditor::level.h *= GFX_MULT;
 
 	Level::LEVEL_W_PIXELS *= GFX_MULT;
 	Level::LEVEL_H_PIXELS *= GFX_MULT;

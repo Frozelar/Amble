@@ -17,10 +17,12 @@ const int LevelEditor::MSG_DISPLAY_TIME = 180;
 std::vector< int > LevelEditor::leMsgTimers;
 std::map< std::string, int > LevelEditor::leControls;
 Thing* LevelEditor::mouseThing;
-// SDL_Rect LevelEditor::level = { 0, 0, 0, 0 };
 int LevelEditor::leLvlMoveX = 0, LevelEditor::leLvlMoveY = 0;
 int LevelEditor::leTotMoveX = 0, LevelEditor::leTotMoveY = 0;
 int LevelEditor::DEFAULT_LVL_MOVE = Game::DEFAULT_W * Game::DEFAULT_H / 2;
+int LevelEditor::leTakingInput = 0;
+Texture* LevelEditor::leInputTexture = NULL;
+SDL_Rect LevelEditor::level = { 0, 0, 0, 0 };
 
 LevelEditor::LevelEditor()
 {
@@ -40,8 +42,10 @@ LevelEditor::LevelEditor()
 	leControls["Open"] = SDLK_e;
 	leControls["Set Width"] = SDLK_COMMA;
 	leControls["Set Height"] = SDLK_PERIOD;
-	leMsgs["saved"] = num;
-	leMsgs["opened"] = ++num;
+	leMsgs["Save"] = num;
+	leMsgs["Open"] = ++num;
+	leMsgs["Set Width"] = ++num;
+	leMsgs["Set Height"] = ++num;
 	leMsgTextures.resize(leMsgs.size());
 	leMsgTimers.resize(leMsgTextures.size());
 	for (int i = 0; i < leMsgTextures.size(); i++)
@@ -49,12 +53,19 @@ LevelEditor::LevelEditor()
 		leMsgTextures[i] = new Texture(0, 0, 0, 0);
 		leMsgTimers[i] = 0;
 	}
-	leMsgTextures[leMsgs["saved"]]->txLoadT("Level Saved (output.map)", Game::gBodyFont.font, Game::gBodyFont.color);
-	leMsgTextures[leMsgs["saved"]]->txRect.x = Game::WINDOW_W - leMsgTextures[leMsgs["saved"]]->txRect.w - Game::DEFAULT_W;
-	leMsgTextures[leMsgs["saved"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["saved"]]->txRect.h - Game::DEFAULT_H;
-	leMsgTextures[leMsgs["opened"]]->txLoadT("Level Opened (output.map)", Game::gBodyFont.font, Game::gBodyFont.color);
-	leMsgTextures[leMsgs["opened"]]->txRect.x = Game::WINDOW_W - leMsgTextures[leMsgs["opened"]]->txRect.w - Game::DEFAULT_W;
-	leMsgTextures[leMsgs["opened"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["opened"]]->txRect.h - Game::DEFAULT_H;
+	leMsgTextures[leMsgs["Save"]]->txLoadT("Level Saved (output.map)", Game::gBodyFont.font, Game::gBodyFont.color);
+	leMsgTextures[leMsgs["Save"]]->txRect.x = Game::WINDOW_W - leMsgTextures[leMsgs["Save"]]->txRect.w - Game::DEFAULT_W;
+	leMsgTextures[leMsgs["Save"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Save"]]->txRect.h - Game::DEFAULT_H;
+	leMsgTextures[leMsgs["Open"]]->txLoadT("Level Opened (output.map)", Game::gBodyFont.font, Game::gBodyFont.color);
+	leMsgTextures[leMsgs["Open"]]->txRect.x = Game::WINDOW_W - leMsgTextures[leMsgs["Open"]]->txRect.w - Game::DEFAULT_W;
+	leMsgTextures[leMsgs["Open"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Open"]]->txRect.h - Game::DEFAULT_H;
+	leMsgTextures[leMsgs["Set Width"]]->txLoadT("Enter Level Width: ", Game::gBodyFont.font, Game::gBodyFont.color);
+	leMsgTextures[leMsgs["Set Width"]]->txRect.x = Game::DEFAULT_W;
+	leMsgTextures[leMsgs["Set Width"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Set Width"]]->txRect.h - Game::DEFAULT_H;
+	leMsgTextures[leMsgs["Set Height"]]->txLoadT("Enter Level Height: ", Game::gBodyFont.font, Game::gBodyFont.color);
+	leMsgTextures[leMsgs["Set Height"]]->txRect.x = Game::DEFAULT_W;
+	leMsgTextures[leMsgs["Set Height"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Set Height"]]->txRect.h - Game::DEFAULT_H;
+	leInputTexture = new Texture(0, 0, 0, 0);
 }
 
 LevelEditor::~LevelEditor()
@@ -70,6 +81,11 @@ LevelEditor::~LevelEditor()
 			delete leMsgTextures[i];
 			leMsgTextures[i] = NULL;
 		}
+	if (leInputTexture != NULL)
+	{
+		delete leInputTexture;
+		leInputTexture = NULL;
+	}
 }
 
 /*
@@ -108,7 +124,12 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 	SDL_GetMouseState(&mx, &my);
 	// i = (mx * my) / (Game::DEFAULT_W * Game::DEFAULT_H);
 	i = ((my - leTotMoveY) / Game::DEFAULT_H * Level::LEVEL_W) + ((mx - leTotMoveX) / Game::DEFAULT_W);
-
+	//std::cout << i << std::endl;
+	if (leTakingInput > 0)
+	{
+		leAcceptInput(e);
+		return true;
+	}
 	if (e->type == SDL_MOUSEMOTION)
 	{
 		if (mouseThing != NULL && mx >= 0 + leTotMoveX && my >= 0 + leTotMoveY && mx < Level::LEVEL_W_PIXELS + leTotMoveX && my < Level::LEVEL_H_PIXELS + leTotMoveY)
@@ -121,24 +142,32 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 	{
 		if (e->button.button == leControls["Place"] || isDragging == leControls["Place"])
 		{
-			if (mouseThing != NULL)
+			if (mx >= 0 + leTotMoveX && my >= 0 + leTotMoveY && mx < Level::LEVEL_W_PIXELS + leTotMoveX && my < Level::LEVEL_H_PIXELS + leTotMoveY)
 			{
-				if(Game::things[i] == NULL)
-					Game::newThing(mouseThing->tgType, i, mouseThing->tgHitboxRect.x, mouseThing->tgHitboxRect.y, mouseThing->tgGetSubtype());
-			}
-			else
-			{
-				Game::gPlayer->tgLevelUnit = i;
-				Game::gPlayer->tgHitboxRect.x = mx / Game::DEFAULT_W * Game::DEFAULT_W;
-				Game::gPlayer->tgHitboxRect.y = my / Game::DEFAULT_H * Game::DEFAULT_H;
+				if (mouseThing != NULL)
+				{
+					if (Game::things[i] == NULL)
+						Game::newThing(mouseThing->tgType, i, mouseThing->tgHitboxRect.x, mouseThing->tgHitboxRect.y, mouseThing->tgGetSubtype());
+				}
+				else
+				{
+					Game::things[Game::gPlayer->tgLevelUnit] = NULL;
+					Game::things[i] = Game::gPlayer;
+					Game::gPlayer->tgLevelUnit = i;
+					Game::gPlayer->tgHitboxRect.x = mx / Game::DEFAULT_W * Game::DEFAULT_W;
+					Game::gPlayer->tgHitboxRect.y = my / Game::DEFAULT_H * Game::DEFAULT_H;
+				}
 			}
 			isDragging = leControls["Place"];
 		}
 		else if (e->button.button == leControls["Delete"] || isDragging == leControls["Delete"])
 		{
-			if(Game::things[i] != NULL)
-				if (Game::things[i]->tgType != Game::ThingType["player"])
-					Game::destroyThing(i);
+			if (mx >= 0 + leTotMoveX && my >= 0 + leTotMoveY && mx < Level::LEVEL_W_PIXELS + leTotMoveX && my < Level::LEVEL_H_PIXELS + leTotMoveY)
+			{
+				if (Game::things[i] != NULL)
+					if (Game::things[i]->tgType != Game::ThingType["player"])
+						Game::destroyThing(i);
+			}
 			isDragging = leControls["Delete"];
 		}
 	}
@@ -220,6 +249,14 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 		{
 			leOpen();
 		}
+		else if (e->key.keysym.sym == leControls["Set Width"])
+		{
+			leTakingInput = leMsgs["Set Width"];
+		}
+		else if (e->key.keysym.sym == leControls["Set Height"])
+		{
+			leTakingInput = leMsgs["Set Height"];
+		}
 		else if (e->key.keysym.sym == Game::gPlayer->plControls["Pause"])
 		{
 			Game::changeGameState(Game::GameState["menu"]);
@@ -259,6 +296,8 @@ void LevelEditor::leMoveLevel()
 				Game::things[i]->tgHitboxRect.x += leLvlMoveX;
 				Game::things[i]->tgHitboxRect.y += leLvlMoveY;
 			}
+		level.x += leLvlMoveX;
+		level.y += leLvlMoveY;
 		leTotMoveX += leLvlMoveX;
 		leTotMoveY += leLvlMoveY;
 	}
@@ -276,11 +315,17 @@ void LevelEditor::leRender()
 	SDL_SetRenderDrawColor(Game::gRenderer, 105, 105, 245, 255);
 	SDL_RenderClear(Game::gRenderer);
 	Graphics::gxRender(false);
+	SDL_RenderDrawRect(Game::gRenderer, &level);
 	if(mouseThing != NULL)
 		mouseThing->tgRender();
 	for (int i = 0; i < leMsgTimers.size(); i++)
 		if (leMsgTimers[i] > 0 && leMsgTextures[i] != NULL)
 			leMsgTextures[i]->txRender();
+	if (leTakingInput > 0)
+	{
+		leMsgTextures[leTakingInput]->txRender();
+		leInputTexture->txRender();
+	}
 	SDL_RenderPresent(Game::gRenderer);
 }
 
@@ -331,7 +376,7 @@ bool LevelEditor::leSave()
 		else
 			level << prefix << value << " ";
 	}
-	leMsgTimers[leMsgs["saved"]]++;
+	leMsgTimers[leMsgs["Save"]]++;
 
 	return true;
 }
@@ -339,9 +384,103 @@ bool LevelEditor::leSave()
 bool LevelEditor::leOpen()
 {
 	Level::generateLevel(-1);
-	leMsgTimers[leMsgs["opened"]]++;
+	leMsgTimers[leMsgs["Open"]]++;
 	leLvlMoveX = leLvlMoveY = 0;
 	leTotMoveX = leTotMoveY = 0;
+	level = { 0, 0, Level::LEVEL_W_PIXELS, Level::LEVEL_H_PIXELS };
 	// leInitLevel();
 	return true;
+}
+
+void LevelEditor::leAcceptInput(SDL_Event* e)
+{
+	static std::string input = "";
+	if (e->type == SDL_KEYUP && e->key.keysym.sym != SDLK_RETURN)
+	{
+		if (e->key.keysym.sym == SDLK_BACKSPACE)
+			input = "";
+		else
+			input = input + SDL_GetKeyName(e->key.keysym.sym);
+		leInputTexture->txRect = { 0, 0, 0, 0 };
+		leInputTexture->txLoadT((input == "" ? " " : input), Game::gBodyFont.font, Game::gBodyFont.color);
+		if (leTakingInput == leMsgs["Set Width"])
+		{
+			leInputTexture->txRect.x = leMsgTextures[leMsgs["Set Width"]]->txRect.x + leMsgTextures[leMsgs["Set Width"]]->txRect.w + Game::DEFAULT_W;
+			leInputTexture->txRect.y = leMsgTextures[leMsgs["Set Width"]]->txRect.y;
+		}
+		else if (leTakingInput == leMsgs["Set Height"])
+		{
+			leInputTexture->txRect.x = leMsgTextures[leMsgs["Set Height"]]->txRect.x + leMsgTextures[leMsgs["Set Height"]]->txRect.w + Game::DEFAULT_W;
+			leInputTexture->txRect.y = leMsgTextures[leMsgs["Set Height"]]->txRect.y;
+		}
+	}
+	else if (e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_RETURN && input.size() > 0)
+	{
+		if (leTakingInput == leMsgs["Set Width"])
+			leChangeDimensions(std::atoi(input.c_str()), Level::LEVEL_H);
+		else if (leTakingInput == leMsgs["Set Height"])
+			leChangeDimensions(Level::LEVEL_W, std::atoi(input.c_str()));
+		input = "";
+		leInputTexture->txLoadT(" ", Game::gBodyFont.font, Game::gBodyFont.color);
+		leTakingInput = NULL;
+	}
+	else if (e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_ESCAPE)
+	{
+		input = "";
+		leInputTexture->txLoadT(" ", Game::gBodyFont.font, Game::gBodyFont.color);
+		leTakingInput = NULL;
+	}
+}
+
+void LevelEditor::leChangeDimensions(int w, int h)
+{
+	if (w > Level::LEVEL_W)
+	{
+		for (int i = 0, irow = 0; i < Game::things.size() + 1; i++, irow++)
+		{
+			if (irow % Level::LEVEL_W == 0)
+			{
+				for (; irow % w != 0; i++, irow++)
+					Game::things.insert(Game::things.begin() + i, NULL);
+				irow = 0;
+			}
+		}
+	}
+	else if (w < Level::LEVEL_W)
+	{
+		for (int i = 0, irow = 0; i < Game::things.size() + 1; i++, irow++)
+		{
+			if (irow % w == 0)
+			{
+				for (; irow % Level::LEVEL_W != 0; /* i++, */ irow++)
+					Game::things.erase(Game::things.begin() + i);
+				irow = 0;
+			}
+		}
+	}
+	if (h > Level::LEVEL_H)
+	{
+		while (Game::things.size() < h * Level::LEVEL_W)
+			Game::things.insert(Game::things.end(), NULL);
+	}
+	else if (h < Level::LEVEL_H)
+	{
+		while (Game::things.size() > h * Level::LEVEL_W)
+			Game::things.erase(Game::things.end() - 1);
+	}
+	for (int i = 0; i < Game::things.size(); i++)
+		if (Game::things[i] != NULL)
+			Game::things[i]->tgLevelUnit = (Game::things[i]->tgHitboxRect.y / Game::DEFAULT_H * w) + (Game::things[i]->tgHitboxRect.x / Game::DEFAULT_W);
+	Level::LEVEL_W = w;
+	Level::LEVEL_H = h;
+	Level::LEVEL_W_PIXELS = Level::LEVEL_W * Game::DEFAULT_W;
+	Level::LEVEL_H_PIXELS = Level::LEVEL_H * Game::DEFAULT_H;
+	Level::LEVEL_UNITS = Level::LEVEL_W * Level::LEVEL_H;
+	Level::LEVEL_PIXELS = Level::LEVEL_UNITS * Game::DEFAULT_W;
+	//Game::things.resize(Level::LEVEL_UNITS);
+	Game::gColliding.resize(Level::LEVEL_UNITS);
+	level.w = Level::LEVEL_W_PIXELS;
+	level.h = Level::LEVEL_H_PIXELS;
+
+	std::cout << Game::things.size() << " " << Level::LEVEL_UNITS << std::endl;
 }
