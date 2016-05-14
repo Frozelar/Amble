@@ -395,7 +395,7 @@ bool LevelEditor::leOpen()
 void LevelEditor::leAcceptInput(SDL_Event* e)
 {
 	static std::string input = "";
-	if (e->type == SDL_KEYUP && e->key.keysym.sym != SDLK_RETURN)
+	if (e->type == SDL_KEYUP && e->key.keysym.sym != SDLK_RETURN && e->key.keysym.sym != SDLK_ESCAPE)
 	{
 		if (e->key.keysym.sym == SDLK_BACKSPACE)
 			input = "";

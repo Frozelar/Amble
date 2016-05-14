@@ -353,6 +353,9 @@ void Graphics::gxIncScale(bool gfxscale)
 	TTF_CloseFont(Game::gHeadingFont.font);
 	TTF_CloseFont(Game::gBodyFont.font);
 	TTF_CloseFont(Game::gTitleFont.font);
+	Game::gHeadingFont.size *= GFX_MULT;
+	Game::gBodyFont.size *= GFX_MULT;
+	Game::gTitleFont.size *= GFX_MULT;
 	Game::gHeadingFont.font = TTF_OpenFont(hfont.c_str(), Game::gHeadingFont.size);
 	Game::gBodyFont.font = TTF_OpenFont(bfont.c_str(), Game::gBodyFont.size);
 	Game::gTitleFont.font = TTF_OpenFont(tfont.c_str(), Game::gTitleFont.size);
