@@ -17,6 +17,10 @@ const int LevelEditor::MSG_DISPLAY_TIME = 180;
 std::vector< int > LevelEditor::leMsgTimers;
 std::map< std::string, int > LevelEditor::leControls;
 Thing* LevelEditor::mouseThing;
+// SDL_Rect LevelEditor::level = { 0, 0, 0, 0 };
+int LevelEditor::leLvlMoveX = 0, LevelEditor::leLvlMoveY = 0;
+int LevelEditor::leTotMoveX = 0, LevelEditor::leTotMoveY = 0;
+int LevelEditor::DEFAULT_LVL_MOVE = Game::DEFAULT_W * Game::DEFAULT_H / 2;
 
 LevelEditor::LevelEditor()
 {
@@ -32,8 +36,8 @@ LevelEditor::LevelEditor()
 	leControls["Subtype Down"] = SDLK_QUOTE;
 	leControls["Type Up"] = SDLK_RIGHTBRACKET;
 	leControls["Type Down"] = SDLK_LEFTBRACKET;
-	leControls["Save"] = SDLK_s;
-	leControls["Open"] = SDLK_o;
+	leControls["Save"] = SDLK_q;
+	leControls["Open"] = SDLK_e;
 	leMsgs["saved"] = num;
 	leMsgs["opened"] = ++num;
 	leMsgTextures.resize(leMsgs.size());
@@ -53,8 +57,43 @@ LevelEditor::LevelEditor()
 
 LevelEditor::~LevelEditor()
 {
-	delete mouseThing;
-	mouseThing = NULL;
+	if (mouseThing != NULL)
+	{
+		delete mouseThing;
+		mouseThing = NULL;
+	}
+	for (int i = 0; i < leMsgTextures.size(); i++)
+		if (leMsgTextures[i] != NULL)
+		{
+			delete leMsgTextures[i];
+			leMsgTextures[i] = NULL;
+		}
+}
+
+/*
+bool LevelEditor::leInitLevel()
+{
+	level = { 0, 0, Level::LEVEL_W, Level::LEVEL_H };
+	return true;
+}
+*/
+
+bool LevelEditor::leEnter()
+{
+	leOpen();
+	if (mouseThing == NULL)
+		mouseThing = new Tile(NULL, 1, -1);
+	return true;
+}
+
+bool LevelEditor::leExit()
+{
+	if (mouseThing != NULL)
+	{
+		delete mouseThing;
+		mouseThing = NULL;
+	}
+	return true;
 }
 
 bool LevelEditor::leHandleEnvironment(SDL_Event* e)
@@ -66,11 +105,11 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 	static int isDragging = 0;
 	SDL_GetMouseState(&mx, &my);
 	// i = (mx * my) / (Game::DEFAULT_W * Game::DEFAULT_H);
-	i = (my / Game::DEFAULT_H * Level::LEVEL_W) + (mx / Game::DEFAULT_W);
+	i = ((my - leTotMoveY) / Game::DEFAULT_H * Level::LEVEL_W) + ((mx - leTotMoveX) / Game::DEFAULT_W);
 
 	if (e->type == SDL_MOUSEMOTION)
 	{
-		if (mouseThing != NULL && mx >= 0 && my >= 0 && mx < Level::LEVEL_W_PIXELS && my < Level::LEVEL_H_PIXELS)
+		if (mouseThing != NULL && mx >= 0 + leTotMoveX && my >= 0 + leTotMoveY && mx < Level::LEVEL_W_PIXELS + leTotMoveX && my < Level::LEVEL_H_PIXELS + leTotMoveY)
 		{
 			mouseThing->tgHitboxRect.x = mx;
 			mouseThing->tgHitboxRect.y = my;
@@ -106,9 +145,28 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 		if (isDragging > 0)
 			isDragging = 0;
 	}
+	if (e->type == SDL_KEYDOWN)
+	{
+		if (e->key.keysym.sym == leControls["Up"])
+			leLvlMoveY = -DEFAULT_LVL_MOVE;
+		else if (e->key.keysym.sym == leControls["Down"])
+			leLvlMoveY = DEFAULT_LVL_MOVE;
+		else if (e->key.keysym.sym == leControls["Left"])
+			leLvlMoveX = -DEFAULT_LVL_MOVE;
+		else if (e->key.keysym.sym == leControls["Right"])
+			leLvlMoveX = DEFAULT_LVL_MOVE;
+	}
 	if (e->type == SDL_KEYUP)
 	{
-		if (e->key.keysym.sym == leControls["Type Up"])
+		if (e->key.keysym.sym == leControls["Up"] && leLvlMoveY < 0)
+			leLvlMoveY = 0;
+		else if (e->key.keysym.sym == leControls["Down"] && leLvlMoveY > 0)
+			leLvlMoveY = 0;
+		else if (e->key.keysym.sym == leControls["Left"] && leLvlMoveX < 0)
+			leLvlMoveX = 0;
+		else if (e->key.keysym.sym == leControls["Right"] && leLvlMoveX > 0)
+			leLvlMoveX = 0;
+		else if (e->key.keysym.sym == leControls["Type Up"])
 		{
 			if(mouseThing == NULL)
 				newType = Game::ThingType["player"] + 1;
@@ -190,6 +248,21 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 	return true;
 }
 
+void LevelEditor::leMoveLevel()
+{
+	if (leLvlMoveX != 0 || leLvlMoveY != 0)
+	{
+		for (int i = 0; i < Game::things.size(); i++)
+			if (Game::things[i] != NULL)
+			{
+				Game::things[i]->tgHitboxRect.x += leLvlMoveX;
+				Game::things[i]->tgHitboxRect.y += leLvlMoveY;
+			}
+		leTotMoveX += leLvlMoveX;
+		leTotMoveY += leLvlMoveY;
+	}
+}
+
 void LevelEditor::leRender()
 {
 	for (int i = 0; i < leMsgTimers.size(); i++)
@@ -266,5 +339,8 @@ bool LevelEditor::leOpen()
 {
 	Level::generateLevel(-1);
 	leMsgTimers[leMsgs["opened"]]++;
+	leLvlMoveX = leLvlMoveY = 0;
+	leTotMoveX = leTotMoveY = 0;
+	// leInitLevel();
 	return true;
 }

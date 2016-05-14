@@ -281,6 +281,7 @@ void Game::centerCamera(void)
 // if type has the offset built-in, then do NOT give the final thingtype argument; otherwise, give a thingtype
 void Game::newThing(int type = -1, int levelunit = -1, int x = -1, int y = -1, int thingtype = -1)
 {
+	SDL_Rect trect = { 0, 0, 0, 0 };
 	if (x == -1 || y == -1)
 	{
 		x = (levelunit - ((levelunit / Level::LEVEL_W) * Level::LEVEL_W)) * DEFAULT_W;
@@ -312,6 +313,7 @@ void Game::newThing(int type = -1, int levelunit = -1, int x = -1, int y = -1, i
 	}
 	else if (levelunit > -1 && type > -1 && thingtype > -1)
 	{
+		trect = { x / DEFAULT_W * DEFAULT_W, y / DEFAULT_H * DEFAULT_H, 0, 0 };
 		if (type == ThingType["player"])
 		{
 			gPlayer->tgHitboxRect.x = x;
@@ -320,11 +322,11 @@ void Game::newThing(int type = -1, int levelunit = -1, int x = -1, int y = -1, i
 			things[levelunit] = gPlayer;
 		}
 		else if (type == ThingType["tile"])
-			things[levelunit] = new Tile(NULL, thingtype, levelunit);
+			things[levelunit] = new Tile(&trect, thingtype, levelunit);
 		else if (type == ThingType["enemy"])
-			things[levelunit] = new Enemy(NULL, thingtype, levelunit);
+			things[levelunit] = new Enemy(&trect, thingtype, levelunit);
 		else if (type == ThingType["collectible"])
-			things[levelunit] = new Collectible(NULL, thingtype, levelunit);
+			things[levelunit] = new Collectible(&trect, thingtype, levelunit);
 	}
 }
 

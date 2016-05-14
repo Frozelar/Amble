@@ -14,8 +14,16 @@ public:
 	static std::map< std::string, int > leMsgs;
 	static std::map< std::string, int > leControls;
 	static Thing* mouseThing;
+	static SDL_Rect level;
+	static int leLvlMoveX, leLvlMoveY;
+	static int leTotMoveX, leTotMoveY;
+	static int DEFAULT_LVL_MOVE;
 
+	// static bool leInitLevel(void);
+	static bool leEnter(void);
+	static bool leExit(void);
 	static bool leHandleEnvironment(SDL_Event*);
+	static void leMoveLevel(void);
 	static void leRender(void);
 	static bool leSave(void);
 	static bool leOpen(void);

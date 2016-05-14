@@ -124,9 +124,15 @@ int LuaBridge::labInitValues(void)
 	lua_pop(L, 7);
 
 	lua_getglobal(L, "WINDOW_W");
-	Game::WINDOW_W = lua_tonumber(L, -1);
 	lua_getglobal(L, "WINDOW_H");
-	Game::WINDOW_H = lua_tonumber(L, -1);
+	if (lua_tonumber(L, -2) != Game::WINDOW_W || lua_tonumber(L, -1) != Game::WINDOW_H)
+	{
+		Game::WINDOW_W = lua_tonumber(L, -2);
+		Game::WINDOW_H = lua_tonumber(L, -1);
+		Graphics::gxUpdateWindow();
+	}
+	lua_pop(L, 2);
+
 	lua_getglobal(L, "DEFAULT_W");
 	Game::DEFAULT_W = lua_tonumber(L, -1);
 	lua_getglobal(L, "DEFAULT_H");
@@ -161,7 +167,7 @@ int LuaBridge::labInitValues(void)
 	// Player* pl = &Game::gPlayer;
 	// lua_pushlightuserdata(L, pl);
 	// lua_settable(L, LUA_REGISTRYINDEX);
-	lua_pop(L, 14);
+	lua_pop(L, 12);
 
 	/*
 	lua_getglobal(L, "textColor");						// textColor

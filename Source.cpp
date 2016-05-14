@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 		{
 			if (needtoinitlevel)
 			{
-				Level::generateLevel(Level::currentLevel + 1);	// may need to change later?
+				LevelEditor::leEnter();
 				needtoinitlevel = false;
 			}
 			while (SDL_PollEvent(Game::gEvent) != NULL)
@@ -106,11 +106,16 @@ int main(int argc, char** argv)
 						LevelEditor::leHandleEnvironment(Game::gEvent);
 				}
 			}
+			LevelEditor::leMoveLevel();
 			LevelEditor::leRender();
 		}
 
 		if (!needtoinitlevel && (/* Game::gState == Game::GameState["editor"] || */ Game::gState == Game::GameState["title"]))
+		{
 			needtoinitlevel = true;
+			if (Game::gOldState == Game::GameState["editor"])
+				LevelEditor::leExit();
+		}
 	}
 
 	close();

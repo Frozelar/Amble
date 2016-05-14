@@ -16,6 +16,7 @@ public:
 
 	static void gxIncScale(bool = true);
 	static void gxToggleFullscreen(bool = true);
+	static void gxUpdateWindow(void);
 
 	static bool isFullscreen;
 	static float GFX_SCALE;

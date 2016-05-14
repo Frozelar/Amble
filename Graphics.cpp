@@ -438,11 +438,19 @@ void Graphics::gxIncScale(bool gfxscale)
 		LevelEditor::leMsgTextures[i]->txRect.w *= GFX_MULT;
 		LevelEditor::leMsgTextures[i]->txRect.h *= GFX_MULT;
 	}
+	LevelEditor::DEFAULT_LVL_MOVE *= GFX_MULT;
+	LevelEditor::leTotMoveX *= GFX_MULT;
+	LevelEditor::leTotMoveY *= GFX_MULT;
 
 	Level::LEVEL_W_PIXELS *= GFX_MULT;
 	Level::LEVEL_H_PIXELS *= GFX_MULT;
 	Level::LEVEL_PIXELS *= GFX_MULT;
 
+	gxUpdateWindow();
+}
+
+void Graphics::gxUpdateWindow()
+{
 	SDL_SetWindowSize(Game::gWindow, Game::WINDOW_W, Game::WINDOW_H);
 }
 
