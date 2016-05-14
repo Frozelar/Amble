@@ -431,6 +431,13 @@ void Graphics::gxIncScale(bool gfxscale)
 	LevelEditor::mouseThing->tgGFXrect.y *= GFX_MULT;
 	LevelEditor::mouseThing->tgGFXrect.w *= GFX_MULT;
 	LevelEditor::mouseThing->tgGFXrect.h *= GFX_MULT;
+	for (int i = 0; i < LevelEditor::leMsgTextures.size(); i++)
+	{
+		LevelEditor::leMsgTextures[i]->txRect.x *= GFX_MULT;
+		LevelEditor::leMsgTextures[i]->txRect.y *= GFX_MULT;
+		LevelEditor::leMsgTextures[i]->txRect.w *= GFX_MULT;
+		LevelEditor::leMsgTextures[i]->txRect.h *= GFX_MULT;
+	}
 
 	Level::LEVEL_W_PIXELS *= GFX_MULT;
 	Level::LEVEL_H_PIXELS *= GFX_MULT;

@@ -8,6 +8,10 @@ public:
 	~LevelEditor();
 
 	// static ControlScheme leControls;
+	static std::vector< Texture* > leMsgTextures;
+	static std::vector< int > leMsgTimers;
+	static const int MSG_DISPLAY_TIME;
+	static std::map< std::string, int > leMsgs;
 	static std::map< std::string, int > leControls;
 	static Thing* mouseThing;
 

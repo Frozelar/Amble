@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "Level.h"
 #include "Graphics.h"
+#include "Texture.h"
 #include "Thing.h"
 #include "Collectible.h"
 #include "Enemy.h"
@@ -10,11 +11,16 @@
 
 LevelEditor* Game::gLevelEditor = NULL;
 
+std::map< std::string, int > LevelEditor::leMsgs;
+std::vector< Texture* > LevelEditor::leMsgTextures;
+const int LevelEditor::MSG_DISPLAY_TIME = 180;
+std::vector< int > LevelEditor::leMsgTimers;
 std::map< std::string, int > LevelEditor::leControls;
 Thing* LevelEditor::mouseThing;
 
 LevelEditor::LevelEditor()
 {
+	int num = 0;
 	mouseThing = new Tile(NULL, 1, -1);
 	leControls["Up"] = SDLK_w;
 	leControls["Down"] = SDLK_s;
@@ -28,6 +34,21 @@ LevelEditor::LevelEditor()
 	leControls["Type Down"] = SDLK_LEFTBRACKET;
 	leControls["Save"] = SDLK_s;
 	leControls["Open"] = SDLK_o;
+	leMsgs["saved"] = num;
+	leMsgs["opened"] = ++num;
+	leMsgTextures.resize(leMsgs.size());
+	leMsgTimers.resize(leMsgTextures.size());
+	for (int i = 0; i < leMsgTextures.size(); i++)
+	{
+		leMsgTextures[i] = new Texture(0, 0, 0, 0);
+		leMsgTimers[i] = 0;
+	}
+	leMsgTextures[leMsgs["saved"]]->txLoadT("Level Saved (output.map)", Game::gBodyFont.font, Game::gBodyFont.color);
+	leMsgTextures[leMsgs["saved"]]->txRect.x = Game::WINDOW_W - leMsgTextures[leMsgs["saved"]]->txRect.w - Game::DEFAULT_W;
+	leMsgTextures[leMsgs["saved"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["saved"]]->txRect.h - Game::DEFAULT_H;
+	leMsgTextures[leMsgs["opened"]]->txLoadT("Level Opened (output.map)", Game::gBodyFont.font, Game::gBodyFont.color);
+	leMsgTextures[leMsgs["opened"]]->txRect.x = Game::WINDOW_W - leMsgTextures[leMsgs["opened"]]->txRect.w - Game::DEFAULT_W;
+	leMsgTextures[leMsgs["opened"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["opened"]]->txRect.h - Game::DEFAULT_H;
 }
 
 LevelEditor::~LevelEditor()
@@ -171,11 +192,21 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 
 void LevelEditor::leRender()
 {
+	for (int i = 0; i < leMsgTimers.size(); i++)
+	{
+		if (leMsgTimers[i] > 0 && leMsgTimers[i] < MSG_DISPLAY_TIME)
+			leMsgTimers[i]++;
+		else if (leMsgTimers[i] > 0)
+			leMsgTimers[i] = 0;
+	}
 	SDL_SetRenderDrawColor(Game::gRenderer, 105, 105, 245, 255);
 	SDL_RenderClear(Game::gRenderer);
 	Graphics::gxRender(false);
 	if(mouseThing != NULL)
 		mouseThing->tgRender();
+	for (int i = 0; i < leMsgTimers.size(); i++)
+		if (leMsgTimers[i] > 0 && leMsgTextures[i] != NULL)
+			leMsgTextures[i]->txRender();
 	SDL_RenderPresent(Game::gRenderer);
 }
 
@@ -226,6 +257,7 @@ bool LevelEditor::leSave()
 		else
 			level << prefix << value << " ";
 	}
+	leMsgTimers[leMsgs["saved"]]++;
 
 	return true;
 }
@@ -233,5 +265,6 @@ bool LevelEditor::leSave()
 bool LevelEditor::leOpen()
 {
 	Level::generateLevel(-1);
+	leMsgTimers[leMsgs["opened"]]++;
 	return true;
 }
