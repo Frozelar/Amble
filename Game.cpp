@@ -56,6 +56,12 @@ int Game::DEFAULT_ENEMY_W = 8;
 // default enemy hitbox height
 int Game::DEFAULT_ENEMY_H = 8;
 
+// default collectible hitbox width
+int Game::DEFAULT_COLLECTIBLE_W = 8;
+
+// default collectible hitbox height
+int Game::DEFAULT_COLLECTIBLE_H = 8;
+
 // default offset value for graphics
 int Game::DEFAULT_GFX_OFFSET = 2;
 

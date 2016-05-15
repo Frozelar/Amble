@@ -147,6 +147,10 @@ int LuaBridge::labInitValues(void)
 	Game::DEFAULT_ENEMY_W = lua_tonumber(L, -1);
 	lua_getglobal(L, "DEFAULT_ENEMY_H");
 	Game::DEFAULT_ENEMY_H = lua_tonumber(L, -1);
+	lua_getglobal(L, "DEFAULT_COLLECTIBLE_W");
+	Game::DEFAULT_COLLECTIBLE_W = lua_tonumber(L, -1);
+	lua_getglobal(L, "DEFAULT_COLLECTIBLE_H");
+	Game::DEFAULT_COLLECTIBLE_H = lua_tonumber(L, -1);
 	lua_getglobal(L, "DEFAULT_SPEED");
 	Game::DEFAULT_SPEED = lua_tonumber(L, -1);
 	// Game::TOTAL_GRAVITY_ARRAY_UNITS = lua_getglobal(L, "TOTAL_GRAVITY_ARRAY_UNITS");					<< THIS DOESNT EVEN WORK ANYWAYS
@@ -167,7 +171,7 @@ int LuaBridge::labInitValues(void)
 	// Player* pl = &Game::gPlayer;
 	// lua_pushlightuserdata(L, pl);
 	// lua_settable(L, LUA_REGISTRYINDEX);
-	lua_pop(L, 12);
+	lua_pop(L, 14);
 
 	/*
 	lua_getglobal(L, "textColor");						// textColor
@@ -745,6 +749,32 @@ int LuaBridge::labChangeLevel()
 			}
 		}
 	}
+	// lua_getglobal(L, "initThings");
+	// lua_call(L, 0, 0);
+	// labPullThings();
+	/*
+	for (int i = 0; i < Level::LEVEL_UNITS; i++)
+	{
+		if (Game::things[i] != NULL)
+		{
+			lua_getglobal(L, "things");							// things table
+			lua_pushnumber(L, i + 1);							// things table, i
+			lua_gettable(L, -2);								// things table, specific thing
+			lua_pushstring(L, "tgHitbox");						// things table, specific thing, "tgHitbox"
+			lua_gettable(L, -2);								// things table, specific thing, tgHitbox
+			lua_pushstring(L, "w");								// things table, specific thing, tgHitbox, "w"
+			lua_gettable(L, -2);								// things table, specific thing, tgHitbox, w
+			lua_insert(L, -2);									// things table, specific thing, w, tgHitbox
+			lua_pushstring(L, "h");								// things table, specific thing, w, tgHitbox, "h"
+			lua_gettable(L, -2);								// things table, specific thing, w, tgHitbox, h
+			lua_insert(L, -2);									// things table, specific thing, w, h, tgHitbox
+			Game::things[i]->tgHitboxRect.w = (int)lua_tonumber(L, -3);
+			Game::things[i]->tgHitboxRect.h = (int)lua_tonumber(L, -2);
+			lua_pop(L, 5);										//
+		}
+	}
+	*/
+
 	return 0;
 }
 
@@ -795,106 +825,8 @@ int LuaBridge::labHandleEnvironment(void)
 	}
 	lua_pop(L, 1);									// 
 
-	for (int i = 0; i < Level::LEVEL_UNITS; i++)
-	{
-		if (Game::things[i] != NULL)
-		{
-			lua_getglobal(L, "things");							// things table
-			lua_pushnumber(L, i + 1);							// things table, i
-			lua_gettable(L, -2);								// things table, specific thing
-			lua_pushstring(L, "tgVerticals");					// things table, specific thing, "tgVerticals"
-			lua_pushnumber(L, Game::things[i]->tgVerticals);	// things table, specific thing, "tgVerticals", tgVerticals
-			lua_settable(L, -3);								// things table, specific thing
-			lua_pushstring(L, "tgSpeed");						// things table, specific thing, "tgSpeed"
-			lua_pushnumber(L, Game::things[i]->tgSpeed);		// things table, specific thing, "tgSpeed", tgSpeed
-			lua_settable(L, -3);								// things table, specific thing
-			lua_pushstring(L, "tgHealth");						// things table, specific thing, "tgHealth"
-			lua_pushnumber(L, Game::things[i]->tgHealth);		// things table, specific thing, "tgHealth", tgHealth
-			lua_settable(L, -3);								// things table, specific thing
-			lua_pushstring(L, "tgDashing");						// things table, specific thing, "tgDashing"
-			lua_pushnumber(L, Game::things[i]->tgDashing);		// things table, specific thing, "tgDashing", tgDashing
-			lua_settable(L, -3);								// things table, specific thing
-			// lua_pop(L, 2);
-			lua_pushstring(L, "tgHitbox");						// things table, specific thing, "tgHitbox"
-			lua_gettable(L, -2);								// things table, specific thing, tgHitbox
-			lua_pushstring(L, "x");								// things table, specific thing, tgHitbox, "x"
-			lua_pushnumber(L, Game::things[i]->tgHitboxRect.x);	// things table, specific thing, tgHitbox, "x", x
-			lua_settable(L, -3);								// things table, specific thing, tgHitbox
-			lua_pushstring(L, "y");								// things table, specific thing, tgHitbox, "y"
-			lua_pushnumber(L, Game::things[i]->tgHitboxRect.y); // things table, specific thing, tgHitbox, "y", y
-			lua_settable(L, -3);								// things table, specific thing, tgHitbox
-			lua_pop(L, 1);										// things table, specific thing
+	labPushThings();
 
-			// if (Game::things[i]->tgType == Game::ThingType["tile"] || Game::things[i]->tgType == Game::ThingType["collectible"] || Game::things[i]->tgType == Game::ThingType["enemy"])
-			if(Game::things[i]->tgType != Game::ThingType["temp"])
-			{
-				for (int j = 0; j < Game::things[i]->tgColliding.size(); j++)
-				{
-					//if (Game::things[i]->tgColliding[j] != -1)
-					//{
-						lua_pushstring(L, "tgColliding");						// things, specific thing, "tgColliding"
-						lua_gettable(L, -2);									// things, specific thing, tgColliding
-						lua_pushnumber(L, j + 1);								// things, specific thing, tgColliding, direction
-						lua_pushnumber(L, (Game::things[i]->tgColliding[j] == -1 ? -1 : Game::things[i]->tgColliding[j] + 1));
-																				// things, specific thing, tgColliding, direction, thing2->tgLevelUnit
-						lua_settable(L, -3);									// things, specific thing, tgColliding
-						lua_pop(L, 1);											// things, specific thing
-						/*
-						lua_pushstring(L, "tgColDir");					// things, specific thing, "tgColDir"
-						lua_pushnumber(L, j + 1);						// things, specific thing, "tgColDir", dir
-						lua_settable(L, -3);							// things, specific thing
-						*/
-					//}
-				}
-			}
-
-			/*
-			if (Game::things[i]->tgType == Game::ThingType["enemy"])
-			{
-				lua_getfield(L, -1, "enHandleAI");			// things table, specific thing, enHandleAI()
-				lua_call(L, 0, 0);							// things table, specific thing
-				// lua_pop(L, 1);							// things table, specific thing
-			}
-			else if (Game::things[i]->tgType == Game::ThingType["tile"])
-			{
-				lua_getfield(L, -1, "tiHandleAI");			// things table, specific thing, tiHandleAI()
-				lua_call(L, 0, 0);							// things table, specific thing
-				// lua_pop(L, 1);
-			}
-			else if (Game::things[i]->tgType == Game::ThingType["player"])
-			{
-				// ?
-			}
-			else if (Game::things[i]->tgType == Game::ThingType["collectible"])
-			{
-				// lua_getfield(L, -1, "clHandleAI");	// things table, specific thing, clHandleAI()
-				// lua_call(L, 0, 0);					// things table, specific thing
-				if (Game::things[i]->tgHealth == 0)
-				{
-					lua_getfield(L, -1, "clCollect");		// things table, specific thing, clCollect()
-					lua_call(L, 0, 0);						// things table, specific thing
-				}
-			}
-			*/
-			lua_pop(L, 2);										// 
-		}
-		else if (Game::things[i] == NULL)
-		{
-			lua_getglobal(L, "things");							// things table
-			lua_pushnumber(L, i + 1);							// things table, i
-			lua_gettable(L, -2);								// things table, specific thing
-			if (lua_type(L, -1) != LUA_TNUMBER)
-			{
-				lua_pop(L, 1);								// things table
-				lua_pushnumber(L, i + 1);					// things table, i
-				lua_pushnumber(L, -1);						// things table, i, -1
-				lua_settable(L, -3);						// things table
-				lua_pop(L, 1);								// 
-			}
-			else
-				lua_pop(L, 2);								// 
-		}
-	}
 	lua_getglobal(L, "handleEnvironment");
 	lua_call(L, 0, 0);
 
@@ -905,51 +837,7 @@ int LuaBridge::labHandleEnvironment(void)
 	Graphics::GFX_SCALE = lua_tonumber(L, -1);
 	lua_pop(L, 1);												//
 
-	for (int i = 0; i < Level::LEVEL_UNITS; i++)
-	{
-		if (Game::things[i] != NULL)
-		{
-			lua_getglobal(L, "things");							// things table
-			lua_pushnumber(L, i + 1);							// things table, i
-			lua_gettable(L, -2);								// things table, specific thing
-			lua_pushstring(L, "tgVerticals");					// things table, specific thing, "tgVerticals"
-			lua_gettable(L, -2);								// things table, specific thing, tgVerticals
-			Game::things[i]->tgVerticals = (int)lua_tonumber(L, -1);
-			lua_pop(L, 1);										// things table, specific thing
-			lua_pushstring(L, "tgSpeed");						// things table, specific thing, "tgSpeed"
-			lua_gettable(L, -2);								// things table, specific thing, tgSpeed
-			Game::things[i]->tgSpeed = (int)lua_tonumber(L, -1);
-			/*
-			if (Game::things[i]->tgSpeed > 0)
-				Game::things[i]->tgDirection = RIGHT;
-			else if (Game::things[i]->tgSpeed < 0)
-				Game::things[i]->tgDirection = LEFT;
-				*/
-			lua_pop(L, 1);										// things table, specific thing
-			lua_pushstring(L, "tgHealth");						// things table, specific thing, "tgHealth"
-			lua_gettable(L, -2);								// things table, specific thing, tgHealth
-			Game::things[i]->tgHealth = (int)lua_tonumber(L, -1);
-			lua_pop(L, 1);										// things table, specific thing
-			lua_pushstring(L, "tgFrame");						// things table, specific thing, "tgFrame"
-			lua_gettable(L, -2);								// things table, specific thing, tgFrame
-			Game::things[i]->tgFrame = (int)lua_tonumber(L, -1) - 1;
-			lua_pop(L, 1);										// things table, specific thing
-
-			// lua_getglobal(L, "things");		// things table
-			// lua_pushnumber(L, i);			// things table, i
-			// lua_gettable(L, -2);				// things table, specific thing
-			lua_pushstring(L, "tgHitbox");						// things table, specific thing, "tgHitbox"
-			lua_gettable(L, -2);								// things table, specific thing, tgHitbox
-			lua_pushstring(L, "x");								// things table, specific thing, tgHitbox, "x"
-			lua_gettable(L, -2);								// things table, specific thing, tgHitbox, x
-			lua_insert(L, -2);									// things table, specific thing, x, tgHitbox
-			lua_pushstring(L, "y");								// things table, specific thing, x, tgHitbox, "y"
-			lua_gettable(L, -2);								// things table, specific thing, x, tgHitbox, y
-			Game::things[i]->tgHitboxRect.x = (int)lua_tonumber(L, -3);
-			Game::things[i]->tgHitboxRect.y = (int)lua_tonumber(L, -1);
-			lua_pop(L, 5);										//
-		}
-	}
+	labPullThings();
 
 	lua_getglobal(L, "gBackground");							// gBackground
 	lua_pushstring(L, "bgType");								// gBackground, "bgType"
@@ -1113,6 +1001,182 @@ int LuaBridge::labHandleEnvironment(void)
 	}
 	*/
 
+	return 0;
+}
+
+int LuaBridge::labPushThings(void)
+{
+	for (int i = 0; i < Level::LEVEL_UNITS; i++)
+	{
+		if (Game::things[i] != NULL)
+		{
+			lua_getglobal(L, "things");							// things table
+			lua_pushnumber(L, i + 1);							// things table, i
+			lua_gettable(L, -2);								// things table, specific thing
+			lua_pushstring(L, "tgVerticals");					// things table, specific thing, "tgVerticals"
+			lua_pushnumber(L, Game::things[i]->tgVerticals);	// things table, specific thing, "tgVerticals", tgVerticals
+			lua_settable(L, -3);								// things table, specific thing
+			lua_pushstring(L, "tgSpeed");						// things table, specific thing, "tgSpeed"
+			lua_pushnumber(L, Game::things[i]->tgSpeed);		// things table, specific thing, "tgSpeed", tgSpeed
+			lua_settable(L, -3);								// things table, specific thing
+			lua_pushstring(L, "tgHealth");						// things table, specific thing, "tgHealth"
+			lua_pushnumber(L, Game::things[i]->tgHealth);		// things table, specific thing, "tgHealth", tgHealth
+			lua_settable(L, -3);								// things table, specific thing
+			lua_pushstring(L, "tgDashing");						// things table, specific thing, "tgDashing"
+			lua_pushnumber(L, Game::things[i]->tgDashing);		// things table, specific thing, "tgDashing", tgDashing
+			lua_settable(L, -3);								// things table, specific thing
+			// lua_pop(L, 2);
+			lua_pushstring(L, "tgHitbox");						// things table, specific thing, "tgHitbox"
+			lua_gettable(L, -2);								// things table, specific thing, tgHitbox
+			lua_pushstring(L, "x");								// things table, specific thing, tgHitbox, "x"
+			lua_pushnumber(L, Game::things[i]->tgHitboxRect.x);	// things table, specific thing, tgHitbox, "x", x
+			lua_settable(L, -3);								// things table, specific thing, tgHitbox
+			lua_pushstring(L, "y");								// things table, specific thing, tgHitbox, "y"
+			lua_pushnumber(L, Game::things[i]->tgHitboxRect.y); // things table, specific thing, tgHitbox, "y", y
+			lua_settable(L, -3);								// things table, specific thing, tgHitbox
+			/*
+			lua_pushstring(L, "w");								// things table, specific thing, tgHitbox, "w"
+			lua_pushnumber(L, Game::things[i]->tgHitboxRect.w); // things table, specific thing, tgHitbox, "w", w
+			lua_settable(L, -3);								// things table, specific thing, tgHitbox
+			lua_pushstring(L, "h");								// things table, specific thing, tgHitbox, "h"
+			lua_pushnumber(L, Game::things[i]->tgHitboxRect.h); // things table, specific thing, tgHitbox, "h", h
+			lua_settable(L, -3);								// things table, specific thing, tgHitbox
+			*/
+			lua_pop(L, 1);										// things table, specific thing
+
+																// if (Game::things[i]->tgType == Game::ThingType["tile"] || Game::things[i]->tgType == Game::ThingType["collectible"] || Game::things[i]->tgType == Game::ThingType["enemy"])
+			if (Game::things[i]->tgType != Game::ThingType["temp"])
+			{
+				for (int j = 0; j < Game::things[i]->tgColliding.size(); j++)
+				{
+					//if (Game::things[i]->tgColliding[j] != -1)
+					//{
+					lua_pushstring(L, "tgColliding");						// things, specific thing, "tgColliding"
+					lua_gettable(L, -2);									// things, specific thing, tgColliding
+					lua_pushnumber(L, j + 1);								// things, specific thing, tgColliding, direction
+					lua_pushnumber(L, (Game::things[i]->tgColliding[j] == -1 ? -1 : Game::things[i]->tgColliding[j] + 1));
+					// things, specific thing, tgColliding, direction, thing2->tgLevelUnit
+					lua_settable(L, -3);									// things, specific thing, tgColliding
+					lua_pop(L, 1);											// things, specific thing
+					/*
+					lua_pushstring(L, "tgColDir");					// things, specific thing, "tgColDir"
+					lua_pushnumber(L, j + 1);						// things, specific thing, "tgColDir", dir
+					lua_settable(L, -3);							// things, specific thing
+					*/
+					//}
+				}
+			}
+
+			/*
+			if (Game::things[i]->tgType == Game::ThingType["enemy"])
+			{
+			lua_getfield(L, -1, "enHandleAI");			// things table, specific thing, enHandleAI()
+			lua_call(L, 0, 0);							// things table, specific thing
+			// lua_pop(L, 1);							// things table, specific thing
+			}
+			else if (Game::things[i]->tgType == Game::ThingType["tile"])
+			{
+			lua_getfield(L, -1, "tiHandleAI");			// things table, specific thing, tiHandleAI()
+			lua_call(L, 0, 0);							// things table, specific thing
+			// lua_pop(L, 1);
+			}
+			else if (Game::things[i]->tgType == Game::ThingType["player"])
+			{
+			// ?
+			}
+			else if (Game::things[i]->tgType == Game::ThingType["collectible"])
+			{
+			// lua_getfield(L, -1, "clHandleAI");	// things table, specific thing, clHandleAI()
+			// lua_call(L, 0, 0);					// things table, specific thing
+			if (Game::things[i]->tgHealth == 0)
+			{
+			lua_getfield(L, -1, "clCollect");		// things table, specific thing, clCollect()
+			lua_call(L, 0, 0);						// things table, specific thing
+			}
+			}
+			*/
+			lua_pop(L, 2);										// 
+		}
+		else if (Game::things[i] == NULL)
+		{
+			lua_getglobal(L, "things");							// things table
+			lua_pushnumber(L, i + 1);							// things table, i
+			lua_gettable(L, -2);								// things table, specific thing
+			if (lua_type(L, -1) != LUA_TNUMBER)
+			{
+				lua_pop(L, 1);								// things table
+				lua_pushnumber(L, i + 1);					// things table, i
+				lua_pushnumber(L, -1);						// things table, i, -1
+				lua_settable(L, -3);						// things table
+				lua_pop(L, 1);								// 
+			}
+			else
+				lua_pop(L, 2);								// 
+		}
+	}
+	return 0;
+}
+
+int LuaBridge::labPullThings(void)
+{
+	for (int i = 0; i < Level::LEVEL_UNITS; i++)
+	{
+		if (Game::things[i] != NULL)
+		{
+			lua_getglobal(L, "things");							// things table
+			lua_pushnumber(L, i + 1);							// things table, i
+			lua_gettable(L, -2);								// things table, specific thing
+			lua_pushstring(L, "tgVerticals");					// things table, specific thing, "tgVerticals"
+			lua_gettable(L, -2);								// things table, specific thing, tgVerticals
+			Game::things[i]->tgVerticals = (int)lua_tonumber(L, -1);
+			lua_pop(L, 1);										// things table, specific thing
+			lua_pushstring(L, "tgSpeed");						// things table, specific thing, "tgSpeed"
+			lua_gettable(L, -2);								// things table, specific thing, tgSpeed
+			Game::things[i]->tgSpeed = (int)lua_tonumber(L, -1);
+			/*
+			if (Game::things[i]->tgSpeed > 0)
+			Game::things[i]->tgDirection = RIGHT;
+			else if (Game::things[i]->tgSpeed < 0)
+			Game::things[i]->tgDirection = LEFT;
+			*/
+			lua_pop(L, 1);										// things table, specific thing
+			lua_pushstring(L, "tgHealth");						// things table, specific thing, "tgHealth"
+			lua_gettable(L, -2);								// things table, specific thing, tgHealth
+			Game::things[i]->tgHealth = (int)lua_tonumber(L, -1);
+			lua_pop(L, 1);										// things table, specific thing
+			lua_pushstring(L, "tgFrame");						// things table, specific thing, "tgFrame"
+			lua_gettable(L, -2);								// things table, specific thing, tgFrame
+			Game::things[i]->tgFrame = (int)lua_tonumber(L, -1) - 1;
+			lua_pop(L, 1);										// things table, specific thing
+
+			// lua_getglobal(L, "things");		// things table
+			// lua_pushnumber(L, i);			// things table, i
+			// lua_gettable(L, -2);				// things table, specific thing
+			lua_pushstring(L, "tgHitbox");						// things table, specific thing, "tgHitbox"
+			lua_gettable(L, -2);								// things table, specific thing, tgHitbox
+			lua_pushstring(L, "x");								// things table, specific thing, tgHitbox, "x"
+			lua_gettable(L, -2);								// things table, specific thing, tgHitbox, x
+			lua_insert(L, -2);									// things table, specific thing, x, tgHitbox
+			lua_pushstring(L, "y");								// things table, specific thing, x, tgHitbox, "y"
+			lua_gettable(L, -2);								// things table, specific thing, x, tgHitbox, y
+			lua_insert(L, -2);									// things table, specific thing, x, y, tgHitbox
+			/*
+			lua_pushstring(L, "w");								// things table, specific thing, x, y, tgHitbox, "w"
+			lua_gettable(L, -2);								// things table, specific thing, x, y, tgHitbox, w
+			lua_insert(L, -2);									// things table, specific thing, x, y, w, tgHitbox
+			lua_pushstring(L, "h");								// things table, specific thing, x, y, w, tgHitbox, "h"
+			lua_gettable(L, -2);								// things table, specific thing, x, y, w, tgHitbox, h
+			lua_insert(L, -2);									// things table, specific thing, x, y, w, h, tgHitbox
+			*/
+			Game::things[i]->tgHitboxRect.x = (int)lua_tonumber(L, -3);
+			Game::things[i]->tgHitboxRect.y = (int)lua_tonumber(L, -2);
+			// Game::things[i]->tgHitboxRect.x = (int)lua_tonumber(L, -5);
+			// Game::things[i]->tgHitboxRect.y = (int)lua_tonumber(L, -4);
+			// Game::things[i]->tgHitboxRect.w = (int)lua_tonumber(L, -3);
+			// Game::things[i]->tgHitboxRect.h = (int)lua_tonumber(L, -2);
+			lua_pop(L, 5);										//
+		}
+	}
 	return 0;
 }
 

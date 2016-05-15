@@ -31,7 +31,7 @@ HEALTH_INDEX = 1
 POWER_INDEX = 2
 
 -- COLLECTIBLE_OFFSET = 200
-collectibleTypes = { "cbit", "cbyte" }
+collectibleTypes = { "Bit", "Byte" }
 TOTAL_COLLECTIBLE_TYPES = #collectibleTypes
 
 -- {name, # frames or # frame sets}
@@ -83,7 +83,7 @@ TOTAL_JUMP_ARRAY_UNITS = #jumpArray
 dashArray = { 16, 16, 12, 8, 6, 4, 2, 2, 1 }
 TOTAL_DASH_ARRAY_UNITS = #dashArray
 
-floatArray = { 0, 1, 1, 0, -1, -1, 0 }
+floatArray = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, -1, -1 }
 TOTAL_FLOAT_ARRAY_UNITS = #floatArray
 
 GFX_SCALE = 1.0
@@ -96,6 +96,8 @@ PLAYER_W = 8
 PLAYER_H = 16
 DEFAULT_ENEMY_W = 8
 DEFAULT_ENEMY_H = 8
+DEFAULT_COLLECTIBLE_W = 8
+DEFAULT_COLLECTIBLE_H = 8
 DEFAULT_GFX_OFFSET = 2
 DEFAULT_SPEED = 2
 DEFAULT_COOLDOWN = 128
@@ -451,15 +453,15 @@ function Enemy:enHandleAI()
 	--if thingTypes[self.tgColliding] == "tile"
   
     if self.tgVerticals == 0 and self.tgDashing == 0 and self.enCooldown == 0 then
-      checkrect = self.tgHitbox
-      checkrect.w = checkrect.w + DEFAULT_W * 4
-      checkrect.x = checkrect.x - DEFAULT_W * 2
-      checkrect.h = checkrect.h + DEFAULT_H * 4
-      checkrect.y = checkrect.y - DEFAULT_H * 2
+      --checkrect = self.tgHitbox
+      checkrect.w = self.tgHitbox.w + DEFAULT_W * 4
+      checkrect.x = self.tgHitbox.x - DEFAULT_W * 2
+      checkrect.h = self.tgHitbox.h + DEFAULT_H * 4
+      checkrect.y = self.tgHitbox.y - DEFAULT_H * 2
       iscolliding = checkCollision(checkrect, things[gPlayerUnit].tgHitbox)
       if iscolliding == true then
-		checkrect = self.tgHitbox
-		checkrect.y = checkrect.y - DEFAULT_H
+		--checkrect = self.tgHitbox
+		checkrect.y = self.tgHitbox.y - DEFAULT_H
 		if self.tgSpeed > 0 then
 			checkrect.x = checkrect.x + dashArray[self.tgDashing + 1]
 		elseif self.tgSpeed < 0 then
@@ -640,8 +642,8 @@ function Collectible:new(levelUnit)
   self.tgColliding = { -1, -1, -1, -1 }
   self.clSubtype = -1
   self.tgHitbox = Rectangle(0, 0, 0, 0)
-  self.tgHitbox.w = DEFAULT_W
-  self.tgHitbox.h = DEFAULT_H
+  self.tgHitbox.w = DEFAULT_COLLECTIBLE_W
+  self.tgHitbox.h = DEFAULT_COLLECTIBLE_H
 end
 
 function Collectible:clHandleAI()
@@ -653,9 +655,9 @@ function Collectible:clHandleAI()
 end
 
 function Collectible:clCollect()
-    if collectibleTypes[self.clSubtype] == "cbit" then
+    if collectibleTypes[self.clSubtype] == "Bit" then
       points = points + 1
-    elseif collectibleTypes[self.clSubtype] == "cbyte" then
+    elseif collectibleTypes[self.clSubtype] == "Byte" then
       points = points + 8
     end
 	
@@ -743,6 +745,19 @@ function init()
 		--things[i] = nil
 	end
   end
+end
+
+function initThings()
+	for i = 1, #things do
+		if things[i] ~= -1 then
+			if things[i].tgType == "collectible" then
+				if collectibleTypes[things[i].clSubtype] == "Bit" then
+					things[i].tgHitbox.w = DEFAULT_COLLECTIBLE_W / 2
+					things[i].tgHitbox.h = DEFAULT_COLLECTIBLE_H / 2
+				end
+			end
+		end
+	end
 end
 
 function handleEnvironment()

@@ -24,6 +24,8 @@ public:
 	static int labInitValues(void);
 	// static int labCall(int);
 	static int labHandleEnvironment(void);
+	static int labPushThings(void);
+	static int labPullThings(void);
 	static int labChangeLevel(void);
 	static int labCheckCollision(lua_State*);
 	static int labClose(void);

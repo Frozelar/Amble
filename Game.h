@@ -150,6 +150,8 @@ public:
 	static int PLAYER_H;
 	static int DEFAULT_ENEMY_W;
 	static int DEFAULT_ENEMY_H;
+	static int DEFAULT_COLLECTIBLE_W;
+	static int DEFAULT_COLLECTIBLE_H;
 	static int DEFAULT_GFX_OFFSET;
 	static int DEFAULT_SPEED;
 	// static const int TOTAL_COLLISIONS;

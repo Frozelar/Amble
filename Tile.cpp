@@ -12,8 +12,8 @@ Tile::Tile(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType["t
 	tgHitboxRect.h = Game::DEFAULT_H;
 	tgGFXrect.x = tgHitboxRect.x;
 	tgGFXrect.y = tgHitboxRect.y;
-	tgGFXrect.w = Game::DEFAULT_W;
-	tgGFXrect.h = Game::DEFAULT_H;
+	tgGFXrect.w = Game::DEFAULT_W + Game::DEFAULT_GFX_OFFSET * 2;
+	tgGFXrect.h = Game::DEFAULT_H + Game::DEFAULT_GFX_OFFSET * 2;
 	tiType = subtype;
 }
 
