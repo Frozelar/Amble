@@ -24,7 +24,7 @@ tileTypes = { "dirtBlock", "dirtWall" }
 TOTAL_TILE_TYPES = #tileTypes
 
 -- ENEMY_OFFSET = 100
-enemyTypes = { "dude", "guy" }
+enemyTypes = { "Bean", "Daub" }
 TOTAL_ENEMY_TYPES = #enemyTypes
 enemyStats = { {100, 1}, {75, 5} }		-- order corresponds to enemyTypes; format = {health, power}
 HEALTH_INDEX = 1
@@ -39,7 +39,7 @@ graphicsIdentifiers = {
 	{ {"Title", 1}, {"Underground", 1}, {"Sky", 1}, {"Autumn", 1} }, -- backgrounds (# frames)
 	{ {"DirtBlock", 1}, {"DirtWall", 1} }, -- tiles (# frames (PER tile subidentifier))
 	{ {"" --[[ "Player" ]], 5} }, -- player states (# frame SETS (5 by default)
-	{ {"Dude", 5}, {"Guy", 5} }, -- enemies (# frame SETS (5 by default))
+	{ {"Bean", 5}, {"Daub", 5} }, -- enemies (# frame SETS (5 by default))
 	{ {"Bit", 4}, {"Byte", 4} }, -- collectibles (# frames)
 	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} } -- particles (# frames)
 }
@@ -447,7 +447,7 @@ function Enemy:enHandleAI()
 	self.enCooldown = self.enCooldown - 1
   end
   
-  if t == "dude" then
+  if t == "Bean" then
 	--if thingTypes[self.tgColliding] == "tile"
   
     if self.tgVerticals == 0 and self.tgDashing == 0 and self.enCooldown == 0 then
@@ -507,8 +507,8 @@ function Enemy:enHandleAI()
 		end
 	end
 	]]
-  elseif t == "guy" then
-		self.tgSpeed = -DEFAULT_SPEED
+  elseif t == "Daub" then
+		self.tgSpeed = 0
 	
   end
 end
@@ -518,7 +518,7 @@ function Enemy:enResolveCollision(pDirection)
 	local t = enemyTypes[self.enSubtype]
 	local col = self.tgColliding[pDirection]
 	
-	if t == "dude" then
+	if t == "Bean" then
 		if col == gPlayerUnit then
 			things[gPlayerUnit].tgHealth = things[gPlayerUnit].tgHealth - self.enPower
 			playAudio(SFX_INDEX, "Hurt")
@@ -527,7 +527,7 @@ function Enemy:enResolveCollision(pDirection)
 		if things[col].tgType == "tile" then
 			--print(direction[pDirection] .. " " .. col)
 		end
-	elseif t == "guy" then
+	elseif t == "Daub" then
 		
 	end
 end
