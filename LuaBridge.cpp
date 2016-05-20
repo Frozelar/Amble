@@ -726,6 +726,12 @@ int LuaBridge::labChangeLevel()
 		{
 			lua_pushnumber(L, i + 1);								// things, i
 			lua_gettable(L, -2);									// things, specific thing
+
+			lua_pushstring(L, "tgSubtype");						// things, specific thing, "tgSubtype"
+			lua_pushnumber(L, Game::things[i]->tgGetSubtype());	// things, specific thing, "tgSubtype", subtype
+			lua_settable(L, -3);								// things, specific thing
+			lua_pop(L, 1);										// things
+			/*
 			if (Game::things[i]->tgType == Game::ThingType["enemy"])
 			{
 				lua_pushstring(L, "enSubtype");						// things, specific thing, "enSubtype"
@@ -747,12 +753,21 @@ int LuaBridge::labChangeLevel()
 				lua_settable(L, -3);								// things, specific thing
 				lua_pop(L, 1);										// things
 			}
+			*/
 		}
 	}
-	// lua_getglobal(L, "initThings");
-	// lua_call(L, 0, 0);
-	// labPullThings();
-	/*
+	labInitThings();
+	
+	return 0;
+}
+
+int LuaBridge::labInitThings(void)
+{
+	//Game::centerCamera();
+	lua_getglobal(L, "initThings");
+	lua_call(L, 0, 0);
+	labPullThings(false);
+
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{
 		if (Game::things[i] != NULL)
@@ -773,8 +788,17 @@ int LuaBridge::labChangeLevel()
 			lua_pop(L, 5);										//
 		}
 	}
-	*/
-
+	lua_getglobal(L, "GFX_SCALE");					// GFX_SCALE
+	if (lua_tonumber(L, -1) != Graphics::GFX_SCALE)
+	{
+		lua_pushnumber(L, Graphics::GFX_SCALE);		// GFX_SCALE (lua), GFX_SCALE (c++)
+		lua_setglobal(L, "GFX_SCALE");				// GFX_SCALE (lua)
+		lua_pushnumber(L, Graphics::GFX_MULT);		// GFX_SCALE (lua), GFX_MULT (c++)
+		lua_setglobal(L, "GFX_MULT");				// GFX_SCALE (lua)
+		lua_getglobal(L, "incGFXscale");			// GFX_SCALE (lua), incGFXscale()
+		lua_call(L, 0, 0);							// GFX_SCALE (lua)
+	}
+	lua_pop(L, 1);									// 
 	return 0;
 }
 
@@ -1117,9 +1141,9 @@ int LuaBridge::labPushThings(void)
 	return 0;
 }
 
-int LuaBridge::labPullThings(void)
+int LuaBridge::labPullThings(bool searchForNewThings)
 {
-	for (int i = 0; i < Level::LEVEL_UNITS; i++)
+	for (int i = 0; i < Game::things.size(); i++)
 	{
 		if (Game::things[i] != NULL)
 		{
@@ -1175,6 +1199,36 @@ int LuaBridge::labPullThings(void)
 			// Game::things[i]->tgHitboxRect.w = (int)lua_tonumber(L, -3);
 			// Game::things[i]->tgHitboxRect.h = (int)lua_tonumber(L, -2);
 			lua_pop(L, 5);										//
+		}
+		else if (searchForNewThings && Game::things[i] == NULL)
+		{
+			lua_getglobal(L, "things");							// things table
+			lua_pushnumber(L, i + 1);							// things table, i
+			lua_gettable(L, -2);								// things table, specific thing
+			if (lua_type(L, -1) != LUA_TNUMBER)
+			{
+				lua_getfield(L, -1, "tgType");						// things table, specific thing, tgType
+				lua_getfield(L, -2, "tgSubtype");					// things table, specific thing, tgSubtype
+				/*
+				if(Game::ThingType[lua_tostring(L, -1)] == Game::ThingType["tile"])
+					lua_getfield(L, -2, "tiSubtype");				// things table, specific thing, tgType, tgSubtype
+				if(Game::ThingType[lua_tostring(L, -1)] == Game::ThingType["enemy"])
+					lua_getfield(L, -2, "enSubtype");				// things table, specific thing, tgType, tgSubtype
+				if(Game::ThingType[lua_tostring(L, -1)] == Game::ThingType["collectible"])
+					lua_getfield(L, -2, "clSubtype");				// things table, specific thing, tgType, tgSubtype
+					*/
+				Game::newThing(Game::ThingType[lua_tostring(L, -2)], i, -1, -1, lua_tonumber(L, -1));
+				lua_pop(L, 2);										// things table, specific thing
+				lua_getfield(L, -1, "tgHitbox");					// things table, specific thing, tgHitbox
+				lua_pushnumber(L, Game::things[i]->tgHitboxRect.x);	// things table, specific thing, tgHitbox, x
+				lua_setfield(L, -2, "x");							// things table, specific thing, tgHitbox
+				lua_pushnumber(L, Game::things[i]->tgHitboxRect.y);	// things table, specific thing, tgHitbox, y
+				lua_setfield(L, -2, "y");							// things table, specific thing, tgHitbox
+				lua_pop(L, 3);									// 
+				labInitThings();
+			}
+			else
+				lua_pop(L, 2);								// 
 		}
 	}
 	return 0;

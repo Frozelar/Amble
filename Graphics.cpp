@@ -360,6 +360,11 @@ void Graphics::gxIncScale(bool gfxscale)
 	Game::gBodyFont.font = TTF_OpenFont(bfont.c_str(), Game::gBodyFont.size);
 	Game::gTitleFont.font = TTF_OpenFont(tfont.c_str(), Game::gTitleFont.size);
 
+	Game::gCamera.x *= GFX_MULT;
+	Game::gCamera.y *= GFX_MULT;
+	Game::gCamera.w *= GFX_MULT;
+	Game::gCamera.h *= GFX_MULT;
+
 	Game::gPlayer->tgHitboxRect.x *= GFX_MULT;
 	Game::gPlayer->tgHitboxRect.y *= GFX_MULT;
 	Game::gPlayer->tgHitboxRect.w *= GFX_MULT;

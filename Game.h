@@ -192,6 +192,7 @@ public:
 	static Menu* gMenu;
 	static std::vector<Thing*> things;
 	static std::vector<Particle*> particles;
+	static SDL_Rect gCamera;
 
 	// static Game gGame;
 	// static Level gLevel;
@@ -199,7 +200,7 @@ public:
 	static void centerCamera(void);
 	static bool applyAI(void);
 	// int type, int levelunit, int x (optional if levelunit is given), int y (optional if levelunit is given), int thingtype (use ONLY if offset is not used with the type)
-	static void newThing(int, int, int, int, int);
+	static void newThing(int = -1, int = -1, int = -1, int = -1, int = -1);
 	static void newParticle(SDL_Rect*, int, SDL_Point*, int, int);
 	static void destroyThing(int);
 	static void destroyParticle(int);

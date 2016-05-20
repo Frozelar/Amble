@@ -352,7 +352,7 @@ function Player:plResolveCollision(pDirection)
 	end
 end
 
-Tile = {tiIsSolid, tiSubtype}
+Tile = {tiIsSolid, tgSubtype}
 Tile.__index = Tile
 
 setmetatable(Tile, {
@@ -376,22 +376,18 @@ function Tile:new(levelUnit)
   self.tgDashing = 0
   self.tgColliding = { -1, -1, -1, -1 }
   self.tiIsSolid = true
-  self.tiSubtype = 1
+  self.tgSubtype = 1
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = DEFAULT_W
   self.tgHitbox.h = DEFAULT_H
-  self.tgMaxFrames = graphicsIdentifiers[2][self.tiSubtype][2]
+  self.tgMaxFrames = graphicsIdentifiers[2][self.tgSubtype][2]
 end
 
 function Tile:tiHandleAI()
-  for i = 1, #things do
-    if things[i] ~= -1 and thingTypes[things[i].tgType] == "tile" then
-      if tileTypes[things[i].tiSubtype] == "dirtBlock" then
+   if tileTypes[self.tgSubtype] == "dirtBlock" then
         -- instead of doing this, just include the things that actually need AI??
-      elseif tileTypes[things[i].tiSubtype] == "dirtWall" then
+  elseif tileTypes[self.tgSubtype] == "dirtWall" then
         
-      end
-    end
   end
 end
 
@@ -406,7 +402,7 @@ function Tile:tiCycleFrames()
 	end
 end
 
-Enemy = {enPower, enSubtype, enDashing}
+Enemy = {enPower, tgSubtype, enDashing}
 Enemy.__index = Enemy
 
 setmetatable(Enemy, {
@@ -432,7 +428,7 @@ function Enemy:new(levelUnit)
   self.tgHealth = -2
   self.tgDashing = 0
   self.enPower = -2
-  self.enSubtype = -1
+  self.tgSubtype = -1
   self.enDashing = 0
   self.enCooldown = 0
   self.tgHitbox = Rectangle(0, 0, 0, 0)
@@ -443,7 +439,7 @@ end
 function Enemy:enHandleAI()
   local checkrect = Rectangle(0, 0, 0, 0)
   local iscolliding = false
-  local t = enemyTypes[self.enSubtype]
+  local t = enemyTypes[self.tgSubtype]
   
   if self.enCooldown > 0 then
 	self.enCooldown = self.enCooldown - 1
@@ -517,7 +513,7 @@ end
 
 -- player, tile
 function Enemy:enResolveCollision(pDirection)
-	local t = enemyTypes[self.enSubtype]
+	local t = enemyTypes[self.tgSubtype]
 	local col = self.tgColliding[pDirection]
 	
 	if t == "Bean" then
@@ -618,7 +614,7 @@ function Enemy:enCycleFrames()
 	-- end
 end
 
-Collectible = {clSubtype}
+Collectible = {tgSubtype}
 Collectible.__index = Collectible
 
 setmetatable(Collectible, {
@@ -640,7 +636,7 @@ function Collectible:new(levelUnit)
   self.tgHealth = 100
   self.tgDashing = 0
   self.tgColliding = { -1, -1, -1, -1 }
-  self.clSubtype = -1
+  self.tgSubtype = -1
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = DEFAULT_COLLECTIBLE_W
   self.tgHitbox.h = DEFAULT_COLLECTIBLE_H
@@ -655,9 +651,9 @@ function Collectible:clHandleAI()
 end
 
 function Collectible:clCollect()
-    if collectibleTypes[self.clSubtype] == "Bit" then
+    if collectibleTypes[self.tgSubtype] == "Bit" then
       points = points + 1
-    elseif collectibleTypes[self.clSubtype] == "Byte" then
+    elseif collectibleTypes[self.tgSubtype] == "Byte" then
       points = points + 8
     end
 	
@@ -751,7 +747,7 @@ function initThings()
 	for i = 1, #things do
 		if things[i] ~= -1 then
 			if things[i].tgType == "collectible" then
-				if collectibleTypes[things[i].clSubtype] == "Bit" then
+				if collectibleTypes[things[i].tgSubtype] == "Bit" then
 					things[i].tgHitbox.w = DEFAULT_COLLECTIBLE_W / 2
 					things[i].tgHitbox.h = DEFAULT_COLLECTIBLE_H / 2
 				end
@@ -786,8 +782,8 @@ function handleEnvironment()
 				
 			elseif things[i].tgType == "enemy" then
 				if things[i].tgHealth == -2 or things[i].enPower == -2 then
-					things[i].tgHealth = enemyStats[things[i].enSubtype][HEALTH_INDEX]
-					things[i].enPower = enemyStats[things[i].enSubtype][POWER_INDEX]
+					things[i].tgHealth = enemyStats[things[i].tgSubtype][HEALTH_INDEX]
+					things[i].enPower = enemyStats[things[i].tgSubtype][POWER_INDEX]
 				end
 				
 				things[i]:enCycleFrames()
@@ -861,6 +857,8 @@ function incGFXscale()
 	PLAYER_H = PLAYER_H * GFX_MULT
 	DEFAULT_ENEMY_W = DEFAULT_ENEMY_W * GFX_MULT
 	DEFAULT_ENEMY_H = DEFAULT_ENEMY_H * GFX_MULT
+	DEFAULT_COLLECTIBLE_W = DEFAULT_COLLECTIBLE_W * GFX_MULT
+	DEFAULT_COLLECTIBLE_H = DEFAULT_COLLECTIBLE_H * GFX_MULT
 	DEFAULT_GFX_OFFSET = DEFAULT_GFX_OFFSET * GFX_MULT
 	DEFAULT_SPEED = DEFAULT_SPEED * GFX_MULT
 	for i = 1, #jumpArray do
@@ -875,6 +873,15 @@ function incGFXscale()
 	for i = 1, #floatArray do
 		floatArray[i] = floatArray[i] * GFX_MULT
 	end
+	--[[
+	for i = 1, #things do
+		if things[i] ~= -1 then
+			things[i].tgHitbox.x = things[i].tgHitbox.x * GFX_MULT
+			things[i].tgHitbox.y = things[i].tgHitbox.y * GFX_MULT
+			things[i].tgHitbox.w = things[i].tgHitbox.w * GFX_MULT
+			things[i].tgHitbox.h = things[i].tgHitbox.h * GFX_MULT
+		end
+	end]]
 	-- everything else should be handled in c++
 end
 

@@ -139,6 +139,8 @@ void Level::moveLevel(void)
 			}
 		}
 	}
+	Game::gCamera.x += Level::gLevelMovementsX;
+	Game::gCamera.y += Level::gLevelMovementsY;
 	Level::gLevelMovementsX = 0;
 	Level::gLevelMovementsY = 0;
 	Game::gPlayer->tgHitboxRect = Game::gPlayer->plOldHitboxRect;
@@ -162,6 +164,7 @@ void Level::setBG(void)
 
 void Level::closeLevel()
 {
+	Game::gCamera = { 0, 0, 0, 0 };
 	for (int i = 0; i < Game::things.size(); i++)
 	{
 		if (Game::things[i] != NULL)

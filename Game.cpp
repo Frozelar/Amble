@@ -126,6 +126,8 @@ SDL_Color Game::highlightColor = { 255, 255, 255, 255 };
 // const int Game::MAX_PARTICLES = 4096;
 std::vector<Particle*> Game::particles;
 
+SDL_Rect Game::gCamera = { 0, 0, 0, 0 };
+
 Game* Game::gGame;
 
 Game::Game()
@@ -283,10 +285,11 @@ void Game::centerCamera(void)
 			}
 		}
 	}
+	gCamera = { differenceX, differenceY, Level::LEVEL_W_PIXELS, Level::LEVEL_H_PIXELS };
 }
 
 // if type has the offset built-in, then do NOT give the final thingtype argument; otherwise, give a thingtype
-void Game::newThing(int type = -1, int levelunit = -1, int x = -1, int y = -1, int thingtype = -1)
+void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 {
 	SDL_Rect trect = { 0, 0, 0, 0 };
 	if (x == -1 || y == -1)
@@ -321,6 +324,11 @@ void Game::newThing(int type = -1, int levelunit = -1, int x = -1, int y = -1, i
 	else if (levelunit > -1 && type > -1 && thingtype > -1)
 	{
 		trect = { x / DEFAULT_W * DEFAULT_W, y / DEFAULT_H * DEFAULT_H, 0, 0 };
+		if (gCamera.x != 0 || gCamera.y != 0)
+		{
+			trect.x += gCamera.x;
+			trect.y += gCamera.y;
+		}
 		if (type == ThingType["player"])
 		{
 			gPlayer->tgHitboxRect.x = x;
