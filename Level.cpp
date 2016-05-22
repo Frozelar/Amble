@@ -4,6 +4,7 @@
 #include "Thing.h"
 #include "LuaBridge.h"
 #include "Audio.h"
+#include "Particle.h"
 
 // default units in the level
 int Level::LEVEL_UNITS = Level::levelW() * Level::levelH();
@@ -136,6 +137,14 @@ void Level::moveLevel(void)
 			{
 				Game::things[i]->tgHitboxRect.y += Level::gLevelMovementsY;
 				Game::things[i]->tgHitboxRect.x += Level::gLevelMovementsX;
+			}
+		}
+		for (int i = 0; i < Game::particles.size(); i++)
+		{
+			if (Game::particles[i] != NULL)
+			{
+				Game::particles[i]->ptRect.x += Level::gLevelMovementsX;
+				Game::particles[i]->ptRect.y += Level::gLevelMovementsY;
 			}
 		}
 	}

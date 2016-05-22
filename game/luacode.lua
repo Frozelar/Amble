@@ -132,6 +132,27 @@ function Point:__eq(other)
 	self.y = other.y
 end
 
+PolarPoint = { r = 0, angle = 0 }
+PolarPoint.__index = PolarPoint
+
+setmetatable(PolarPoint, {
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		self:new(...)
+		return self
+	end
+})
+
+function PolarPoint:new(pr, pang)
+	self.r = pr
+	self.angle = pang
+end
+
+function Point:__eq(other)
+	self.r = other.r
+	self.angle = other.angle
+end
+
 Rectangle = { x = 0, y = 0, w = 0, h = 0 }
 Rectangle.__index = Rectangle
 
@@ -201,7 +222,7 @@ function Background:bgCycleFrames()
 	end
 end
 
-Particle = { ptType, ptRect, ptDestination, ptLife, ptSpeed, ptFrame, ptFrameInterval, ptMaxFrames }
+Particle = { ptType, ptRect, ptDestination, --[[ptLife,]] ptSpeedX, ptSpeedY, ptFrame, ptFrameInterval, ptMaxFrames }
 Particle.__index = Particle
 
 setmetatable(Particle, {
@@ -213,19 +234,32 @@ setmetatable(Particle, {
 })
 
 function Particle:new(pType, px, py)
+	-- local rectdest = Point(0, 0)
+	
 	self.ptRect = Rectangle(px, py, 0, 0)
 	if string.sub(graphicsIdentifiers[6][pType][1], 1, 3) == "Big" then
-		ptRect.w = 2
-		ptRect.h = 2
+		self.ptRect.w = 2
+		self.ptRect.h = 2
 	else
-		ptRect.w = 1
-		ptRect.h = 1
+		self.ptRect.w = 1
+		self.ptRect.h = 1
 	end
 	
-	self.ptType = pType
-	self.ptDestination = Point:new(px + math.random(-8, 8), py + math.random(-8, 8))
-	self.ptSpeed = math.random(1, 4)
-	self.ptLife = ((px - self.ptDestination.x) + (py - self.ptDestination.y)) / ptSpeed
+	self.ptType = pType	
+	self.ptDestination = Point(px + math.random(-8, 8), py + math.random(-8, 8))
+	self.ptSpeedX = (self.ptDestination.x - self.ptRect.x) - math.random(1, math.abs(math.floor(self.ptDestination.x - self.ptRect.x)) + 1)
+	self.ptSpeedY = (self.ptDestination.y - self.ptRect.y) - math.random(1, math.abs(math.floor(self.ptDestination.y - self.ptRect.y)) + 1)
+	--[[
+	self.ptDestination = rectToPolar(Point(px + math.random(-8, 8), py + math.random(-8, 8)))  --Point(px + math.random(-8, 8), py + math.random(-8, 8))
+	if self.ptDestination.angle < 0 then
+		self.ptDestination.angle = self.ptDestination.angle + 360
+	end
+	rectdest = polarToRect(self.ptDestination)
+	-- self.ptSpeed = math.random(1, 4)
+	self.ptSpeedX = (polarToRect(self.ptDestination).x - self.ptRect.x) - math.random(1, math.abs(math.floor(rectdest.x - self.ptRect.x)) + 1)
+	self.ptSpeedY = (polarToRect(self.ptDestination).y - self.ptRect.y) - math.random(1, math.abs(math.floor(rectdest.y - self.ptRect.y)) + 1)
+	]]
+	-- self.ptLife = ((px - self.ptDestination.x) + (py - self.ptDestination.y)) / ptSpeed
 	self.ptFrame = 0
 	self.ptFrameInterval = 0
 	self.ptMaxFrames = graphicsIdentifiers[6][self.ptType][2]
@@ -675,6 +709,18 @@ gBackground = Background()
 gPlayerUnit = 0
 gParticles = {}
 totalParticles = #gParticles
+
+-- converts a rectangular point to a polar point (with theta expressed in DEGREES)
+function rectToPolar(rcoord)
+	pcoord = PolarPoint(math.sqrt(rcoord.x * rcoord.x, rcoord.y * rcoord.y), math.atan(rcoord.y / rcoord.x) * 180 / math.pi)
+	return pcoord
+end
+
+-- converts a polar point (with theta in DEGREES) to a rectangular point
+function polarToRect(pcoord)
+	rcoord = Point(pcoord.r * math.cos(pcoord.angle * math.pi / 180), pcoord.r * math.sin(pcoord.angle * math.pi / 180))
+	return rcoord
+end
 
 function copythings(v)
   things[#things + 1] = v

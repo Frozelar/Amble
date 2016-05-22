@@ -201,7 +201,7 @@ public:
 	static bool applyAI(void);
 	// int type, int levelunit, int x (optional if levelunit is given), int y (optional if levelunit is given), int thingtype (use ONLY if offset is not used with the type)
 	static void newThing(int = -1, int = -1, int = -1, int = -1, int = -1);
-	static void newParticle(SDL_Rect*, int, SDL_Point*, int, int);
+	static void newParticle(SDL_Rect*, int, SDL_Point*, int = -1, int = -1);
 	static void destroyThing(int);
 	static void destroyParticle(int);
 	static void changeGameState(int);

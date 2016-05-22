@@ -42,6 +42,12 @@ struct Collision {
 	Thing* thing2 = NULL;
 };
 
+struct PolarPoint {
+	PolarPoint(int pr = NULL, int pang = NULL) { r = pr; angle = pang; }
+	int r = 0;
+	int angle = 0;
+};
+
 /*
 struct ControlScheme {
 	int up = SDLK_w;
@@ -60,3 +66,5 @@ bool initFont(void);
 void close(void);
 
 int invertDir(int);
+SDL_Point polarToRect(PolarPoint);
+PolarPoint rectToPolar(SDL_Point);

@@ -901,32 +901,32 @@ int LuaBridge::labHandleEnvironment(void)
 	lua_pop(L, 1);													//
 
 	lua_getglobal(L, "totalParticles");							// totalParticles
-	if (Game::particles.size() != (int)lua_tonumber(L, -1))
+	if (Game::particles.size() < (int)lua_tonumber(L, -1))
 	{
 		SDL_Rect pRect;
 		int pType;
 		// int pNum = (int)lua_tonumber(L, -1) - 1;
 		SDL_Point pDestination;
-		int pLife;
-		int pSpeed;
+		// int pLife;
+		int pSpeedX, pSpeedY;
 
 		lua_getglobal(L, "gParticles");							// totalParticles, gParticles
-		lua_insert(L, 1);										// gParticles, totalParticles
+		lua_insert(L, -2);										// gParticles, totalParticles
 		lua_gettable(L, -2);									// gParticles, specific particle
 		lua_pushstring(L, "ptRect");							// gParticles, specific particle, "ptRect"
 		lua_gettable(L, -2);									// gParticles, specific particle, ptRect
 		lua_pushstring(L, "x");									// gParticles, specific particle, ptRect, "x"
 		lua_gettable(L, -2);									// gParticles, specific particle, ptRect, x
-		lua_insert(L, 3);										// gParticles, specific particle, x, ptRect
+		lua_insert(L, -2);										// gParticles, specific particle, x, ptRect
 		lua_pushstring(L, "y");									// gParticles, specific particle, x, ptRect, "y"
 		lua_gettable(L, -2);									// gParticles, specific particle, x, ptRect, y
-		lua_insert(L, 4);										// gParticles, specific particle, x, y, ptRect
+		lua_insert(L, -2);										// gParticles, specific particle, x, y, ptRect
 		lua_pushstring(L, "w");									// gParticles, specific particle, x, y, ptRect, "w"
 		lua_gettable(L, -2);									// gParticles, specific particle, x, y, ptRect, w
-		lua_insert(L, 5);										// gParticles, specific particle, x, y, w, ptRect
+		lua_insert(L, -2);										// gParticles, specific particle, x, y, w, ptRect
 		lua_pushstring(L, "h");									// gParticles, specific particle, x, y, w, ptRect, "h"
 		lua_gettable(L, -2);									// gParticles, specific particle, x, y, w, ptRect, h
-		lua_insert(L, 6);										// gParticles, specific particle, x, y, w, h, ptRect
+		lua_insert(L, -2);										// gParticles, specific particle, x, y, w, h, ptRect
 		pRect.x = lua_tonumber(L, -5);
 		pRect.y = lua_tonumber(L, -4);
 		pRect.w = lua_tonumber(L, -3);
@@ -936,27 +936,38 @@ int LuaBridge::labHandleEnvironment(void)
 		lua_gettable(L, -2);									// gParticles, specific particle, ptDestination
 		lua_pushstring(L, "x");									// gParticles, specific particle, ptDestination, "x"
 		lua_gettable(L, -2);									// gParticles, specific particle, ptDestination, x
-		lua_insert(L, 3);										// gParticles, specific particle, x, ptDestination
+		lua_insert(L, -2);										// gParticles, specific particle, x, ptDestination
 		lua_pushstring(L, "y");									// gParticles, specific particle, x, ptDestination, "y"
 		lua_gettable(L, -2);									// gParticles, specific particle, x, ptDestination, y
-		lua_insert(L, 4);										// gParticles, specific particle, x, y, ptDestination
+		lua_insert(L, -2);										// gParticles, specific particle, x, y, ptDestination
 		pDestination.x = lua_tonumber(L, -3);
 		pDestination.y = lua_tonumber(L, -2);
 		lua_pop(L, 3);											// gParticles, specific particle
 		lua_pushstring(L, "ptType");							// gParticles, specific particle, "ptType"
 		lua_gettable(L, -2);									// gParticles, specific particle, ptType
+		/*
 		lua_pushstring(L, "ptLife");							// gParticles, specific particle, ptType, "ptLife"
 		lua_gettable(L, -3);									// gParticles, specific particle, ptType, ptLife
-		lua_pushstring(L, "ptSpeed");							// gParticles, specific particle, ptType, ptLife, "ptSpeed"
-		lua_gettable(L, -4);									// gParticles, specific particle, ptType, ptLife, ptSpeed
+		*/
+		lua_pushstring(L, "ptSpeedX");							// gParticles, specific particle, ptType, "ptSpeedX"
+		lua_gettable(L, -3);									// gParticles, specific particle, ptType, ptSpeedX
+		lua_pushstring(L, "ptSpeedY");							// gParticles, specific particle, ptType, ptSpeedX, "ptSpeedY"
+		lua_gettable(L, -4);									// gParticles, specific particle, ptType, ptSpeedX, ptSpeedY
 		pType = lua_tonumber(L, -3);
-		pLife = lua_tonumber(L, -2);
-		pSpeed = lua_tonumber(L, -1);
-		lua_pop(L, 5);											// 
+		// pLife = lua_tonumber(L, -2);
+		pSpeedX = lua_tonumber(L, -2);
+		pSpeedY = lua_tonumber(L, -1);
+		lua_pop(L, 4);											// 
 
 		// Game::particles.resize(pNum + 1);
 		/* Game::particles[pNum] = */ 
-		Game::newParticle(&pRect, pType, /* pNum, */ &pDestination, pLife, pSpeed);
+		Game::newParticle(&pRect, pType, /* pNum, */ &pDestination, pSpeedX, pSpeedY);
+	}
+	else if (Game::particles.size() > lua_tonumber(L, -1))
+	{
+		while (Game::particles.size() > lua_tonumber(L, -1))
+			Game::destroyParticle(Game::particles.size() - 1);
+		lua_pop(L, 1);
 	}
 
 	// this should already be handled in things, down below

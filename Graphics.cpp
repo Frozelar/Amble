@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "Menu.h"
 #include "LevelEditor.h"
+#include "Particle.h"
 
 bool Graphics::isFullscreen = false;
 float Graphics::GFX_SCALE = 1.0;
@@ -290,6 +291,15 @@ void Graphics::gxRender(bool updateRenderer)
 				// Game::things[i]->tgSyncTexture();
 				Game::things[i]->tgRender();
 			}
+		}
+	}
+
+	for (int i = 0; i < Game::particles.size(); i++)
+	{
+		if (Game::particles[i] != NULL)
+		{
+			if(Game::checkCollisionRects(&Game::particles[i]->ptRect, &cameraRect))
+				Game::particles[i]->ptRender();
 		}
 	}
 

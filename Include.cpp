@@ -2,7 +2,8 @@
 #include "Game.h"
 #include "Luabridge.h"
 #include "Thing.h"
-// #include "Thing.h"
+
+const int PI = 3.141592653;
 
 /*
 class Collision {
@@ -121,4 +122,20 @@ int invertDir(int dir)
 	else if (dir == Game::Direction["right"])
 		return Game::Direction["left"];
 	return -1;
+}
+
+// takes a polar point (with theta expressed in DEGREES) and converts it to a rectangular point
+SDL_Point polarToRect(PolarPoint coord)
+{
+	SDL_Point rect = { coord.r * cos(coord.angle * PI / 180), coord.r * sin(coord.angle * PI / 180) };
+	return rect;
+}
+
+// takes a rectangular point and converts it to a polar point (with theta expressed in DEGREES)
+PolarPoint rectToPolar(SDL_Point coord)
+{
+	PolarPoint polar = { (int)sqrt(coord.x * coord.x + coord.y * coord.y), (int)atan(coord.y / coord.x) * 180 / PI };
+	if (polar.angle < 0)
+		polar.angle += 360;
+	return polar;
 }

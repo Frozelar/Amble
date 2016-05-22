@@ -11,7 +11,7 @@
 #include "Tile.h"
 #include "Menu.h"
 #include "LevelEditor.h"
-// #include "Particle.h"
+#include "Particle.h"
 
 std::map<std::string, int> Game::Direction;
 std::map<std::string, int> Game::ThingType;
@@ -264,6 +264,13 @@ bool Game::applyAI(void)
 			}
 		}
 	}
+	for (int i = 0; i < particles.size(); i++)
+	{
+		if (particles[i] != NULL)
+		{
+			particles[i]->ptMove();
+		}
+	}
 	return true;
 }
 
@@ -345,11 +352,14 @@ void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 	}
 }
 
-void Game::newParticle(SDL_Rect* location, int type, SDL_Point* destination, int life = -1, int speed = -1)
+void Game::newParticle(SDL_Rect* location, int type, SDL_Point* destination, int speedX, int speedY)
 {
 	int pos = particles.size();
+	SDL_Rect loc = *location;
+	loc.x += Game::gCamera.x;
+	loc.y += Game::gCamera.y;
 	particles.resize(pos + 1);
-	//particles[pos] = new Particle(location, type, pos, destination, life, speed);
+	particles[pos] = new Particle(&loc, type, pos, destination, speedX, speedY);
 }
 
 void Game::destroyThing(int num)
@@ -362,6 +372,7 @@ void Game::destroyParticle(int num)
 {
 	delete particles[num];
 	particles[num] = NULL;
+	particles.resize((num - 1 < 0 ? 0 : num - 1));
 }
 
 void Game::changeGameState(int newState)
