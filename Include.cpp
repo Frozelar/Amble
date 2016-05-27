@@ -3,7 +3,7 @@
 #include "Luabridge.h"
 #include "Thing.h"
 
-const int PI = 3.141592653;
+const int PI = 3.141592654;
 
 /*
 class Collision {
@@ -138,4 +138,10 @@ PolarPoint rectToPolar(SDL_Point coord)
 	if (polar.angle < 0)
 		polar.angle += 360;
 	return polar;
+}
+
+SDL_Rect multDimensions(SDL_Rect rect, float num)
+{
+	SDL_Rect newrect = { rect.x * num, rect.y * num, rect.w * num, rect.h * num };
+	return newrect;
 }

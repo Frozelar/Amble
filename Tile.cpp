@@ -6,8 +6,10 @@
 
 Tile::Tile(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType["tile"], unit)
 {
-	tgHitboxRect.x = (box == NULL ? ((unit - ((unit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W) : box->x);
-	tgHitboxRect.y = (box == NULL ? ((unit / Level::LEVEL_W) * Game::DEFAULT_H) : box->y);
+	// tgHitboxRect.x = (box == NULL ? ((unit - ((unit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W) : box->x);
+	// tgHitboxRect.y = (box == NULL ? ((unit / Level::LEVEL_W) * Game::DEFAULT_H) : box->y);
+	tgHitboxRect.x = (box == NULL ? unit * Game::DEFAULT_W / Game::DEFAULT_W : box->x);
+	tgHitboxRect.y = (box == NULL ? unit * Game::DEFAULT_H / Game::DEFAULT_H : box->y);
 	tgHitboxRect.w = Game::DEFAULT_W;
 	tgHitboxRect.h = Game::DEFAULT_H;
 	tgGFXrect.x = tgHitboxRect.x;

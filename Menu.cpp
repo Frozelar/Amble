@@ -214,6 +214,7 @@ bool Menu::muHandleMenu(SDL_Event* e)
 		else if (e->type == SDL_MOUSEBUTTONUP)
 		{
 			for (int i = menuPos; i < menuPos + NumOptions[muMenu]; i++)
+			{
 				if (muOptionTextures[i] != NULL)
 				{
 					if (Game::checkCollisionRects(&mouse, &muOptionTextures[i]->txRect))
@@ -262,28 +263,18 @@ bool Menu::muHandleMenu(SDL_Event* e)
 								muMenu = MenuID["audio"];
 							}
 							else if (muOptions[i] == "Game Controls")
-							{
 								muMenu = MenuID["gmcontrols"];
-							}
 							else if (muOptions[i] == "Editor Controls")
-							{
 								muMenu = MenuID["lecontrols"];
-							}
 							else if (muOptions[i] == "Return")
-							{
 								muMenu--; // = muOldMenu;
-							}
 						}
 						else if (muMenu == MenuID["graphics"])
 						{
 							if (muOptions[i] == "Window Size")
-							{
 								Graphics::gxIncScale();
-							}
 							else if (muOptions[i] == "Toggle Fullscreen")
-							{
 								Graphics::gxToggleFullscreen();
-							}
 							else if (muOptions[i] == "Return")
 								muMenu--; // = muOldMenu;
 						}
@@ -312,7 +303,7 @@ bool Menu::muHandleMenu(SDL_Event* e)
 								muMenu -= 3;
 							else
 							{
-								if(!muIsMapping)
+								if (!muIsMapping)
 									muIsMapping = true;
 								muMapButton(muMenu, muOptions[i], e->key.keysym.sym);
 							}
@@ -330,6 +321,7 @@ bool Menu::muHandleMenu(SDL_Event* e)
 						}
 					}
 				}
+			}
 		}
 	}
 	else if (Game::gState == Game::GameState["title"])

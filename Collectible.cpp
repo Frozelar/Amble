@@ -8,8 +8,10 @@ Collectible::Collectible(SDL_Rect* box, int subtype, int unit) : Thing(box, Game
 {
 	tgHitboxRect.w = Game::DEFAULT_COLLECTIBLE_W;
 	tgHitboxRect.h = Game::DEFAULT_COLLECTIBLE_H;
-	tgHitboxRect.x = (box == NULL ? ((unit - ((unit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W) : box->x);
-	tgHitboxRect.y = (box == NULL ? ((unit / Level::LEVEL_W) * Game::DEFAULT_H) : box->y);
+	// tgHitboxRect.x = (box == NULL ? ((unit - ((unit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W) : box->x);
+	// tgHitboxRect.y = (box == NULL ? ((unit / Level::LEVEL_W) * Game::DEFAULT_H) : box->y);
+	tgHitboxRect.x = (box == NULL ? unit * Game::DEFAULT_W / Game::DEFAULT_W : box->x);
+	tgHitboxRect.y = (box == NULL ? unit * Game::DEFAULT_H / Game::DEFAULT_H : box->y);
 	tgGFXrect.x = tgHitboxRect.x - Game::DEFAULT_GFX_OFFSET;
 	tgGFXrect.y = tgHitboxRect.y - Game::DEFAULT_GFX_OFFSET;
 	tgGFXrect.w = Game::DEFAULT_ENEMY_W + Game::DEFAULT_GFX_OFFSET * 2;

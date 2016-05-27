@@ -8,6 +8,10 @@ Particle::Particle(SDL_Rect* placement, int type, int num, SDL_Point* destinatio
 	ptNumber = num;
 	ptType = type;
 	ptRect = *placement;
+	if (life != -1)
+		ptLife = life;
+	else
+		ptLife = 1;
 	if (destination != NULL)
 		ptDestination = *destination;
 	else
@@ -18,22 +22,22 @@ Particle::Particle(SDL_Rect* placement, int type, int num, SDL_Point* destinatio
 	else
 		ptLifeSpan = rand() % 100 + 1;
 		*/
-	if (speedX != -1 && speedY != -1)
-	{
+	// if (speedX != -1 && speedY != -1)
+	// {
 		ptSpeedX = speedX;
 		ptSpeedY = speedY;
-	}
-	else
-	{
-		ptSpeedX = (ptRect.x > ptDestination.x ? rand() % Game::DEFAULT_SPEED : -(rand() % Game::DEFAULT_SPEED));
-		ptSpeedY = (ptRect.y > ptDestination.y ? rand() % Game::DEFAULT_SPEED : -(rand() % Game::DEFAULT_SPEED));
+	// }
+	// else
+	// {
+	// 	ptSpeedX = (ptRect.x > ptDestination.x ? rand() % Game::DEFAULT_SPEED : -(rand() % Game::DEFAULT_SPEED));
+	// 	ptSpeedY = (ptRect.y > ptDestination.y ? rand() % Game::DEFAULT_SPEED : -(rand() % Game::DEFAULT_SPEED));
 		// ptSpeedX = ptDestination.x - ptRect.x - (rand() % ptDestination.x - ptRect.x - 1);
 		// ptSpeedY = ptDestination.y - ptRect.y - (rand() % ptDestination.y - ptRect.y - 1);
 		// ptSpeedX = (ptDestination.x - ptRect.x) - rand() % std::abs((int)(ptDestination.x - ptRect.x)) + 1;
 		// ptSpeedY = (ptDestination.y - ptRect.y) - rand() % std::abs((int)(ptDestination.y - ptRect.y)) + 1;
 		// ptSpeedX = (polarToRect(ptDestination).x - ptRect.x) - (rand() % ((polarToRect(ptDestination).x - ptRect.x - 1) == 0 ? 1 : (polarToRect(ptDestination).x - ptRect.x - 1)));
 		// ptSpeedY = (polarToRect(ptDestination).y - ptRect.y) - (rand() % ((polarToRect(ptDestination).y - ptRect.y - 1) == 0 ? 1 : (polarToRect(ptDestination).y - ptRect.y - 1)));
-	}
+	// }
 }
 
 Particle::~Particle()
@@ -45,9 +49,12 @@ void Particle::ptMove()
 {
 	ptRect.x += ptSpeedX;
 	ptRect.y += ptSpeedY;
-	if (((ptSpeedX > 0 && ptRect.x > ptDestination.x) || (ptSpeedX < 0 && ptRect.x < ptDestination.x)) && 
-		((ptSpeedY > 0 && ptRect.y > ptDestination.y) || (ptSpeedY < 0 && ptRect.y < ptDestination.x)))
-		Game::destroyParticle(ptNumber);
+	// std::cout << ptNumber << " | " << ptRect.x << " " << ptDestination.x << " | " << ptRect.y << " " << ptDestination.y << std::endl;
+	if ((((ptSpeedX > 0 && ptRect.x > ptDestination.x) || (ptSpeedX < 0 && ptRect.x < ptDestination.x)) && 
+		((ptSpeedY > 0 && ptRect.y > ptDestination.y) || (ptSpeedY < 0 && ptRect.y < ptDestination.y))) || 
+		((ptSpeedX == 0 && ptSpeedY > 0 && ptRect.y > ptDestination.y) || (ptSpeedX == 0 && ptSpeedY < 0 && ptRect.y < ptDestination.y) || 
+		(ptSpeedY == 0 && ptSpeedX > 0 && ptRect.x > ptDestination.x) || (ptSpeedY == 0 && ptSpeedX < 0 && ptRect.x < ptDestination.x)))
+		ptLife = 0; // Game::destroyParticle(ptNumber);
 	// else if (ptRect.x % 15 == 0 || ptRect.y % 15 == 0)
 	// 	ptAlpha -= 17;
 }

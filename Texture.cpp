@@ -1,13 +1,10 @@
 #include "Texture.h"
 
-Texture::Texture(int passedX, int passedY, int passedW, int passedH)
+Texture::Texture(int px, int py, int pw, int ph)
 {
 	// set properties
 	// txRect = new SDL_Rect();
-	txRect.x = passedX;
-	txRect.y = passedY;
-	txRect.w = passedW;
-	txRect.h = passedH;
+	txRect = { px, py, pw, ph };
 }
 
 Texture::~Texture()
@@ -52,8 +49,8 @@ bool Texture::txLoadF(std::string path)
 	if (imageSurface == NULL)
 	{
 		// output a message if the surface failed to load
-		printf("Error loading image at the specified path: %s\n", path.c_str());
-		printf("IMG_GetError: %s\n", IMG_GetError());
+		std::cout << "Error loading image at the specified path: " << path << std::endl;
+		std::cout << "IMG_GetError: " << IMG_GetError() << std::endl;
 		success = false;
 	}
 	else
@@ -67,7 +64,7 @@ bool Texture::txLoadF(std::string path)
 		if (createdTexture == NULL)
 		{
 			// output an error
-			printf("Error creating texture from surface.  SDL_GetError: %s\n", SDL_GetError());
+			std::cout << "Error creating texture from surface.  SDL_GetError: " << SDL_GetError() << std::endl;
 		}
 		else
 		{
@@ -102,7 +99,7 @@ bool Texture::txLoadT(std::string text, TTF_Font* font, SDL_Color color)
 		txTexture = SDL_CreateTextureFromSurface(Game::gRenderer, textSurface);
 		if (txTexture == NULL)
 		{
-			printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+			std::cout << "Unable to create texture from rendered text! SDL Error: " << SDL_GetError() << std::endl;
 		}
 		else
 		{
@@ -118,15 +115,14 @@ bool Texture::txLoadT(std::string text, TTF_Font* font, SDL_Color color)
 	}
 	else
 	{
-		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+		std::cout << "Unable to render text surface! SDL_TTF Error: " << TTF_GetError() << std::endl;
 	}
 
 	//Return success
 	return txTexture != NULL;
 }
 
-void Texture::txRender(SDL_Rect *clip, SDL_Point *center,
-	double rotation, SDL_RendererFlip flip)
+void Texture::txRender(SDL_Rect *clip, SDL_Point *center, double rotation, SDL_RendererFlip flip)
 {
 	// rect to render to
 	SDL_Rect renderRect{ txRect.x, txRect.y, txRect.w, txRect.h };

@@ -174,6 +174,7 @@ void Player::plMove(void)
 		else
 		{
 			for (int i = 0; i < Game::gColliding.size(); i++)
+			{
 				if (Game::gColliding[i] != NULL)
 				{
 					tgColliding[Game::Direction["down"]] = i;
@@ -181,6 +182,7 @@ void Player::plMove(void)
 					// collided = true;
 					// break;
 				}
+			}
 		}
 		tgHitboxRect.y--;
 	}
@@ -190,6 +192,7 @@ void Player::plMove(void)
 		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
 		{
 			for (int i = 0; i < Game::gColliding.size(); i++)
+			{
 				if (Game::gColliding[i] != NULL)
 				{
 					if (tgVerticals > 0)
@@ -199,6 +202,7 @@ void Player::plMove(void)
 					// collided = true;
 					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgVerticals > 0 ? Game::Direction["down"] : Game::Direction["up"]));
 				}
+			}
 			plJumps = 0;
 		}
 	}
@@ -220,7 +224,9 @@ void Player::plMove(void)
 	{
 		tgHitboxRect.x += tgSpeed;
 		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+		{
 			for (int i = 0; i < Game::gColliding.size(); i++)
+			{
 				if (Game::gColliding[i] != NULL)
 				{
 					if (tgSpeed > 0)
@@ -230,6 +236,8 @@ void Player::plMove(void)
 					// collided = true;
 					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgSpeed > 0 ? Game::Direction["right"] : Game::Direction["left"]));
 				}
+			}
+		}
 	}
 	/*
 	if (!collided)
@@ -413,7 +421,6 @@ void Player::tgResolveCollision(Thing* thing, int dir)
 	// tgColliding[dir - 1] = thing->tgLevelUnit;
 	// direction = invertDir(dir);
 	thing->tgColliding[dir] = tgLevelUnit;
-	// ???
 }
 
 void Player::tgRender(void)
@@ -426,7 +433,6 @@ void Player::tgRender(void)
 	else
 		Graphics::playerTextures[plState][tgFrame]->txColor(255, 255, 255);
 
-	Graphics::playerTextures[plState][tgFrame]->txRect = tgGFXrect; // ????
+	Graphics::playerTextures[plState][tgFrame]->txRect = tgGFXrect;
 	Graphics::playerTextures[plState][tgFrame]->txRender();
-
 }

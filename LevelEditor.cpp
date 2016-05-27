@@ -76,11 +76,13 @@ LevelEditor::~LevelEditor()
 		mouseThing = NULL;
 	}
 	for (int i = 0; i < leMsgTextures.size(); i++)
+	{
 		if (leMsgTextures[i] != NULL)
 		{
 			delete leMsgTextures[i];
 			leMsgTextures[i] = NULL;
 		}
+	}
 	if (leInputTexture != NULL)
 	{
 		delete leInputTexture;
@@ -242,25 +244,15 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 			}
 		}
 		else if (e->key.keysym.sym == leControls["Save"])
-		{
 			leSave();
-		}
 		else if (e->key.keysym.sym == leControls["Open"])
-		{
 			leOpen();
-		}
 		else if (e->key.keysym.sym == leControls["Set Width"])
-		{
 			leTakingInput = leMsgs["Set Width"];
-		}
 		else if (e->key.keysym.sym == leControls["Set Height"])
-		{
 			leTakingInput = leMsgs["Set Height"];
-		}
 		else if (e->key.keysym.sym == Game::gPlayer->plControls["Pause"])
-		{
 			Game::changeGameState(Game::GameState["menu"]);
-		}
 	}
 
 	if (changedThing)
@@ -291,11 +283,13 @@ void LevelEditor::leMoveLevel()
 	if (leLvlMoveX != 0 || leLvlMoveY != 0)
 	{
 		for (int i = 0; i < Game::things.size(); i++)
+		{
 			if (Game::things[i] != NULL)
 			{
 				Game::things[i]->tgHitboxRect.x += leLvlMoveX;
 				Game::things[i]->tgHitboxRect.y += leLvlMoveY;
 			}
+		}
 		level.x += leLvlMoveX;
 		level.y += leLvlMoveY;
 		leTotMoveX += leLvlMoveX;

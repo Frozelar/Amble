@@ -34,6 +34,9 @@ POWER_INDEX = 2
 collectibleTypes = { "Bit", "Byte" }
 TOTAL_COLLECTIBLE_TYPES = #collectibleTypes
 
+particleTypes = { "Red", "Gray", "Blue", "BigRed", "BigGray", "BigBlue" }
+TOTAL_PARTICLE_TYPES = #particleTypes
+
 -- {name, # frames or # frame sets}
 graphicsIdentifiers = { 
 	{ {"Title", 1}, {"Underground", 1}, {"Sky", 1}, {"Autumn", 1} }, -- backgrounds (# frames)
@@ -185,7 +188,7 @@ setmetatable(Background, {
 	-- __index = Rectangle,
 	__call = function(pClass, ...)
 		local self = setmetatable({}, pClass)
-		Background:new(...)
+		self:new(...)
 		return self
 	end
 })
@@ -200,7 +203,6 @@ end
 
 --[[
 function Background:bgSetType(pType)
-	print(pType)
 	self.bgType = pType
 	self.bgMaxFrames = graphicsIdentifiers[1][self.bgType][2]
 end
@@ -237,7 +239,7 @@ function Particle:new(pType, px, py)
 	-- local rectdest = Point(0, 0)
 	
 	self.ptRect = Rectangle(px, py, 0, 0)
-	if string.sub(graphicsIdentifiers[6][pType][1], 1, 3) == "Big" then
+	if string.sub(particleTypes[pType], 1, 3) == "Big" then
 		self.ptRect.w = 2
 		self.ptRect.h = 2
 	else
@@ -247,8 +249,22 @@ function Particle:new(pType, px, py)
 	
 	self.ptType = pType	
 	self.ptDestination = Point(px + math.random(-8, 8), py + math.random(-8, 8))
-	self.ptSpeedX = (self.ptDestination.x - self.ptRect.x) - math.random(1, math.abs(math.floor(self.ptDestination.x - self.ptRect.x)) + 1)
-	self.ptSpeedY = (self.ptDestination.y - self.ptRect.y) - math.random(1, math.abs(math.floor(self.ptDestination.y - self.ptRect.y)) + 1)
+	self.ptSpeedX = (self.ptDestination.x - self.ptRect.x)-- - math.random(-8, 8) -- - math.random(1, math.abs(math.floor(self.ptDestination.x - self.ptRect.x)) + 1)
+	if self.ptSpeedX == 0 then
+		if math.random(0, 1) == 0 then
+			self.ptSpeedX = 1
+		else
+			self.ptSpeedX = -1
+		end
+	end
+	self.ptSpeedY = (self.ptDestination.y - self.ptRect.y)-- - math.random(-8, 8) -- - math.random(1, math.abs(math.floor(self.ptDestination.y - self.ptRect.y)) + 1)
+	if self.ptSpeedY == 0 then
+		if math.random(0, 1) == 0 then
+			self.ptSpeedY = 1
+		else
+			self.ptSpeedY = -1
+		end
+	end
 	--[[
 	self.ptDestination = rectToPolar(Point(px + math.random(-8, 8), py + math.random(-8, 8)))  --Point(px + math.random(-8, 8), py + math.random(-8, 8))
 	if self.ptDestination.angle < 0 then
@@ -382,7 +398,11 @@ function Player:plResolveCollision(pDirection)
 	local col = self.tgColliding[pDirection]
 	
 	if things[col].tgType == "tile" then
-		-- print(pDirection .. " " .. col)
+		if direction[pDirection] == "left" then
+			-- spawnParticle(self.tgHitbox.x, self.tgHitbox.y, 3, 1)
+		elseif direction[pDirection] == "right" then
+			-- spawnParticle(self.tgHitbox.x + self.tgHitbox.w, self.tgHitbox.y, 3, 1)
+		end
 	end
 end
 
@@ -522,6 +542,12 @@ function Enemy:enHandleAI()
 	if self.tgSpeed == 0 then
 		self.tgSpeed = DEFAULT_SPEED
 	end
+	if self.tgSpeed > 0 and self.tgSpeed ~= DEFAULT_SPEED then
+		self.tgSpeed = DEFAULT_SPEED
+	end
+	if self.tgSpeed < 0 and self.tgSpeed ~= -DEFAULT_SPEED then
+		self.tgSpeed = -DEFAULT_SPEED
+	end
 	--self.tgHitbox.x = self.tgHitbox.x + self.tgSpeed
 	
 	--[[
@@ -533,7 +559,7 @@ function Enemy:enHandleAI()
 				if thingTypes[things[i].tgType] == "enemy" or thingTypes[things[i].tgType] == "tile" then
 					self.tgSpeed = -self.tgSpeed
 				elseif thingTypes[things[i].tgType] == "player" then
-					print("uh well hi")
+					
 				end
 			end
 		end
@@ -554,10 +580,9 @@ function Enemy:enResolveCollision(pDirection)
 		if col == gPlayerUnit then
 			things[gPlayerUnit].tgHealth = things[gPlayerUnit].tgHealth - self.enPower
 			playAudio(SFX_INDEX, "Hurt")
-			--print(direction[pDirection] .. " " .. col)
 		end
 		if things[col].tgType == "tile" then
-			--print(direction[pDirection] .. " " .. col)
+		
 		end
 	elseif t == "Daub" then
 		
@@ -804,6 +829,14 @@ end
 
 function handleEnvironment()
 	totalParticles = #gParticles
+	
+	-- spawnParticle(math.random(1, 20), math.random(1, 20), 4, 1)
+	
+	for i = 1, #gParticles do
+		if gParticles[i] ~= nil then
+			gParticles[i]:ptCycleFrames()
+		end
+	end
 	for i = 1, #things do
 		if things[i] ~= -1 then
 			if things[i].tgType == "player" then
@@ -843,7 +876,6 @@ function handleEnvironment()
 				if things[gPlayerUnit].tgColliding ~= -1 and things[gPlayerUnit].tgColDir ~= -1 then
 				print(things[gPlayerUnit].tgColliding)
 					if thingTypes[things[things[gPlayerUnit].tgColliding].tgType] == "enemy" then
-						things[i].tgColliding = gPlayerUnit
 						things[i].tgColDir = invertDir(things[gPlayerUnit].tgColDir)
 						things[i]:enResolveCollision()
 					end
@@ -931,6 +963,23 @@ function incGFXscale()
 	-- everything else should be handled in c++
 end
 
+function spawnParticle(px, py, ptype, pnum)
+	local num = pnum
+	local i = 1
+	while num > 0 do
+		if gParticles[i] == nil then
+			gParticles[i] = Particle(ptype, px, py)
+			num = num - 1
+		end
+		i = i + 1
+	end
+end
+
+function deleteParticle(which)
+	-- gParticles[which] = nil
+	table.remove(gParticles, which)
+end
+
 --[[
 function checkCollision(thing1, thing2)
 	if thing2 == nil then
@@ -952,7 +1001,7 @@ function init()
   for i = 1, #things, 1 do
     if things[i] ~= -1 then
       if things[i] == thingTypes["player"] then
-		print("PLAYER MADE EEEE")
+
         things[i] = Player:new(i)
       elseif things[i] == thingTypes["tile"] then
         things[i] = Tile:new(i)
@@ -1000,7 +1049,7 @@ function handleLevelLoad(levelUnits)
 	for i = 1, levelUnits + 1, 1 do
 		--if things[i] == nil then
 		things[i] = -1
-		print("index->(-1) \n")
+
 		--end
 	end
 end

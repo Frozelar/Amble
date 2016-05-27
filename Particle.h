@@ -23,6 +23,7 @@ public:
 	int ptFrame = 0;
 	int ptFrameWaitCounter = 1;
 	int ptNumber = -1;
+	int ptLife = 1;
 	SDL_Point ptDestination;
 	SDL_Rect ptRect;
 };

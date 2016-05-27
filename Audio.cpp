@@ -26,6 +26,16 @@ Audio::Audio()
 
 Audio::~Audio()
 {
+	for (int i = 0; i < music.size(); i++)
+	{
+		Mix_FreeMusic(music[i]);
+		music[i] = NULL;
+	}
+	for (int i = 0; i < sfx.size(); i++)
+	{
+		Mix_FreeChunk(sfx[i]);
+		sfx[i] = NULL;
+	}
 }
 
 bool Audio::auInit()
@@ -37,7 +47,7 @@ bool Audio::auInit()
 	// initialize SDL_Mixer for music
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < NULL)
 	{
-		std::cout << "SDL_Mixer error:" << std::endl;
+		std::cout << "SDL_Mixer error: " << std::endl;
 		std::cout << Mix_GetError() << std::endl;
 		return false;
 	}

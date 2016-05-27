@@ -8,8 +8,10 @@ Enemy::Enemy(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType[
 {
 	tgHitboxRect.w = Game::DEFAULT_ENEMY_W;
 	tgHitboxRect.h = Game::DEFAULT_ENEMY_H;
-	tgHitboxRect.x = (box == NULL ? ((unit - ((unit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W) : box->x);
-	tgHitboxRect.y = (box == NULL ? ((unit / Level::LEVEL_W) * Game::DEFAULT_H) : box->y);
+	// tgHitboxRect.x = (box == NULL ? ((unit - ((unit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W) : box->x);
+	// tgHitboxRect.y = (box == NULL ? ((unit / Level::LEVEL_W) * Game::DEFAULT_H) : box->y);
+	tgHitboxRect.x = (box == NULL ? unit * Game::DEFAULT_W / Game::DEFAULT_W : box->x);
+	tgHitboxRect.y = (box == NULL ? unit * Game::DEFAULT_H / Game::DEFAULT_H : box->y);
 	tgGFXrect.x = tgHitboxRect.x - Game::DEFAULT_GFX_OFFSET;
 	tgGFXrect.y = tgHitboxRect.y - Game::DEFAULT_GFX_OFFSET;
 	tgGFXrect.w = Game::DEFAULT_ENEMY_W + Game::DEFAULT_GFX_OFFSET * 2;
@@ -22,6 +24,7 @@ void Enemy::tgResolveCollision(Thing* thing, int dir)
 	// tgColliding[dir].thing1 = Game::things[tgLevelUnit];
 	tgColliding[dir] = thing->tgLevelUnit;
 
+	/*
 	if (thing->tgType == Game::ThingType["player"] || thing->tgType == Game::ThingType["enemy"])
 	{
 		if (dir == Game::Direction["right"] || dir == Game::Direction["left"])
@@ -38,6 +41,7 @@ void Enemy::tgResolveCollision(Thing* thing, int dir)
 		// if (thing->tgType == Game::ThingType["player"])
 		// 	thing->tgHealth -= enPower;
 	}
+	*/
 	/*
 	else if (thing->tgType == Game::ThingType["tile"])
 	{

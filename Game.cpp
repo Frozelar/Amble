@@ -124,7 +124,7 @@ std::string Game::rExt = ".png";
 SDL_Color Game::highlightColor = { 255, 255, 255, 255 };
 
 // const int Game::MAX_PARTICLES = 4096;
-std::vector<Particle*> Game::particles;
+std::vector<Particle*> Game::gParticles;
 
 SDL_Rect Game::gCamera = { 0, 0, 0, 0 };
 
@@ -180,6 +180,14 @@ Game::~Game()
 			delete gColliding[i];
 			gColliding[i] = NULL;
 		}
+	for (int i = 0; i < gParticles.size(); i++)
+	{
+		if (gParticles[i] != NULL)
+		{
+			delete gParticles[i];
+			gParticles[i] = NULL;
+		}
+	}
 }
 
 bool Game::checkCollision(Thing* thingOne, Thing* thingTwo, int levelunit, bool outputCollision)
@@ -264,11 +272,11 @@ bool Game::applyAI(void)
 			}
 		}
 	}
-	for (int i = 0; i < particles.size(); i++)
+	for (int i = 0; i < gParticles.size(); i++)
 	{
-		if (particles[i] != NULL)
+		if (gParticles[i] != NULL)
 		{
-			particles[i]->ptMove();
+			gParticles[i]->ptMove();
 		}
 	}
 	return true;
@@ -352,27 +360,36 @@ void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 	}
 }
 
-void Game::newParticle(SDL_Rect* location, int type, SDL_Point* destination, int speedX, int speedY)
+void Game::newParticle(SDL_Rect* location, int type, SDL_Point* destination, int speedX, int speedY, int num)
 {
-	int pos = particles.size();
+	int pos = (num == -1 ? gParticles.size() : num);
 	SDL_Rect loc = *location;
-	loc.x += Game::gCamera.x;
-	loc.y += Game::gCamera.y;
-	particles.resize(pos + 1);
-	particles[pos] = new Particle(&loc, type, pos, destination, speedX, speedY);
+	// loc.x += Game::gCamera.x;
+	// loc.y += Game::gCamera.y;
+	if (pos >= gParticles.size())
+		gParticles.resize(pos + 1);
+	else if (gParticles[pos] != NULL)
+		destroyParticle(pos);
+	gParticles[pos] = new Particle(&loc, type, pos, destination, -1, speedX, speedY);
 }
 
 void Game::destroyThing(int num)
 {
-	delete things[num];
-	things[num] = NULL;
+	if (num >= 0 && num < things.size())
+	{
+		delete things[num];
+		things[num] = NULL;
+	}
 }
 
 void Game::destroyParticle(int num)
 {
-	delete particles[num];
-	particles[num] = NULL;
-	particles.resize((num - 1 < 0 ? 0 : num - 1));
+	if (num >= 0 && num < gParticles.size())
+	{
+		delete gParticles[num];
+		gParticles[num] = NULL;
+		gParticles.erase(gParticles.begin() + num);
+	}
 }
 
 void Game::changeGameState(int newState)

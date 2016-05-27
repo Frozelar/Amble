@@ -68,3 +68,4 @@ void close(void);
 int invertDir(int);
 SDL_Point polarToRect(PolarPoint);
 PolarPoint rectToPolar(SDL_Point);
+SDL_Rect multDimensions(SDL_Rect, float);

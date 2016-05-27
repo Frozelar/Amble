@@ -276,10 +276,7 @@ void Graphics::gxRender(bool updateRenderer)
 	}
 
 	bgState = Level::levelBG;
-	Graphics::backgroundTextures[bgState][bgFrame]->txRect.x = 0;
-	Graphics::backgroundTextures[bgState][bgFrame]->txRect.y = 0;
-	Graphics::backgroundTextures[bgState][bgFrame]->txRect.w = Game::WINDOW_W;
-	Graphics::backgroundTextures[bgState][bgFrame]->txRect.h = Game::WINDOW_H;
+	Graphics::backgroundTextures[bgState][bgFrame]->txRect = { 0, 0, Game::WINDOW_W, Game::WINDOW_H };
 	Graphics::backgroundTextures[bgState][bgFrame]->txRender();
 	// gPlayer->tgRender();
 	for (int i = 0; i < Game::things.size(); i++)
@@ -294,12 +291,12 @@ void Graphics::gxRender(bool updateRenderer)
 		}
 	}
 
-	for (int i = 0; i < Game::particles.size(); i++)
+	for (int i = 0; i < Game::gParticles.size(); i++)
 	{
-		if (Game::particles[i] != NULL)
+		if (Game::gParticles[i] != NULL)
 		{
-			if(Game::checkCollisionRects(&Game::particles[i]->ptRect, &cameraRect))
-				Game::particles[i]->ptRender();
+			if(Game::checkCollisionRects(&Game::gParticles[i]->ptRect, &cameraRect))
+				Game::gParticles[i]->ptRender();
 		}
 	}
 
@@ -370,31 +367,20 @@ void Graphics::gxIncScale(bool gfxscale)
 	Game::gBodyFont.font = TTF_OpenFont(bfont.c_str(), Game::gBodyFont.size);
 	Game::gTitleFont.font = TTF_OpenFont(tfont.c_str(), Game::gTitleFont.size);
 
-	Game::gCamera.x *= GFX_MULT;
-	Game::gCamera.y *= GFX_MULT;
-	Game::gCamera.w *= GFX_MULT;
-	Game::gCamera.h *= GFX_MULT;
+	Game::gCamera = multDimensions(Game::gCamera, GFX_MULT);
+	// Game::gCamera.x *= GFX_MULT;
+	// Game::gCamera.y *= GFX_MULT;
+	// Game::gCamera.w *= GFX_MULT;
+	// Game::gCamera.h *= GFX_MULT;
 
-	Game::gPlayer->tgHitboxRect.x *= GFX_MULT;
-	Game::gPlayer->tgHitboxRect.y *= GFX_MULT;
-	Game::gPlayer->tgHitboxRect.w *= GFX_MULT;
-	Game::gPlayer->tgHitboxRect.h *= GFX_MULT;
-	Game::gPlayer->tgGFXrect.x *= GFX_MULT;
-	Game::gPlayer->tgGFXrect.y *= GFX_MULT;
-	Game::gPlayer->tgGFXrect.w *= GFX_MULT;
-	Game::gPlayer->tgGFXrect.h *= GFX_MULT;
+	Game::gPlayer->tgHitboxRect = multDimensions(Game::gPlayer->tgHitboxRect, GFX_MULT);
+	Game::gPlayer->tgGFXrect = multDimensions(Game::gPlayer->tgGFXrect, GFX_MULT);
 	for (int i = 0; i < Game::things.size(); i++)
 	{
 		if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
 		{
-			Game::things[i]->tgHitboxRect.x *= GFX_MULT;
-			Game::things[i]->tgHitboxRect.y *= GFX_MULT;
-			Game::things[i]->tgHitboxRect.w *= GFX_MULT;
-			Game::things[i]->tgHitboxRect.h *= GFX_MULT;
-			Game::things[i]->tgGFXrect.x *= GFX_MULT;
-			Game::things[i]->tgGFXrect.y *= GFX_MULT;
-			Game::things[i]->tgGFXrect.w *= GFX_MULT;
-			Game::things[i]->tgGFXrect.h *= GFX_MULT;
+			Game::things[i]->tgHitboxRect = multDimensions(Game::things[i]->tgHitboxRect, GFX_MULT);
+			Game::things[i]->tgGFXrect = multDimensions(Game::things[i]->tgGFXrect, GFX_MULT);
 		}
 	}
 	for (int i = 0; i < Game::gravityArray.size(); i++)
@@ -406,81 +392,29 @@ void Graphics::gxIncScale(bool gfxscale)
 	for (int i = 0; i < Game::floatArray.size(); i++)
 		Game::floatArray[i] *= GFX_MULT;
 
-	Menu::ttTitleTexture->txRect.x *= GFX_MULT;
-	Menu::ttTitleTexture->txRect.y *= GFX_MULT;
-	Menu::ttTitleTexture->txRect.w *= GFX_MULT;
-	Menu::ttTitleTexture->txRect.h *= GFX_MULT;
-	Menu::menuTexture->txRect.x *= GFX_MULT;
-	Menu::menuTexture->txRect.y *= GFX_MULT;
-	Menu::menuTexture->txRect.w *= GFX_MULT;
-	Menu::menuTexture->txRect.h *= GFX_MULT;
+	Menu::ttTitleTexture->txRect = multDimensions(Menu::ttTitleTexture->txRect, GFX_MULT);
+	Menu::menuTexture->txRect = multDimensions(Menu::menuTexture->txRect, GFX_MULT);
 	for (int i = 0; i < Menu::muOptionTextures.size(); i++)
-	{
 		if (Menu::muOptionTextures[i] != NULL)
-		{
-			Menu::muOptionTextures[i]->txRect.x *= GFX_MULT;
-			Menu::muOptionTextures[i]->txRect.y *= GFX_MULT;
-			Menu::muOptionTextures[i]->txRect.w *= GFX_MULT;
-			Menu::muOptionTextures[i]->txRect.h *= GFX_MULT;
-		}
-	}
+			Menu::muOptionTextures[i]->txRect = multDimensions(Menu::muOptionTextures[i]->txRect, GFX_MULT);
 	for (int i = 0; i < Menu::ttOptionTextures.size(); i++)
-	{
 		if (Menu::ttOptionTextures[i] != NULL)
-		{
-			Menu::ttOptionTextures[i]->txRect.x *= GFX_MULT;
-			Menu::ttOptionTextures[i]->txRect.y *= GFX_MULT;
-			Menu::ttOptionTextures[i]->txRect.w *= GFX_MULT;
-			Menu::ttOptionTextures[i]->txRect.h *= GFX_MULT;
-		}
-	}
+			Menu::ttOptionTextures[i]->txRect = multDimensions(Menu::ttOptionTextures[i]->txRect, GFX_MULT);
 	for (int i = 0; i < Menu::muMiscTextures.size(); i++)
-	{
-		Menu::muMiscTextures[i]->txRect.x *= GFX_MULT;
-		Menu::muMiscTextures[i]->txRect.y *= GFX_MULT;
-		Menu::muMiscTextures[i]->txRect.w *= GFX_MULT;
-		Menu::muMiscTextures[i]->txRect.h *= GFX_MULT;
-	}
+		Menu::muMiscTextures[i]->txRect = multDimensions(Menu::muMiscTextures[i]->txRect, GFX_MULT);
 	for (int i = 0; i < Menu::muGmControlTextures.size(); i++)
-	{
-		Menu::muGmControlTextures[i]->txRect.x *= GFX_MULT;
-		Menu::muGmControlTextures[i]->txRect.y *= GFX_MULT;
-		Menu::muGmControlTextures[i]->txRect.w *= GFX_MULT;
-		Menu::muGmControlTextures[i]->txRect.h *= GFX_MULT;
-	}
+		Menu::muGmControlTextures[i]->txRect = multDimensions(Menu::muGmControlTextures[i]->txRect, GFX_MULT);
 	for (int i = 0; i < Menu::muLeControlTextures.size(); i++)
-	{
-		Menu::muLeControlTextures[i]->txRect.x *= GFX_MULT;
-		Menu::muLeControlTextures[i]->txRect.y *= GFX_MULT;
-		Menu::muLeControlTextures[i]->txRect.w *= GFX_MULT;
-		Menu::muLeControlTextures[i]->txRect.h *= GFX_MULT;
-	}
-	LevelEditor::mouseThing->tgHitboxRect.x *= GFX_MULT;
-	LevelEditor::mouseThing->tgHitboxRect.y *= GFX_MULT;
-	LevelEditor::mouseThing->tgHitboxRect.w *= GFX_MULT;
-	LevelEditor::mouseThing->tgHitboxRect.h *= GFX_MULT;
-	LevelEditor::mouseThing->tgGFXrect.x *= GFX_MULT;
-	LevelEditor::mouseThing->tgGFXrect.y *= GFX_MULT;
-	LevelEditor::mouseThing->tgGFXrect.w *= GFX_MULT;
-	LevelEditor::mouseThing->tgGFXrect.h *= GFX_MULT;
+		Menu::muLeControlTextures[i]->txRect = multDimensions(Menu::muLeControlTextures[i]->txRect, GFX_MULT);
+	LevelEditor::mouseThing->tgHitboxRect = multDimensions(LevelEditor::mouseThing->tgHitboxRect, GFX_MULT);
+	LevelEditor::mouseThing->tgGFXrect = multDimensions(LevelEditor::mouseThing->tgGFXrect, GFX_MULT);
 	for (int i = 0; i < LevelEditor::leMsgTextures.size(); i++)
-	{
-		LevelEditor::leMsgTextures[i]->txRect.x *= GFX_MULT;
-		LevelEditor::leMsgTextures[i]->txRect.y *= GFX_MULT;
-		LevelEditor::leMsgTextures[i]->txRect.w *= GFX_MULT;
-		LevelEditor::leMsgTextures[i]->txRect.h *= GFX_MULT;
-	}
+		LevelEditor::leMsgTextures[i]->txRect = multDimensions(LevelEditor::leMsgTextures[i]->txRect, GFX_MULT);
 	LevelEditor::DEFAULT_LVL_MOVE *= GFX_MULT;
 	LevelEditor::leTotMoveX *= GFX_MULT;
 	LevelEditor::leTotMoveY *= GFX_MULT;
-	LevelEditor::leInputTexture->txRect.x *= GFX_MULT;
-	LevelEditor::leInputTexture->txRect.y *= GFX_MULT;
-	LevelEditor::leInputTexture->txRect.w *= GFX_MULT;
-	LevelEditor::leInputTexture->txRect.h *= GFX_MULT;
-	LevelEditor::level.x *= GFX_MULT;
-	LevelEditor::level.y *= GFX_MULT;
-	LevelEditor::level.w *= GFX_MULT;
-	LevelEditor::level.h *= GFX_MULT;
+	LevelEditor::leInputTexture->txRect = multDimensions(LevelEditor::leInputTexture->txRect, GFX_MULT);
+	LevelEditor::level = multDimensions(LevelEditor::level, GFX_MULT);
 
 	Level::LEVEL_W_PIXELS *= GFX_MULT;
 	Level::LEVEL_H_PIXELS *= GFX_MULT;
