@@ -49,6 +49,7 @@ std::vector< Texture* > Menu::muMiscTextures;	// "Sound Effects", "Music", "Pres
 std::vector< Texture* > Menu::muGmControlTextures;
 std::vector< Texture* > Menu::muLeControlTextures;
 const int Menu::MISC_BUTTON_INDEX = 2;
+const int Menu::COPYRIGHT_INDEX = 3;
 
 Menu::Menu()
 {
@@ -82,12 +83,15 @@ Menu::Menu()
 	menuTexture->txRect.x = (Game::WINDOW_W - menuTexture->txRect.w) / 2;
 	menuTexture->txRect.y = (Game::WINDOW_H - menuTexture->txRect.h) / 2;
 
-	muMiscTextures.resize(3);
+	muMiscTextures.resize(4);
 	for (int i = 0; i < muMiscTextures.size(); i++)
 		muMiscTextures[i] = new Texture(0, 0, 0, 0);
 	muMiscTextures[MISC_BUTTON_INDEX]->txLoadT("Press Button", Game::gHeadingFont.font, Game::gHeadingFont.color);
 	muMiscTextures[MISC_BUTTON_INDEX]->txRect.x = Game::DEFAULT_W;
 	muMiscTextures[MISC_BUTTON_INDEX]->txRect.y = Game::DEFAULT_H;
+	muMiscTextures[COPYRIGHT_INDEX]->txLoadT("Copyright (C) 2015, 2016 Frozelar", Game::gBodyFont.font, Game::gBodyFont.color);
+	muMiscTextures[COPYRIGHT_INDEX]->txRect.x = Game::DEFAULT_W;
+	muMiscTextures[COPYRIGHT_INDEX]->txRect.y = Game::WINDOW_H - muMiscTextures[COPYRIGHT_INDEX]->txRect.h - Game::DEFAULT_H;
 
 	for (int i = 0; i < muOptions.size(); i++)
 	{
@@ -423,6 +427,7 @@ void Menu::muRender(void)
 	{
 		for (int i = 0; i < ttOptionTextures.size(); i++)
 			ttOptionTextures[i]->txRender();
+		muMiscTextures[COPYRIGHT_INDEX]->txRender();
 		ttTitleTexture->txRender();
 	}
 	SDL_RenderPresent(Game::gRenderer);

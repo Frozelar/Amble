@@ -49,5 +49,6 @@ public:
 	static std::vector< Texture* > muGmControlTextures;
 	static std::vector< Texture* > muLeControlTextures;
 	static const int MISC_BUTTON_INDEX;
+	static const int COPYRIGHT_INDEX;
 };
 
