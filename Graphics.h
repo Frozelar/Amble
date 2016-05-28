@@ -40,9 +40,13 @@ public:
 	static bool isFullscreen;
 	static float GFX_SCALE;
 	static float GFX_MULT;
+	static int STAT_BAR_W;
+	static int STAT_BAR_H;
 	static std::vector< std::vector<Texture*> > backgroundTextures;
 	static int bgState;
 	static int bgFrame;
+	static Texture* scoreTexture;
+	static Texture* healthTexture;
 	static std::vector< std::vector<Texture*> > tileTextures;
 	static std::vector< std::vector<Texture*> > playerTextures;
 	static std::vector< std::vector<Texture*> > collectibleTextures;

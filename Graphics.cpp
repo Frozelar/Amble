@@ -30,9 +30,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 bool Graphics::isFullscreen = false;
 float Graphics::GFX_SCALE = 1.0;
 float Graphics::GFX_MULT = 1.0;
+int Graphics::STAT_BAR_W = 4;
+int Graphics::STAT_BAR_H = 8;
 std::vector< std::vector<Texture*> > Graphics::backgroundTextures(Game::BackgroundType["total"]);
 int Graphics::bgState = 0;
 int Graphics::bgFrame = 0;
+Texture* Graphics::scoreTexture;
+Texture* Graphics::healthTexture;
 // Texture Graphics::tileTextures[TOTAL_TILE_TYPES][TOTAL_OBJECT_FRAME_TYPES];
 std::vector< std::vector<Texture*> > Graphics::tileTextures(Game::TileType["total"]);
 std::vector< std::vector<Texture*> > Graphics::playerTextures(Game::EntityFrameType["total"]);
@@ -102,6 +106,10 @@ bool Graphics::gxInit(void)
 		particleTextures[i].resize(TOTAL_OBJECT_FRAME_TYPES);
 	*/
 
+	scoreTexture = new Texture(Game::DEFAULT_W, Game::DEFAULT_H, 0, 0);
+	// scoreTexture->txLoadT(std::to_string(Game::gScore), Game::gBodyFont.font, Game::gBodyFont.color);
+	healthTexture = new Texture(Game::WINDOW_W - STAT_BAR_W - Game::DEFAULT_W, Game::DEFAULT_H, STAT_BAR_W, STAT_BAR_H);
+	healthTexture->txLoadF(Game::rDir + "health" + Game::rExt);
 	for (int i = 0; i < playerIdentifiers.size(); i++)
 	{
 		for (int j = 0; j < playerIdentifiers[i].size(); j++)
@@ -287,6 +295,7 @@ void Graphics::gxRender(bool updateRenderer)
 	SDL_Rect cameraRect{ 0 - Game::DEFAULT_W * Game::DEFAULT_H, 0 - Game::DEFAULT_W * Game::DEFAULT_H,
 		Game::WINDOW_W + Game::DEFAULT_W * Game::DEFAULT_H * 2, Game::WINDOW_H + Game::DEFAULT_W * Game::DEFAULT_H * 2 };
 	Thing camera{ &cameraRect, Game::ThingType["temp"], -1 };
+	// static int oldScore = -1;
 	
 	if (updateRenderer)
 	{
@@ -319,30 +328,65 @@ void Graphics::gxRender(bool updateRenderer)
 		}
 	}
 
+	if (Game::gState == Game::GameState["game"])
+	{
+		for (int i = 0; i < Game::gPlayer->tgHealth; i++)
+		{
+			healthTexture->txRect.x -= healthTexture->txRect.w * i;
+			healthTexture->txRender();
+			healthTexture->txRect.x += healthTexture->txRect.w * i;
+		}
+		scoreTexture->txRect.w = scoreTexture->txRect.h = 0;
+		scoreTexture->txLoadT(std::to_string(Game::gScore), Game::gBodyFont.font, Game::gBodyFont.color);
+		scoreTexture->txRender();
+	}
+
 	if (updateRenderer)
 		SDL_RenderPresent(Game::gRenderer);
 }
 
 void Graphics::gxClose(void)
 {
+	delete scoreTexture;
+	scoreTexture = NULL;
+	delete healthTexture;
+	healthTexture = NULL;
 	for (int i = 0; i < playerIdentifiers.size(); i++)
 		for (int j = 0; j < playerIdentifiers[i].size(); j++)
+		{
 			delete playerTextures[i][j];
+			playerTextures[i][j] = NULL;
+		}
 	for (int i = 0; i < enemyIdentifiers.size(); i++)
 		for (int j = 0; j < enemyIdentifiers[i].size(); j++)
+		{
 			delete enemyTextures[i][j];
+			enemyTextures[i][j] = NULL;
+		}
 	for (int i = 0; i < tileIdentifiers.size(); i++)
 		for (int j = 0; j < tileIdentifiers[i].size(); j++)
+		{
 			delete tileTextures[i][j];
+			tileTextures[i][j] = NULL;
+		}
 	for (int i = 0; i < collectibleIdentifiers.size(); i++)
 		for (int j = 0; j < collectibleIdentifiers[i].size(); j++)
+		{
 			delete collectibleTextures[i][j];
+			collectibleTextures[i][j] = NULL;
+		}
 	for (int i = 0; i < particleIdentifiers.size(); i++)
 		for (int j = 0; j < particleIdentifiers[i].size(); j++)
+		{
 			delete particleTextures[i][j];
+			particleTextures[i][j] = NULL;
+		}
 	for (int i = 0; i < backgroundIdentifiers.size(); i++)
 		for (int j = 0; j < backgroundIdentifiers[i].size(); j++)
+		{
 			delete backgroundTextures[i][j];
+			backgroundTextures[i][j] = NULL;
+		}
 }
 
 void Graphics::gxIncScale(bool gfxscale)
@@ -375,6 +419,10 @@ void Graphics::gxIncScale(bool gfxscale)
 	Game::DEFAULT_ENEMY_H *= GFX_MULT;
 	Game::DEFAULT_SPEED *= GFX_MULT;
 	Game::DEFAULT_GFX_OFFSET *= GFX_MULT;
+
+	STAT_BAR_W *= GFX_MULT;
+	STAT_BAR_H *= GFX_MULT;
+	healthTexture->txRect = multDimensions(healthTexture->txRect, GFX_MULT);
 
 	TTF_CloseFont(Game::gHeadingFont.font);
 	TTF_CloseFont(Game::gBodyFont.font);

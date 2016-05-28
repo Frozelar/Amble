@@ -131,6 +131,7 @@ bool Level::generateLevel(int whichLevel)
 
 	levelMap.close();
 	// Game::centerCamera();
+	Game::gScore = 0;
 	LuaBridge::labChangeLevel();
 	Level::playMusic();
 	// LuaBridge::labChangedLevel = true;
