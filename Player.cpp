@@ -89,7 +89,8 @@ void Player::plHandleEvent(SDL_Event* e)
 			{
 				tgDashing += (tgDashing < 0 ? -1 : 1);
 			}
-			else if (plJumps < 3 && (tgVerticals < -((int)Game::jumpArray.size() - 4) || (tgVerticals >= 1 && tgVerticals <= 8)))
+			else if (plJumps == 1 && (tgVerticals < -((int)Game::jumpArray.size() - plActionFrames) || (tgVerticals >= 1 && tgVerticals <= plActionFrames)) || 
+				plJumps == 2 && (tgVerticals < -((int)Game::jumpArray.size() - plActionFrames / 2) || (tgVerticals >= 1 && tgVerticals <= plActionFrames / 2)))
 			{
 				plJumps++;
 				tgVerticals = -1;
@@ -149,7 +150,7 @@ void Player::plHandleDashing(void)
 		tgDashing = (tgSpeed < 0 ? -1 : 1);
 		plActionCounter = 0;
 	}
-	else if ((plActionCounter >= 4 && (tgDashing == 1 || tgDashing == -1)))
+	else if ((plActionCounter >= plActionFrames * 2 && (tgDashing == 1 || tgDashing == -1)) || tgSpeed == 0)
 	{
 		tgDashing = 0;
 		plActionCounter = 0;
@@ -445,8 +446,9 @@ void Player::tgResolveCollision(Thing* thing, int dir)
 void Player::tgRender(void)
 {
 	tgSyncTexture();
-
-	if ((plJumps < 3 && (tgVerticals < -((int)Game::jumpArray.size() - 4) || (tgVerticals >= 1 && tgVerticals <= 8))) || 
+	
+	if ((plJumps == 1 && (tgVerticals < -((int)Game::jumpArray.size() - plActionFrames) || (tgVerticals >= 1 && tgVerticals <= plActionFrames))) || 
+		(plJumps == 2 && (tgVerticals < -((int)Game::jumpArray.size() - plActionFrames / 2) || (tgVerticals >= 1 && tgVerticals <= plActionFrames / 2))) || 
 		(tgDashing == 1 || tgDashing == -1))
 		Graphics::playerTextures[plState][tgFrame]->txColor(Game::highlightColor.r, Game::highlightColor.g, Game::highlightColor.b);
 	else

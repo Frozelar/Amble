@@ -49,7 +49,7 @@ HEALTH_INDEX = 1
 POWER_INDEX = 2
 
 -- COLLECTIBLE_OFFSET = 200
-collectibleTypes = { "Bit", "Byte" }
+collectibleTypes = { "Bit", "Byte", "Jumpbit" }
 TOTAL_COLLECTIBLE_TYPES = #collectibleTypes
 
 particleTypes = { "Red", "Gray", "Blue", "BigRed", "BigGray", "BigBlue" }
@@ -61,7 +61,7 @@ graphicsIdentifiers = {
 	{ {"DirtBlock", 1}, {"DirtWall", 1} }, -- tiles (# frames (PER tile subidentifier))
 	{ {"" --[[ "Player" ]], 5} }, -- player states (# frame SETS (5 by default)
 	{ {"Bean", 5}, {"Daub", 5} }, -- enemies (# frame SETS (5 by default))
-	{ {"Bit", 4}, {"Byte", 4} }, -- collectibles (# frames)
+	{ {"Bit", 4}, {"Byte", 4}, {"Jumpbit", 4} }, -- collectibles (# frames)
 	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} } -- particles (# frames)
 }
 
@@ -344,7 +344,7 @@ function Thing:new(levelUnit)
 	]]
 end
 
-Player = {plJumps, tgDashing}
+Player = {plJumps, plActionFrames, tgDashing}
 Player.__index = Player
 
 setmetatable(Player, {
@@ -367,6 +367,7 @@ function Player:new(levelUnit)
   self.tgHealth = 100
   self.tgColliding = { -1, -1, -1, -1 }
   self.plJumps = 0
+  self.plActionFrames = 1
   self.tgDashing = 0
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = PLAYER_W
@@ -732,6 +733,9 @@ function Collectible:clCollect()
       points = points + 1
     elseif collectibleTypes[self.tgSubtype] == "Byte" then
       points = points + 8
+	elseif collectibleTypes[self.tgSubtype] == "Jumpbit" then
+	  points = points + 1
+	  things[gPlayerUnit].plActionFrames = things[gPlayerUnit].plActionFrames + 1
     end
 	
 	playAudio(SFX_INDEX, "Collect")
@@ -847,7 +851,7 @@ end
 
 function handleEnvironment()
 	totalParticles = #gParticles
-	
+
 	-- spawnParticle(math.random(1, 20), math.random(1, 20), 4, 1)
 	
 	for i = 1, #gParticles do

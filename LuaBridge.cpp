@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Level.h"
 #include "Thing.h"
 #include "Particle.h"
+#include "Player.h"
 #include <sstream>
 
 // const int LuaBridge::MAX_ARGS = 64;
@@ -1121,12 +1122,7 @@ int LuaBridge::labHandleEnvironment(void)
 	Game::gPlayer.tgHitboxRect.y = Game::things[Game::gPlayer.tgLevelUnit]->tgHitboxRect.y;
 	*/
 	
-	
-	
-	
 	//lua_getglobal(L, "Player");
-
-
 
 	/*
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
@@ -1202,6 +1198,11 @@ int LuaBridge::labPushThings(void)
 					*/
 					//}
 				}
+			}
+			if (Game::things[i]->tgType == Game::ThingType["player"])
+			{
+				lua_pushnumber(L, Game::gPlayer->plActionFrames);	// things, specific thing, plActionFrames
+				lua_setfield(L, -2, "plActionFrames");				// things, specific thing
 			}
 
 			/*
@@ -1281,6 +1282,13 @@ int LuaBridge::labPullThings(bool searchForNewThings)
 			lua_getfield(L, -1, "tgFrame");						// things table, specific thing, tgFrame
 			Game::things[i]->tgFrame = (int)lua_tonumber(L, -1) - 1;
 			lua_pop(L, 1);										// things table, specific thing
+
+			if (Game::things[i]->tgType == Game::ThingType["player"])
+			{
+				lua_getfield(L, -1, "plActionFrames");					// things table, specific thing, plActionFrames
+				Game::gPlayer->plActionFrames = lua_tonumber(L, -1);	// things table, specific thing, plActionFrames
+				lua_pop(L, 1);											// things table, specific thing
+			}
 
 			// lua_getglobal(L, "things");		// things table
 			// lua_pushnumber(L, i);			// things table, i

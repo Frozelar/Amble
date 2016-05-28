@@ -46,6 +46,7 @@ public:
 
 	int plJumps = 0;
 	int plActionCounter = 0;
+	int plActionFrames = 1;
 	int plState = 0;
 	int plOldVerticals = 0;
 	SDL_Rect plOldHitboxRect;
