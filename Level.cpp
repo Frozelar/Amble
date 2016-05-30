@@ -83,22 +83,22 @@ bool Level::generateLevel(int whichLevel)
 	currentLevel = whichLevel;
 
 	levelMap >> unitType;
-	Level::LEVEL_W = unitType;
-	Level::LEVEL_W_PIXELS = Level::LEVEL_W * Game::DEFAULT_W;
+	LEVEL_W = unitType;
+	LEVEL_W_PIXELS = LEVEL_W * Game::DEFAULT_W;
 	levelMap >> unitType;
-	Level::LEVEL_H = unitType;
-	Level::LEVEL_H_PIXELS = Level::LEVEL_H * Game::DEFAULT_H;
-	Level::LEVEL_UNITS = Level::LEVEL_W * Level::LEVEL_H;
-	Level::LEVEL_PIXELS = Level::LEVEL_UNITS * Game::DEFAULT_W;
-	Game::things.resize(Level::LEVEL_UNITS);
-	Game::gColliding.resize(Level::LEVEL_UNITS);
+	LEVEL_H = unitType;
+	LEVEL_H_PIXELS = LEVEL_H * Game::DEFAULT_H;
+	LEVEL_UNITS = LEVEL_W * LEVEL_H;
+	LEVEL_PIXELS = LEVEL_UNITS * Game::DEFAULT_W;
+	Game::things.resize(LEVEL_UNITS);
+	Game::gColliding.resize(LEVEL_UNITS);
 
 	levelMap >> unitType;
 	levelBG = unitType /* - Game::OFFSET["BACKGROUND"] */ - 1;
 	levelMap >> unitType;
 	levelTrack = unitType /* - Game::OFFSET["MUSIC"] */ - 1;
 
-	for (int i = 0, j = 0; i < Level::LEVEL_PIXELS;)
+	for (int i = 0, j = 0; i < LEVEL_PIXELS;)
 	{
 		unitType = -1;
 
@@ -119,7 +119,7 @@ bool Level::generateLevel(int whichLevel)
 			i += Game::DEFAULT_W;
 			j++;
 
-			if (x + Game::DEFAULT_W >= Level::LEVEL_W * Game::DEFAULT_W)
+			if (x + Game::DEFAULT_W >= LEVEL_W * Game::DEFAULT_W)
 			{
 				x = 0;
 				y += Game::DEFAULT_H;
@@ -133,7 +133,7 @@ bool Level::generateLevel(int whichLevel)
 	// Game::centerCamera();
 	Game::gScore = 0;
 	LuaBridge::labChangeLevel();
-	Level::playMusic();
+	playMusic();
 	// LuaBridge::labChangedLevel = true;
 	return true;
 }
@@ -143,35 +143,35 @@ void Level::moveLevel(void)
 	// if (Game::gPlayer.tgSpeed != 0)
 	// 	Level::gLevelMovementsX -= Game::gPlayer.tgSpeed;
 	if (Game::gPlayer->tgHitboxRect.x != Game::gPlayer->plOldHitboxRect.x)
-		Level::gLevelMovementsX += (Game::gPlayer->plOldHitboxRect.x - Game::gPlayer->tgHitboxRect.x);
+		gLevelMovementsX += (Game::gPlayer->plOldHitboxRect.x - Game::gPlayer->tgHitboxRect.x);
 	if (Game::gPlayer->tgHitboxRect.y != Game::gPlayer->plOldHitboxRect.y)
-		Level::gLevelMovementsY += (Game::gPlayer->plOldHitboxRect.y - Game::gPlayer->tgHitboxRect.y);
+		gLevelMovementsY += (Game::gPlayer->plOldHitboxRect.y - Game::gPlayer->tgHitboxRect.y);
 	// if (Game::gPlayer.tgVerticals != 0)
 	// 	Level::gLevelMovementsY += (Game::gPlayer.plOldHitboxRect.y - (Game::gPlayer.tgHitboxRect.y +
 	// 	(Game::gPlayer.tgVerticals > 0 ? Game::gravityArray[Game::gPlayer.tgVerticals] : -Game::jumpArray[-Game::gPlayer.tgVerticals])));
-	if (Level::gLevelMovementsX != 0 || Level::gLevelMovementsY != 0)
+	if (gLevelMovementsX != 0 || gLevelMovementsY != 0)
 	{
-		for (int i = 0; i < Level::LEVEL_UNITS; i++)
+		for (int i = 0; i < LEVEL_UNITS; i++)
 		{
 			if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
 			{
-				Game::things[i]->tgHitboxRect.y += Level::gLevelMovementsY;
-				Game::things[i]->tgHitboxRect.x += Level::gLevelMovementsX;
+				Game::things[i]->tgHitboxRect.y += gLevelMovementsY;
+				Game::things[i]->tgHitboxRect.x += gLevelMovementsX;
 			}
 		}
 		for (int i = 0; i < Game::gParticles.size(); i++)
 		{
 			if (Game::gParticles[i] != NULL)
 			{
-				Game::gParticles[i]->ptRect.x += Level::gLevelMovementsX;
-				Game::gParticles[i]->ptRect.y += Level::gLevelMovementsY;
+				Game::gParticles[i]->ptRect.x += gLevelMovementsX;
+				Game::gParticles[i]->ptRect.y += gLevelMovementsY;
 			}
 		}
 	}
-	Game::gCamera.x += Level::gLevelMovementsX;
-	Game::gCamera.y += Level::gLevelMovementsY;
-	Level::gLevelMovementsX = 0;
-	Level::gLevelMovementsY = 0;
+	Game::gCamera.x += gLevelMovementsX;
+	Game::gCamera.y += gLevelMovementsY;
+	gLevelMovementsX = 0;
+	gLevelMovementsY = 0;
 	Game::gPlayer->tgHitboxRect = Game::gPlayer->plOldHitboxRect;
 
 	// if ((Game::gPlayer.tgSpeed > 0 && Game::gPlayer.tgDirection == LEFT) || 

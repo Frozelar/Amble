@@ -63,6 +63,7 @@ graphicsIdentifiers = {
 	{ {"Bean", 5}, {"Daub", 5} }, -- enemies (# frame SETS (5 by default))
 	{ {"Bit", 4}, {"Byte", 4}, {"Jumpbit", 4} }, -- collectibles (# frames)
 	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} } -- particles (# frames)
+	{ {"Dot", 2} }	-- projectiles (# frames)
 }
 
 tileSubIdentifiers = {
@@ -122,6 +123,8 @@ DEFAULT_COLLECTIBLE_H = 8
 DEFAULT_GFX_OFFSET = 2
 DEFAULT_SPEED = 2
 DEFAULT_COOLDOWN = 128
+DEFAULT_PROJECTILE_W = 2
+DEFAULT_PROJECTILE_H = 2
 
 LEVEL_UNITS = 0
 LEVEL_W = 0
@@ -240,6 +243,24 @@ function Background:bgCycleFrames()
 		self.bgFrame = 1
 		self.bgFrameInterval = 0
 	end
+end
+
+Projectile = { pjType, pjSpeed, pjVerticals, pjHitbox }
+Projectile.__index = Projectile
+
+setmetatable(Projectile, {
+	__call = function(pClass, ...)
+		local self = setmetatable({}, pClass)
+		self:new(...)
+		return self
+	end
+})
+
+function Projectile:new(pType, px, py)
+	pjType = ptype
+	pjHitbox = Rectangle(px, py, DEFAULT_PROJECTILE_W, DEFAULT_PROJECTILE_H)
+	pjSpeed = DEFAULT_SPEED
+	pjVerticals = 0
 end
 
 Particle = { ptType, ptRect, ptDestination, --[[ptLife,]] ptSpeedX, ptSpeedY, ptFrame, ptFrameInterval, ptMaxFrames }
