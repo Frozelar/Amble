@@ -52,6 +52,7 @@ public:
 	static std::vector< std::vector<Texture*> > collectibleTextures;
 	static std::vector< std::vector<Texture*> > enemyTextures;
 	static std::vector< std::vector<Texture*> > particleTextures;
+	static std::vector< std::vector<Texture*> > projectileTextures;
 	static std::vector< std::vector<std::string> > backgroundIdentifiers;
 	static std::vector< std::vector<std::string> > playerIdentifiers;
 	static std::vector< std::vector<std::string> > enemyIdentifiers;
@@ -59,6 +60,7 @@ public:
 	static std::vector<std::string> tileSubIdentifiers;
 	static std::vector< std::vector<std::string> > collectibleIdentifiers;
 	static std::vector< std::vector<std::string> > particleIdentifiers;
+	static std::vector< std::vector<std::string> > projectileIdentifiers;
 	static std::vector< std::vector<std::string> > entityFrameTypeIdentifiers;
 	static std::vector< std::vector<std::string> > objectFrameTypeIdentifiers;
 

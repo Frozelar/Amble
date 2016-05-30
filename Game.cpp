@@ -24,13 +24,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Collectible.h"
 #include "Enemy.h"
 #include "Level.h"
-#include "Particle.h"
 #include "Player.h"
 #include "Thing.h"
 #include "Tile.h"
 #include "Menu.h"
 #include "LevelEditor.h"
 #include "Particle.h"
+#include "Projectile.h"
 
 std::map<std::string, int> Game::Direction;
 std::map<std::string, int> Game::ThingType;
@@ -46,6 +46,7 @@ std::map<std::string, int> Game::BackgroundType;
 std::map<std::string, int> Game::MusicType;
 std::map<std::string, int> Game::SoundEffectType;
 std::map<std::string, int> Game::ParticleType;
+std::map<std::string, int> Game::ProjectileType;
 std::map<std::string, int> Game::GameState;
 
 // window width (in pixels)
@@ -80,6 +81,21 @@ int Game::DEFAULT_COLLECTIBLE_W = 8;
 
 // default collectible hitbox height
 int Game::DEFAULT_COLLECTIBLE_H = 8;
+
+// default particle width
+int Game::DEFAULT_PARTICLE_W = 1;
+
+// default particle height
+int Game::DEFAULT_PARTICLE_H = 1;
+
+// default projectile width
+int Game::DEFAULT_PROJECTILE_W = 2;
+
+// default projectile height
+int Game::DEFAULT_PROJECTILE_H = 2;
+
+// default time before projectiles will despawn if they do not hit anything
+int Game::DEFAULT_PROJECTILE_LIFE = 300;
 
 // default offset value for graphics
 int Game::DEFAULT_GFX_OFFSET = 2;
@@ -144,6 +160,7 @@ SDL_Color Game::highlightColor = { 255, 255, 255, 255 };
 
 // const int Game::MAX_PARTICLES = 4096;
 std::vector<Particle*> Game::gParticles;
+std::vector<Projectile*> Game::gProjectiles;
 
 SDL_Rect Game::gCamera = { 0, 0, 0, 0 };
 
@@ -205,6 +222,14 @@ Game::~Game()
 		{
 			delete gParticles[i];
 			gParticles[i] = NULL;
+		}
+	}
+	for (int i = 0; i < gProjectiles.size(); i++)
+	{
+		if (gProjectiles[i] != NULL)
+		{
+			delete gProjectiles[i];
+			gProjectiles[i] = NULL;
 		}
 	}
 }
@@ -282,7 +307,7 @@ bool Game::applyAI(void)
 		{
 			if (things[i]->tgType != ThingType["player"])
 				things[i]->tgApplyAI();
-			if (things[i]->tgHealth == 0)
+			if (things[i]->tgHealth <= 0)
 			{
 				if (things[i]->tgType == ThingType["player"])
 					return false;
@@ -292,12 +317,11 @@ bool Game::applyAI(void)
 		}
 	}
 	for (int i = 0; i < gParticles.size(); i++)
-	{
 		if (gParticles[i] != NULL)
-		{
 			gParticles[i]->ptMove();
-		}
-	}
+	for (int i = 0; i < gProjectiles.size(); i++)
+		if (gProjectiles[i] != NULL)
+			gProjectiles[i]->pjMove();
 	return true;
 }
 
@@ -392,6 +416,16 @@ void Game::newParticle(SDL_Rect* location, int type, SDL_Point* destination, int
 	gParticles[pos] = new Particle(&loc, type, pos, destination, -1, speedX, speedY);
 }
 
+void Game::newProjectile(SDL_Rect* location, int type, int power, int num, int what)
+{
+	int pos = (num == -1 ? gProjectiles.size() : num);
+	if (pos >= gProjectiles.size())
+		gProjectiles.resize(pos + 1);
+	else if (gProjectiles[pos] != NULL)
+		destroyProjectile(pos);
+	gProjectiles[pos] = new Projectile(location, type, power, num, what);
+}
+
 void Game::destroyThing(int num)
 {
 	if (num >= 0 && num < things.size())
@@ -408,6 +442,16 @@ void Game::destroyParticle(int num)
 		delete gParticles[num];
 		gParticles[num] = NULL;
 		gParticles.erase(gParticles.begin() + num);
+	}
+}
+
+void Game::destroyProjectile(int num)
+{
+	if (num >= 0 && num < gProjectiles.size())
+	{
+		delete gProjectiles[num];
+		gProjectiles[num] = NULL;
+		gProjectiles.erase(gProjectiles.begin() + num);
 	}
 }
 

@@ -153,6 +153,7 @@ public:
 	static std::map<std::string, int> MusicType;
 	static std::map<std::string, int> SoundEffectType;
 	static std::map<std::string, int> ParticleType;
+	static std::map<std::string, int> ProjectileType;
 	static std::map<std::string, int> GameState;
 	// static const int TILE_TYPE_OFFSET = 1000;
 	// static const int ENEMY_TYPE_OFFSET = 2000;
@@ -173,6 +174,11 @@ public:
 	static int DEFAULT_COLLECTIBLE_H;
 	static int DEFAULT_GFX_OFFSET;
 	static int DEFAULT_SPEED;
+	static int DEFAULT_PARTICLE_W;
+	static int DEFAULT_PARTICLE_H;
+	static int DEFAULT_PROJECTILE_W;
+	static int DEFAULT_PROJECTILE_H;
+	static int DEFAULT_PROJECTILE_LIFE;
 	// static const int TOTAL_COLLISIONS;
 	// static const int TOTAL_DIRECTIONS;
 	// static const int MAX_PARTICLES;
@@ -211,6 +217,7 @@ public:
 	static Menu* gMenu;
 	static std::vector<Thing*> things;
 	static std::vector<Particle*> gParticles;
+	static std::vector<Projectile*> gProjectiles;
 	static SDL_Rect gCamera;
 
 	// static Game gGame;
@@ -221,8 +228,10 @@ public:
 	// int type, int levelunit, int x (optional if levelunit is given), int y (optional if levelunit is given), int thingtype (use ONLY if offset is not used with the type)
 	static void newThing(int = -1, int = -1, int = -1, int = -1, int = -1);
 	static void newParticle(SDL_Rect*, int, SDL_Point*, int = -1, int = -1, int = -1);
+	static void newProjectile(SDL_Rect*, int, int, int, int);
 	static void destroyThing(int);
 	static void destroyParticle(int);
+	static void destroyProjectile(int);
 	static void changeGameState(int);
 	static void readCFG(bool = true);
 	static void writeCFG(void);

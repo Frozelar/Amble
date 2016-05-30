@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "LuaBridge.h"
 #include "Audio.h"
 #include "Particle.h"
+#include "Projectile.h"
 
 // default units in the level
 int Level::LEVEL_UNITS = Level::levelW() * Level::levelH();
@@ -165,6 +166,14 @@ void Level::moveLevel(void)
 			{
 				Game::gParticles[i]->ptRect.x += gLevelMovementsX;
 				Game::gParticles[i]->ptRect.y += gLevelMovementsY;
+			}
+		}
+		for (int i = 0; i < Game::gProjectiles.size(); i++)
+		{
+			if (Game::gProjectiles[i] != NULL)
+			{
+				Game::gProjectiles[i]->pjRect.x += gLevelMovementsX;
+				Game::gProjectiles[i]->pjRect.y += gLevelMovementsY;
 			}
 		}
 	}

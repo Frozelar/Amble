@@ -44,6 +44,7 @@ class Graphics;
 class Audio;
 class Game;
 class Particle;
+class Projectile;
 class Level;
 class LuaBridge;
 class Menu;

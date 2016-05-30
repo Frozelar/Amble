@@ -55,6 +55,9 @@ TOTAL_COLLECTIBLE_TYPES = #collectibleTypes
 particleTypes = { "Red", "Gray", "Blue", "BigRed", "BigGray", "BigBlue" }
 TOTAL_PARTICLE_TYPES = #particleTypes
 
+projectileTypes = { "Dot" }
+TOTAL_PROJECTILE_TYPES = #projectileTypes
+
 -- {name, # frames or # frame sets}
 graphicsIdentifiers = { 
 	{ {"Title", 1}, {"Underground", 1}, {"Sky", 1}, {"Autumn", 1} }, -- backgrounds (# frames)
@@ -62,7 +65,7 @@ graphicsIdentifiers = {
 	{ {"" --[[ "Player" ]], 5} }, -- player states (# frame SETS (5 by default)
 	{ {"Bean", 5}, {"Daub", 5} }, -- enemies (# frame SETS (5 by default))
 	{ {"Bit", 4}, {"Byte", 4}, {"Jumpbit", 4} }, -- collectibles (# frames)
-	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} } -- particles (# frames)
+	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} }, -- particles (# frames)
 	{ {"Dot", 2} }	-- projectiles (# frames)
 }
 
@@ -123,8 +126,11 @@ DEFAULT_COLLECTIBLE_H = 8
 DEFAULT_GFX_OFFSET = 2
 DEFAULT_SPEED = 2
 DEFAULT_COOLDOWN = 128
+DEFAULT_PARTICLE_W = 1
+DEFAULT_PARTICLE_H = 1
 DEFAULT_PROJECTILE_W = 2
 DEFAULT_PROJECTILE_H = 2
+DEFAULT_PROJECTILE_LIFE = 300
 
 LEVEL_UNITS = 0
 LEVEL_W = 0
@@ -245,7 +251,7 @@ function Background:bgCycleFrames()
 	end
 end
 
-Projectile = { pjType, pjSpeed, pjVerticals, pjHitbox }
+Projectile = { pjType, pjSpeed, pjVerticals, pjRect, pjFrame, pjFrameInterval, pjMaxFrames, pjWhatShotIt, pjPower }
 Projectile.__index = Projectile
 
 setmetatable(Projectile, {
@@ -256,11 +262,59 @@ setmetatable(Projectile, {
 	end
 })
 
-function Projectile:new(pType, px, py)
-	pjType = ptype
-	pjHitbox = Rectangle(px, py, DEFAULT_PROJECTILE_W, DEFAULT_PROJECTILE_H)
-	pjSpeed = DEFAULT_SPEED
-	pjVerticals = 0
+function Projectile:new(pType, px, py, pWhat, pDirection)
+	self.pjType = pType
+	self.pjRect = Rectangle(px, py, DEFAULT_PROJECTILE_W, DEFAULT_PROJECTILE_H)
+	if pDirection == "right" then
+		self.pjSpeed = DEFAULT_SPEED
+		self.pjVerticals = 0
+	elseif pDirection == "left" then
+		self.pjSpeed = -DEFAULT_SPEED
+		self.pjVerticals = 0
+	elseif pDirection == "up" then
+		self.pjSpeed = 0
+		self.pjVerticals = -1
+	elseif pDirection == "down" then
+		self.pjSpeed = 0
+		self.pjVerticals = 1
+	end
+	self.pjWhatShotIt = pWhat
+	self.pjFrame = 0
+	self.pjFrameInterval = 0
+	self.pjMaxFrames = graphicsIdentifiers[7][self.pjType][2]
+	
+	if projectileTypes[pType] == "Dot" then
+		self.pjPower = 5
+	end
+end
+
+function Projectile:pjCycleFrames()
+	if self.pjFrameInterval % 4 == 0 then
+		self.pjFrame = self.pjFrame + 1
+		self.pjFrameInterval = 0
+	end
+	if self.pjFrame > self.pjMaxFrames then
+		self.pjFrame = 1
+		self.pjFrameInterval = 0
+	end
+end
+
+function Projectile:pjMove()
+	local t = projectileTypes[self.pjType]
+	
+	if t == "Dot" then
+		self.pjRect.x = self.pjRect.x + self.pjSpeed
+	end
+end
+
+function pjResolveCollision(whichProj, whichThing)
+	local t = projectileTypes[gProjectiles[whichProj].pjType]
+	
+	if t == "Dot" then
+		if whichThing ~= -1 and things[whichThing].tgType ~= "tile" then
+			playAudio(SFX_INDEX, "Hurt")
+		end
+	end
 end
 
 Particle = { ptType, ptRect, ptDestination, --[[ptLife,]] ptSpeedX, ptSpeedY, ptFrame, ptFrameInterval, ptMaxFrames }
@@ -279,11 +333,11 @@ function Particle:new(pType, px, py)
 	
 	self.ptRect = Rectangle(px, py, 0, 0)
 	if string.sub(particleTypes[pType], 1, 3) == "Big" then
-		self.ptRect.w = 2
-		self.ptRect.h = 2
+		self.ptRect.w = DEFAULT_PARTICLE_W * 2
+		self.ptRect.h = DEFAULT_PARTICLE_H * 2
 	else
-		self.ptRect.w = 1
-		self.ptRect.h = 1
+		self.ptRect.w = DEFAULT_PARTICLE_W
+		self.ptRect.h = DEFAULT_PARTICLE_H
 	end
 	
 	self.ptType = pType	
@@ -606,8 +660,23 @@ function Enemy:enHandleAI()
 	end
 	]]
   elseif t == "Daub" then
-		self.tgSpeed = 0
-	
+	if self.tgSpeed == 0 then
+		self.tgSpeed = DEFAULT_SPEED / 2
+	end
+	if self.tgSpeed > 0 and self.tgSpeed ~= DEFAULT_SPEED / 2 then
+		self.tgSpeed = DEFAULT_SPEED / 2
+	end
+	if self.tgSpeed < 0 and self.tgSpeed ~= -DEFAULT_SPEED / 2 then
+		self.tgSpeed = -DEFAULT_SPEED / 2
+	end
+	if self.enCooldown <= 0 then
+		if self.tgSpeed > 0 then
+			spawnProjectile(self.tgHitbox.x, self.tgHitbox.y, 1, self.tgType, "right")
+		elseif self.tgSpeed < 0 then
+			spawnProjectile(self.tgHitbox.x, self.tgHitbox.y, 1, self.tgType, "left")
+		end
+		self.enCooldown = DEFAULT_COOLDOWN
+	end
   end
 end
 
@@ -777,6 +846,8 @@ gBackground = Background()
 gPlayerUnit = 0
 gParticles = {}
 totalParticles = #gParticles
+gProjectiles = {}
+totalProjectiles = #gProjectiles
 
 -- converts a rectangular point to a polar point (with theta expressed in DEGREES)
 function rectToPolar(rcoord)
@@ -872,12 +943,17 @@ end
 
 function handleEnvironment()
 	totalParticles = #gParticles
-
-	-- spawnParticle(math.random(1, 20), math.random(1, 20), 4, 1)
+	totalProjectiles = #gProjectiles
 	
 	for i = 1, #gParticles do
 		if gParticles[i] ~= nil then
 			gParticles[i]:ptCycleFrames()
+		end
+	end
+	for i = 1, #gProjectiles do
+		if gProjectiles[i] ~= nil then
+			gProjectiles[i]:pjCycleFrames()
+			gProjectiles[i]:pjMove()
 		end
 	end
 	for i = 1, #things do
@@ -980,8 +1056,28 @@ function incGFXscale()
 	DEFAULT_ENEMY_H = DEFAULT_ENEMY_H * GFX_MULT
 	DEFAULT_COLLECTIBLE_W = DEFAULT_COLLECTIBLE_W * GFX_MULT
 	DEFAULT_COLLECTIBLE_H = DEFAULT_COLLECTIBLE_H * GFX_MULT
+	DEFAULT_PARTICLE_W = DEFAULT_PARTICLE_W * GFX_MULT
+	DEFAULT_PARTICLE_H = DEFAULT_PARTICLE_H * GFX_MULT
+	DEFAULT_PROJECTILE_W = DEFAULT_PROJECTILE_W * GFX_MULT
+	DEFAULT_PROJECTILE_H = DEFAULT_PROJECTILE_H * GFX_MULT
 	DEFAULT_GFX_OFFSET = DEFAULT_GFX_OFFSET * GFX_MULT
 	DEFAULT_SPEED = DEFAULT_SPEED * GFX_MULT
+	for i = 1, #gParticles do
+		if gParticles[i] ~= nil then
+			gParticles[i].ptRect.x = gParticles[i].ptRect.x * GFX_MULT
+			gParticles[i].ptRect.y = gParticles[i].ptRect.y * GFX_MULT
+			gParticles[i].ptRect.w = gParticles[i].ptRect.w * GFX_MULT
+			gParticles[i].ptRect.h = gParticles[i].ptRect.h * GFX_MULT
+		end
+	end
+	for i = 1, #gProjectiles do
+		if gProjectiles[i] ~= nil then
+			gProjectiles[i].pjRect.x = gProjectiles[i].pjRect.x * GFX_MULT
+			gProjectiles[i].pjRect.y = gProjectiles[i].pjRect.y * GFX_MULT
+			gProjectiles[i].pjRect.w = gProjectiles[i].pjRect.w * GFX_MULT
+			gProjectiles[i].pjRect.h = gProjectiles[i].pjRect.h * GFX_MULT
+		end
+	end
 	for i = 1, #jumpArray do
 		jumpArray[i] = jumpArray[i] * GFX_MULT
 	end
@@ -1021,6 +1117,21 @@ end
 function deleteParticle(which)
 	-- gParticles[which] = nil
 	table.remove(gParticles, which)
+end
+
+function spawnProjectile(px, py, ptype, pwhat, pdirection)
+	local i = 1
+	while true do
+		if gProjectiles[i] == nil then
+			gProjectiles[i] = Projectile(ptype, px, py, pwhat, pdirection)
+			return
+		end
+		i = i + 1
+	end
+end
+
+function deleteProjectile(which)
+	table.remove(gProjectiles, which)
 end
 
 --[[

@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Menu.h"
 #include "LevelEditor.h"
 #include "Particle.h"
+#include "Projectile.h"
 
 bool Graphics::isFullscreen = false;
 float Graphics::GFX_SCALE = 1.0;
@@ -43,6 +44,7 @@ std::vector< std::vector<Texture*> > Graphics::playerTextures(Game::EntityFrameT
 std::vector< std::vector<Texture*> > Graphics::collectibleTextures(Game::CollectibleType["total"]);
 std::vector< std::vector<Texture*> > Graphics::enemyTextures(Game::EnemyType["total"]);
 std::vector< std::vector<Texture*> > Graphics::particleTextures(Game::ParticleType["total"]);
+std::vector< std::vector<Texture*> > Graphics::projectileTextures(Game::ProjectileType["total"]);
 std::vector< std::vector<std::string> > Graphics::backgroundIdentifiers(Game::BackgroundType["total"]);
 std::vector< std::vector<std::string> > Graphics::playerIdentifiers;
 std::vector< std::vector<std::string> > Graphics::enemyIdentifiers(Game::EnemyType["total"]);
@@ -50,6 +52,7 @@ std::vector< std::vector<std::string> > Graphics::tileIdentifiers(Game::TileType
 std::vector<std::string> Graphics::tileSubIdentifiers(Game::TileSubType["total"]);
 std::vector< std::vector<std::string> > Graphics::collectibleIdentifiers(Game::CollectibleType["total"]);
 std::vector< std::vector<std::string> > Graphics::particleIdentifiers(Game::ParticleType["total"]);
+std::vector< std::vector<std::string> > Graphics::projectileIdentifiers(Game::ProjectileType["total"]);
 std::vector< std::vector<std::string> > Graphics::entityFrameTypeIdentifiers(Game::EntityFrameType["total"]);
 std::vector< std::vector<std::string> > Graphics::objectFrameTypeIdentifiers(Game::ObjectFrameType["total"]);
 
@@ -153,6 +156,14 @@ bool Graphics::gxInit(void)
 			// particleTextures[i].resize(j + 1);
 			particleTextures[i][j] = new Texture();
 			particleTextures[i][j]->txLoadF(Game::rDir + "pt" + particleIdentifiers[i][j] + Game::rExt);
+		}
+	}
+	for (int i = 0; i < projectileIdentifiers.size(); i++)
+	{
+		for (int j = 0; j < projectileIdentifiers[i].size(); j++)
+		{
+			projectileTextures[i][j] = new Texture();
+			projectileTextures[i][j]->txLoadF(Game::rDir + "pj" + projectileIdentifiers[i][j] + Game::rExt);
 		}
 	}
 	for (int i = 0; i < backgroundIdentifiers.size(); i++)
@@ -320,13 +331,14 @@ void Graphics::gxRender(bool updateRenderer)
 	}
 
 	for (int i = 0; i < Game::gParticles.size(); i++)
-	{
 		if (Game::gParticles[i] != NULL)
-		{
 			if(Game::checkCollisionRects(&Game::gParticles[i]->ptRect, &cameraRect))
 				Game::gParticles[i]->ptRender();
-		}
-	}
+
+	for (int i = 0; i < Game::gProjectiles.size(); i++)
+		if (Game::gProjectiles[i] != NULL)
+			if (Game::checkCollisionRects(&Game::gProjectiles[i]->pjRect, &cameraRect))
+				Game::gProjectiles[i]->pjRender();
 
 	if (Game::gState == Game::GameState["game"])
 	{
@@ -381,6 +393,12 @@ void Graphics::gxClose(void)
 			delete particleTextures[i][j];
 			particleTextures[i][j] = NULL;
 		}
+	for (int i = 0; i < projectileIdentifiers.size(); i++)
+		for (int j = 0; j < projectileIdentifiers[i].size(); j++)
+		{
+			delete projectileTextures[i][j];
+			projectileTextures[i][j] = NULL;
+		}
 	for (int i = 0; i < backgroundIdentifiers.size(); i++)
 		for (int j = 0; j < backgroundIdentifiers[i].size(); j++)
 		{
@@ -417,6 +435,13 @@ void Graphics::gxIncScale(bool gfxscale)
 	Game::PLAYER_H *= GFX_MULT;
 	Game::DEFAULT_ENEMY_W *= GFX_MULT;
 	Game::DEFAULT_ENEMY_H *= GFX_MULT;
+	Game::DEFAULT_COLLECTIBLE_W *= GFX_MULT;
+	Game::DEFAULT_COLLECTIBLE_H *= GFX_MULT;
+	Game::DEFAULT_PARTICLE_W *= GFX_MULT;
+	Game::DEFAULT_PARTICLE_H *= GFX_MULT;
+	Game::DEFAULT_PROJECTILE_W *= GFX_MULT;
+	Game::DEFAULT_PROJECTILE_H *= GFX_MULT;
+	Game::DEFAULT_PROJECTILE_LIFE *= GFX_MULT;
 	Game::DEFAULT_SPEED *= GFX_MULT;
 	Game::DEFAULT_GFX_OFFSET *= GFX_MULT;
 
@@ -450,6 +475,12 @@ void Graphics::gxIncScale(bool gfxscale)
 			Game::things[i]->tgGFXrect = multDimensions(Game::things[i]->tgGFXrect, GFX_MULT);
 		}
 	}
+	for (int i = 0; i < Game::gParticles.size(); i++)
+		if (Game::gParticles[i] != NULL)
+			Game::gParticles[i]->ptRect = multDimensions(Game::gParticles[i]->ptRect, GFX_MULT);
+	for (int i = 0; i < Game::gProjectiles.size(); i++)
+		if (Game::gProjectiles[i] != NULL)
+			Game::gProjectiles[i]->pjRect = multDimensions(Game::gProjectiles[i]->pjRect, GFX_MULT);
 	for (int i = 0; i < Game::gravityArray.size(); i++)
 		Game::gravityArray[i] *= GFX_MULT;
 	for (int i = 0; i < Game::jumpArray.size(); i++)
