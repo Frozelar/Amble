@@ -1023,6 +1023,12 @@ int LuaBridge::labHandleEnvironment(void)
 				lua_pushnil(L);											// totalParticles, gParticles, nil (just so that lua_pop(L, 2) works)
 				Game::destroyParticle(i);
 			}
+			else if (Game::gParticles[i] != NULL)
+			{
+				lua_getfield(L, -1, "ptFrame");							// totalParticles, gParticles, specific particle, ptFrame
+				Game::gParticles[i]->ptFrame = lua_tonumber(L, -1) - 1;
+				lua_pop(L, 1);											// totalParticles, gParticles, specific particle
+			}
 		}
 		lua_pop(L, 2);													// totalParticles
 	}
@@ -1082,6 +1088,9 @@ int LuaBridge::labHandleEnvironment(void)
 				lua_getfield(L, -4, "h");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x, y, w, h
 				Game::gProjectiles[i]->pjRect = { (int)lua_tonumber(L, -4), (int)lua_tonumber(L, -3), (int)lua_tonumber(L, -2), (int)lua_tonumber(L, -1) };
 				lua_pop(L, 5);											// totalProjectiles, gProjectiles, specific projectile
+				lua_getfield(L, -1, "pjFrame");							// totalProjectiles, gProjectiles, specific projectile, pjFrame
+				Game::gProjectiles[i]->pjFrame = lua_tonumber(L, -1) - 1;
+				lua_pop(L, 1);											// totalProjectiles, gProjectiles, specific projectile
 			}
 		}
 		lua_pop(L, 2);													// totalProjectiles
@@ -1315,6 +1324,14 @@ int LuaBridge::labPushThings(void)
 				lua_pushnumber(L, Game::gPlayer->plActionFrames);	// things, specific thing, plActionFrames
 				lua_setfield(L, -2, "plActionFrames");				// things, specific thing
 			}
+			/*
+			if (Game::things[i]->tgType == Game::ThingType["enemy"] && Game::things[i]->tgHealth == 0)
+			{
+				lua_getglobal(L, "enDie");							// things, specific thing, enDie()
+				lua_pushnumber(L, Game::things[i]->tgLevelUnit);	// things, specific thing, enDie(), tgLevelUnit
+				lua_call(L, 1, 0);									// things, specific thing
+			}
+			*/
 
 			/*
 			if (Game::things[i]->tgType == Game::ThingType["enemy"])

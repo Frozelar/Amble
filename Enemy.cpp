@@ -41,6 +41,9 @@ Enemy::Enemy(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType[
 void Enemy::tgResolveCollision(Thing* thing, int dir)
 {
 	// tgColliding[dir].thing1 = Game::things[tgLevelUnit];
+	for (int i = 0; i < tgColliding.size(); i++)
+		if (tgColliding[i] == thing->tgLevelUnit)
+			return;
 	tgColliding[dir] = thing->tgLevelUnit;
 
 	/*
@@ -173,12 +176,15 @@ void Enemy::tgApplyAI(void)
 			for (int i = 0; i < Game::gColliding.size(); i++)
 				if (Game::gColliding[i] != NULL)
 				{
+					// if (Game::gColliding[i]->thing2->tgLevelUnit != tgColliding[Game::Direction["up"]] && Game::gColliding[i]->thing2->tgLevelUnit != tgColliding[Game::Direction["down"]])
+					// {
 					if (tgSpeed > 0)
 						right = true;
 					else if (tgSpeed < 0)
 						left = true;
 					// collided = true;
 					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgSpeed > 0 ? Game::Direction["right"] : Game::Direction["left"]));
+					// }
 				}
 	}
 	if (!left /* !collided || (collided && tgSpeed > 0) */)

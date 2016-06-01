@@ -279,7 +279,7 @@ function Projectile:new(pType, px, py, pWhat, pDirection)
 		self.pjVerticals = 1
 	end
 	self.pjWhatShotIt = pWhat
-	self.pjFrame = 0
+	self.pjFrame = 1
 	self.pjFrameInterval = 0
 	self.pjMaxFrames = graphicsIdentifiers[7][self.pjType][2]
 	
@@ -289,7 +289,7 @@ function Projectile:new(pType, px, py, pWhat, pDirection)
 end
 
 function Projectile:pjCycleFrames()
-	if self.pjFrameInterval % 4 == 0 then
+	if self.pjFrameInterval > 4 then
 		self.pjFrame = self.pjFrame + 1
 		self.pjFrameInterval = 0
 	end
@@ -297,6 +297,7 @@ function Projectile:pjCycleFrames()
 		self.pjFrame = 1
 		self.pjFrameInterval = 0
 	end
+	self.pjFrameInterval = self.pjFrameInterval + 1
 end
 
 function Projectile:pjMove()
@@ -369,13 +370,13 @@ function Particle:new(pType, px, py)
 	self.ptSpeedY = (polarToRect(self.ptDestination).y - self.ptRect.y) - math.random(1, math.abs(math.floor(rectdest.y - self.ptRect.y)) + 1)
 	]]
 	-- self.ptLife = ((px - self.ptDestination.x) + (py - self.ptDestination.y)) / ptSpeed
-	self.ptFrame = 0
+	self.ptFrame = 1
 	self.ptFrameInterval = 0
 	self.ptMaxFrames = graphicsIdentifiers[6][self.ptType][2]
 end
 
 function Particle:ptCycleFrames()
-	if self.ptFrameInterval % 4 == 0 then
+	if self.ptFrameInterval > 4 then
 		self.ptFrame = self.ptFrame + 1
 		self.ptFrameInterval = 0
 	end
@@ -383,6 +384,7 @@ function Particle:ptCycleFrames()
 		self.ptFrame = 1
 		self.ptFrameInterval = 0
 	end
+	self.ptFrameInterval = self.ptFrameInterval + 1
 end
 
 Thing = { tgType, tgVerticals, tgSpeed, tgHitbox, tgLevelUnit, tgHealth, tgFrame, tgFrameInterval, tgMaxFrames, tgColliding, tgColDir }
@@ -419,7 +421,7 @@ function Thing:new(levelUnit)
 	]]
 end
 
-Player = {plJumps, plActionFrames, tgDashing}
+Player = {plJumps, plActionFrames, plPower, tgDashing}
 Player.__index = Player
 
 setmetatable(Player, {
@@ -444,6 +446,7 @@ function Player:new(levelUnit)
   self.plJumps = 0
   self.plActionFrames = 1
   self.tgDashing = 0
+  self.plPower = 10
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgHitbox.w = PLAYER_W
   self.tgHitbox.h = PLAYER_H
@@ -671,7 +674,7 @@ function Enemy:enHandleAI()
 	end
 	if self.enCooldown <= 0 then
 		if self.tgSpeed > 0 then
-			spawnProjectile(self.tgHitbox.x, self.tgHitbox.y, 1, self.tgType, "right")
+			spawnProjectile(self.tgHitbox.x + self.tgHitbox.w, self.tgHitbox.y, 1, self.tgType, "right")
 		elseif self.tgSpeed < 0 then
 			spawnProjectile(self.tgHitbox.x, self.tgHitbox.y, 1, self.tgType, "left")
 		end
@@ -684,17 +687,28 @@ end
 function Enemy:enResolveCollision(pDirection)
 	local t = enemyTypes[self.tgSubtype]
 	local col = self.tgColliding[pDirection]
-	
-	if t == "Bean" then
-		if col == gPlayerUnit then
-			things[gPlayerUnit].tgHealth = things[gPlayerUnit].tgHealth - self.enPower
-			playAudio(SFX_INDEX, "Hurt")
+	print(self.tgHealth)
+	if t == "Bean" or t == "Daub" then
+		if things[col].tgType == "player" then
+			if direction[pDirection] == "down" then
+				self.tgHealth = self.tgHealth - things[gPlayerUnit].plPower
+				if things[gPlayerUnit].tgVerticals > 0 then
+					things[gPlayerUnit].tgHitbox.y = things[gPlayerUnit].tgHitbox.y - gravityArray[things[gPlayerUnit].tgVerticals]
+				end
+				things[gPlayerUnit].tgVerticals = -1
+			else -- if things[self.tgColliding[4]].tgType ~= "player" then
+				things[gPlayerUnit].tgHealth = things[gPlayerUnit].tgHealth - self.enPower
+				playAudio(SFX_INDEX, "Hurt")
+			end
 		end
 		if things[col].tgType == "tile" then
 		
 		end
 	elseif t == "Daub" then
 		
+	end
+	if self.tgHealth <= 0 then
+		enDie(self.tgLevelUnit)
 	end
 end
 
@@ -780,6 +794,12 @@ function Enemy:enCycleFrames()
 	--	self.tgFrame = 1
 	--	self.tgFrameInterval = 0
 	-- end
+end
+
+function enDie(which)
+	playAudio(SFX_INDEX, "Explosion")
+	spawnParticle(things[which].tgHitbox.x, things[which].tgHitbox.y, 1, math.random(4, 8))
+	spawnParticle(things[which].tgHitbox.x, things[which].tgHitbox.y, 4, math.random(0, 2))
 end
 
 Collectible = {tgSubtype}
