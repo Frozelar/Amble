@@ -42,14 +42,14 @@ tileTypes = { "dirtBlock", "dirtWall" }
 TOTAL_TILE_TYPES = #tileTypes
 
 -- ENEMY_OFFSET = 100
-enemyTypes = { "Bean", "Daub" }
+enemyTypes = { "Bean", "Daub", "Cragore" }
 TOTAL_ENEMY_TYPES = #enemyTypes
-enemyStats = { {100, 1}, {75, 5} }		-- order corresponds to enemyTypes; format = {health, power}
+enemyStats = { {100, 1}, {75, 5}, {200, 10} }		-- order corresponds to enemyTypes; format = {health, power}
 HEALTH_INDEX = 1
 POWER_INDEX = 2
 
 -- COLLECTIBLE_OFFSET = 200
-collectibleTypes = { "Bit", "Byte", "Jumpbit" }
+collectibleTypes = { "Bit", "Byte", "Jumpbit", "Strikebit" }
 TOTAL_COLLECTIBLE_TYPES = #collectibleTypes
 
 particleTypes = { "Red", "Gray", "Blue", "BigRed", "BigGray", "BigBlue" }
@@ -63,8 +63,8 @@ graphicsIdentifiers = {
 	{ {"Title", 1}, {"Underground", 1}, {"Sky", 1}, {"Autumn", 1} }, -- backgrounds (# frames)
 	{ {"DirtBlock", 1}, {"DirtWall", 1} }, -- tiles (# frames (PER tile subidentifier))
 	{ {"" --[[ "Player" ]], 5} }, -- player states (# frame SETS (5 by default)
-	{ {"Bean", 5}, {"Daub", 5} }, -- enemies (# frame SETS (5 by default))
-	{ {"Bit", 4}, {"Byte", 4}, {"Jumpbit", 4} }, -- collectibles (# frames)
+	{ {"Bean", 5}, {"Daub", 5}, {"Cragore", 5} }, -- enemies (# frame SETS (5 by default))
+	{ {"Bit", 4}, {"Byte", 4}, {"Jumpbit", 4}, {"Strikebit", 4} }, -- collectibles (# frames)
 	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} }, -- particles (# frames)
 	{ {"Dot", 2} }	-- projectiles (# frames)
 }
@@ -680,6 +680,16 @@ function Enemy:enHandleAI()
 		end
 		self.enCooldown = DEFAULT_COOLDOWN
 	end
+  elseif t == "Cragore" then
+	if self.tgSpeed == 0 then
+		self.tgSpeed = DEFAULT_SPEED
+	end
+	if self.tgSpeed > 0 and self.tgSpeed ~= DEFAULT_SPEED then
+		self.tgSpeed = DEFAULT_SPEED
+	end
+	if self.tgSpeed < 0 and self.tgSpeed ~= -DEFAULT_SPEED then
+		self.tgSpeed = -DEFAULT_SPEED
+	end
   end
 end
 
@@ -687,8 +697,8 @@ end
 function Enemy:enResolveCollision(pDirection)
 	local t = enemyTypes[self.tgSubtype]
 	local col = self.tgColliding[pDirection]
-	print(self.tgHealth)
-	if t == "Bean" or t == "Daub" then
+
+	if t == "Bean" or t == "Daub" or t == "Cragore" then
 		if things[col].tgType == "player" then
 			if direction[pDirection] == "down" then
 				self.tgHealth = self.tgHealth - things[gPlayerUnit].plPower
@@ -704,7 +714,7 @@ function Enemy:enResolveCollision(pDirection)
 		if things[col].tgType == "tile" then
 		
 		end
-	elseif t == "Daub" then
+	--elseif t == "Daub" then
 		
 	end
 	if self.tgHealth <= 0 then
@@ -800,6 +810,7 @@ function enDie(which)
 	playAudio(SFX_INDEX, "Explosion")
 	spawnParticle(things[which].tgHitbox.x, things[which].tgHitbox.y, 1, math.random(4, 8))
 	spawnParticle(things[which].tgHitbox.x, things[which].tgHitbox.y, 4, math.random(0, 2))
+	points = points + things[which].enPower
 end
 
 Collectible = {tgSubtype}
@@ -846,6 +857,9 @@ function Collectible:clCollect()
 	elseif collectibleTypes[self.tgSubtype] == "Jumpbit" then
 	  points = points + 1
 	  things[gPlayerUnit].plActionFrames = things[gPlayerUnit].plActionFrames + 1
+	elseif collectibleTypes[self.tgSubtype] == "Strikebit" then
+	  points = points + 1
+	  things[gPlayerUnit].plPower = things[gPlayerUnit].plPower + 1
     end
 	
 	playAudio(SFX_INDEX, "Collect")
@@ -955,6 +969,11 @@ function initThings()
 				if collectibleTypes[things[i].tgSubtype] == "Bit" then
 					things[i].tgHitbox.w = DEFAULT_COLLECTIBLE_W / 2
 					things[i].tgHitbox.h = DEFAULT_COLLECTIBLE_H / 2
+				end
+			elseif things[i].tgType == "enemy" then
+				if enemyTypes[things[i].tgSubtype] == "Cragore" then
+					things[i].tgHitbox.w = DEFAULT_ENEMY_W * 2
+					things[i].tgHitbox.h = DEFAULT_ENEMY_H * 2
 				end
 			end
 		end
