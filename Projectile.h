@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Projectile
 {
 public:
-	Projectile(SDL_Rect*, int, int, int, int);
+	Projectile(SDL_Rect*, int, int, int, int, int);
 	~Projectile();
 
 	void pjMove();

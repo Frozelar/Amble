@@ -907,19 +907,40 @@ int LuaBridge::labHandleEnvironment(void)
 	{
 		if (Game::gProjectiles[i] != NULL)
 		{
-			lua_getglobal(L, "gProjectiles");					// gProjectiles
-			lua_pushnumber(L, i + 1);							// gProjectiles, i + 1
-			lua_gettable(L, -2);								// gProjectiles, specific projectile
-			lua_getfield(L, -1, "pjRect");						// gProjectiles, specific projectile, pjRect
-			lua_pushnumber(L, Game::gProjectiles[i]->pjRect.x);	// gProjectiles, specific projectile, pjRect, x
-			lua_setfield(L, -2, "x");							// gProjectiles, specific projectile, pjRect
-			lua_pushnumber(L, Game::gProjectiles[i]->pjRect.y);	// gProjectiles, specific projectile, pjRect, y
-			lua_setfield(L, -2, "y");							// gProjectiles, specific projectile, pjRect
-			lua_pushnumber(L, Game::gProjectiles[i]->pjRect.w);	// gProjectiles, specific projectile, pjRect, w
-			lua_setfield(L, -2, "w");							// gProjectiles, specific projectile, pjRect
-			lua_pushnumber(L, Game::gProjectiles[i]->pjRect.h);	// gProjectiles, specific projectile, pjRect, h
-			lua_setfield(L, -2, "h");							// gProjectiles, specific projectile, pjRect
-			lua_pop(L, 3);
+			lua_getglobal(L, "totalProjectiles");					// totalProjectiles
+			if (i < lua_tonumber(L, -1))
+			{
+				lua_pop(L, 1);										// 
+				lua_getglobal(L, "gProjectiles");					// gProjectiles
+				lua_pushnumber(L, i + 1);							// gProjectiles, i + 1
+				lua_gettable(L, -2);								// gProjectiles, specific projectile
+				if (lua_isnil(L, -1) <= 0)
+				{
+					lua_getfield(L, -1, "pjRect");						// gProjectiles, specific projectile, pjRect
+					lua_pushnumber(L, Game::gProjectiles[i]->pjRect.x);	// gProjectiles, specific projectile, pjRect, x
+					lua_setfield(L, -2, "x");							// gProjectiles, specific projectile, pjRect
+					lua_pushnumber(L, Game::gProjectiles[i]->pjRect.y);	// gProjectiles, specific projectile, pjRect, y
+					lua_setfield(L, -2, "y");							// gProjectiles, specific projectile, pjRect
+					lua_pushnumber(L, Game::gProjectiles[i]->pjRect.w);	// gProjectiles, specific projectile, pjRect, w
+					lua_setfield(L, -2, "w");							// gProjectiles, specific projectile, pjRect
+					lua_pushnumber(L, Game::gProjectiles[i]->pjRect.h);	// gProjectiles, specific projectile, pjRect, h
+					lua_setfield(L, -2, "h");							// gProjectiles, specific projectile, pjRect
+					lua_pop(L, 3);										// 
+				}
+				else
+					lua_pop(L, 2);
+			}
+			else
+			{
+				lua_pop(L, 1);											// 
+				lua_getglobal(L, "spawnProjectile");					// spawnProjectile()
+				lua_pushnumber(L, Game::gProjectiles[i]->pjRect.x);		// spawnProjectile(), x
+				lua_pushnumber(L, Game::gProjectiles[i]->pjRect.y);		// spawnProjectile(), x, y
+				lua_pushnumber(L, Game::gProjectiles[i]->pjType + 1);	// spawnProjectile(), x, y, type
+				lua_pushnumber(L, Game::gProjectiles[i]->pjWhatShotIt);	// spawnProjectile(), x, y, type, what
+				lua_pushstring(L, (Game::gProjectiles[i]->pjSpeed > 0 ? "right" : "left"));	// spawnProjectile(), x, y, type, what, direction
+				lua_call(L, 5, 0);										// 
+			}
 		}
 	}
 
@@ -1043,35 +1064,35 @@ int LuaBridge::labHandleEnvironment(void)
 		if (i >= Game::gProjectiles.size() && lua_isnil(L, -1) <= 0)
 		{
 			SDL_Rect pRect;
-			int pType;
-			int pWhat;
-			int pPower;
+			int pType, pWhat, pPower, pSpeed;
 
 			lua_getfield(L, -1, "pjType");							// totalProjectiles, gProjectiles, specific projectile, pjType
 			lua_getfield(L, -2, "pjWhatShotIt");					// totalProjectiles, gProjectiles, specific projectile, pjType, pjWhatShotIt
 			lua_getfield(L, -3, "pjPower");							// totalProjectiles, gProjectiles, specific projectile, pjType, pjWhatShotIt, pjPower
-			pType = lua_tonumber(L, -3) - 1;
+			lua_getfield(L, -4, "pjSpeed");							// totalProjectiles, gProjectiles, specific projectile, pjType, pjWhatShotIt, pjPower, pjSpeed
+			pType = lua_tonumber(L, -4) - 1;
 			// pWhat = lua_tonumber(L, -2) - 1;
-			pWhat = Game::ThingType[lua_tostring(L, -2)];
-			pPower = lua_tonumber(L, -1);
-			lua_pop(L, 3);											// totalProjectiles, gProjectiles, specific projectile
+			pWhat = Game::ThingType[lua_tostring(L, -3)];
+			pPower = lua_tonumber(L, -2);
+			pSpeed = lua_tonumber(L, -1);
+			lua_pop(L, 4);											// totalProjectiles, gProjectiles, specific projectile
 			lua_getfield(L, -1, "pjRect");							// totalProjectiles, gProjectiles, specific projectile, pjRect
 			lua_getfield(L, -1, "x");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x
 			lua_getfield(L, -2, "y");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x, y
 			lua_getfield(L, -3, "w");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x, y, w
 			lua_getfield(L, -4, "h");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x, y, w, h
 			pRect = { (int)lua_tonumber(L, -4), (int)lua_tonumber(L, -3), (int)lua_tonumber(L, -2), (int)lua_tonumber(L, -1) };
-			Game::newProjectile(&pRect, pType, pPower, i, pWhat);
+			Game::newProjectile(&pRect, pType, pPower, i, pWhat, pSpeed);
 			lua_pop(L, 5);											// totalProjectiles, gProjectiles, specific projectile
 		}
-		else if (i < Game::gProjectiles.size())
+		else if (i < Game::gProjectiles.size() && lua_isnil(L, -1) <= 0)
 		{
 			if (Game::gProjectiles[i] != NULL && Game::gProjectiles[i]->pjLife <= 0)
 			{
 				lua_pop(L, 1);											// totalProjectiles, gProjectiles
 				lua_getglobal(L, "pjResolveCollision");					// totalProjectiles, gProjectiles, pjResolveCollision()
 				lua_pushnumber(L, i + 1);								// totalProjectiles, gProjectiles, pjResolveCollision(), i
-				lua_pushnumber(L, Game::gProjectiles[i]->pjColliding + 1);	// totalProjectiles, gProjectiles, pjResolveCollision(), i, pjColliding
+				lua_pushnumber(L, Game::gProjectiles[i]->pjColliding + (Game::gProjectiles[i]->pjColliding == -1 ? 0 : 1));	// totalProjectiles, gProjectiles, pjResolveCollision(), i, pjColliding
 				lua_call(L, 2, 0);										// totalProjectiles, gProjectiles
 				lua_getglobal(L, "deleteProjectile");					// totalProjectiles, gProjectiles, deleteProjectile()
 				lua_pushnumber(L, i + 1);								// totalProjectiles, gProjectiles, deleteProjectile(), i
@@ -1392,6 +1413,13 @@ int LuaBridge::labPullThings(bool searchForNewThings)
 			lua_getglobal(L, "things");							// things table
 			lua_pushnumber(L, i + 1);							// things table, i
 			lua_gettable(L, -2);								// things table, specific thing
+			if (Game::things[i]->tgType == Game::ThingType["player"])
+			{
+				lua_getfield(L, -1, "plPower");					// things table, specific thing, plPower
+				Game::gPlayer->plPower = lua_tonumber(L, -1);
+				lua_pop(L, 1);									// things table, specific thing
+			}
+
 			lua_getfield(L, -1, "tgVerticals");					// things table, specific thing, tgVerticals
 			Game::things[i]->tgVerticals = (int)lua_tonumber(L, -1);
 			lua_pop(L, 1);										// things table, specific thing

@@ -33,11 +33,13 @@ public:
 
 	static void gxClose(void);
 
+	static void gxUpdateThingScale(void);
 	static void gxIncScale(bool = true);
 	static void gxToggleFullscreen(bool = true);
 	static void gxUpdateWindow(void);
 
 	static bool isFullscreen;
+	static bool updatedGFX;
 	static float GFX_SCALE;
 	static float GFX_MULT;
 	static int STAT_BAR_W;

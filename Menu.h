@@ -26,6 +26,7 @@ public:
 	Menu();
 	~Menu();
 
+	static void muInitMenu(void);
 	static void muCreateMenu(void);
 	static bool muHandleMenu(SDL_Event*);
 	static void muRender(void);

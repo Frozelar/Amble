@@ -23,11 +23,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Texture.h"
 #include "Thing.h"
 
-Projectile::Projectile(SDL_Rect* rect, int type, int power, int num, int what)
+Projectile::Projectile(SDL_Rect* rect, int type, int power, int num, int what, int dir)
 {
 	pjRect = *rect;
 	pjType = type;
-	pjSpeed = Game::DEFAULT_SPEED;
+	pjSpeed = (dir == Game::Direction["left"] ? -Game::DEFAULT_SPEED : Game::DEFAULT_SPEED);
 	pjLife = Game::DEFAULT_PROJECTILE_LIFE;
 	pjVerticals = 0;
 	pjFrame = 0;

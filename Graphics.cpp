@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Particle.h"
 #include "Projectile.h"
 
+bool Graphics::updatedGFX = false;
 bool Graphics::isFullscreen = false;
 float Graphics::GFX_SCALE = 1.0;
 float Graphics::GFX_MULT = 1.0;
@@ -407,6 +408,20 @@ void Graphics::gxClose(void)
 		}
 }
 
+void Graphics::gxUpdateThingScale()
+{
+	Game::gPlayer->tgHitboxRect = multDimensions(Game::gPlayer->tgHitboxRect, GFX_MULT);
+	Game::gPlayer->tgGFXrect = multDimensions(Game::gPlayer->tgGFXrect, GFX_MULT);
+	for (int i = 0; i < Game::things.size(); i++)
+	{
+		if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
+		{
+			Game::things[i]->tgHitboxRect = multDimensions(Game::things[i]->tgHitboxRect, GFX_MULT);
+			Game::things[i]->tgGFXrect = multDimensions(Game::things[i]->tgGFXrect, GFX_MULT);
+		}
+	}
+}
+
 void Graphics::gxIncScale(bool gfxscale)
 {
 	std::string hfont = Game::rDir + Game::gHeadingFont.name;
@@ -449,15 +464,15 @@ void Graphics::gxIncScale(bool gfxscale)
 	STAT_BAR_H *= GFX_MULT;
 	healthTexture->txRect = multDimensions(healthTexture->txRect, GFX_MULT);
 
-	TTF_CloseFont(Game::gHeadingFont.font);
-	TTF_CloseFont(Game::gBodyFont.font);
-	TTF_CloseFont(Game::gTitleFont.font);
-	Game::gHeadingFont.size *= GFX_MULT;
-	Game::gBodyFont.size *= GFX_MULT;
-	Game::gTitleFont.size *= GFX_MULT;
-	Game::gHeadingFont.font = TTF_OpenFont(hfont.c_str(), Game::gHeadingFont.size);
-	Game::gBodyFont.font = TTF_OpenFont(bfont.c_str(), Game::gBodyFont.size);
-	Game::gTitleFont.font = TTF_OpenFont(tfont.c_str(), Game::gTitleFont.size);
+	//TTF_CloseFont(Game::gHeadingFont.font);
+	//TTF_CloseFont(Game::gBodyFont.font);
+	//TTF_CloseFont(Game::gTitleFont.font);
+	//Game::gHeadingFont.size *= GFX_MULT;
+	//Game::gBodyFont.size *= GFX_MULT;
+	//Game::gTitleFont.size *= GFX_MULT;
+	//Game::gHeadingFont.font = TTF_OpenFont(hfont.c_str(), Game::gHeadingFont.size);
+	//Game::gBodyFont.font = TTF_OpenFont(bfont.c_str(), Game::gBodyFont.size);
+	//Game::gTitleFont.font = TTF_OpenFont(tfont.c_str(), Game::gTitleFont.size);
 
 	Game::gCamera = multDimensions(Game::gCamera, GFX_MULT);
 	// Game::gCamera.x *= GFX_MULT;
@@ -519,6 +534,9 @@ void Graphics::gxIncScale(bool gfxscale)
 	Level::LEVEL_PIXELS *= GFX_MULT;
 
 	gxUpdateWindow();
+
+	if (Game::gOldState == Game::GameState["title"])
+		updatedGFX = !updatedGFX;
 }
 
 void Graphics::gxUpdateWindow()

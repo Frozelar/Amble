@@ -50,7 +50,6 @@ int main(int argc, char** argv)
 	// Level::playMusic();
 	// lua_State* S = luaL_newstate();
 	// luaL_openlibs(S);
-
 	// init();
 	// Level::generateLevel();
 	// Graphics::gxInit();
@@ -64,6 +63,11 @@ int main(int argc, char** argv)
 			if (needtoinitlevel)
 			{
 				Level::generateLevel(Level::currentLevel + 1);	// may need to change later?
+				if (Graphics::updatedGFX)
+				{
+					Graphics::gxUpdateThingScale();
+					Graphics::updatedGFX = false;
+				}
 				Game::centerCamera();
 				// LuaBridge::labChangeLevel();  <--- moved to generateLevel
 				// Level::playMusic();

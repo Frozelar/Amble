@@ -40,7 +40,7 @@ std::vector<std::string> Menu::muOptions = { "Resume", "Settings", "Return to Ti
 	"Graphics", "Audio", "Game Controls", "Editor Controls", "Return", "",
 	"Window Size", "Toggle Fullscreen", "Return", "",
 	"Music", "Sound Effects", "Return", "",
-	"Left", "Right", "Up", "Down", "Jump", "Pause", "Return", "", 
+	"Left", "Right", "Up", "Down", "Jump", "Pause", "Shoot Left", "Shoot Right", "Return", "", 
 	"Left", "Right", "Up", "Down", "Place", "Delete", "Type Up", "Type Down", "Subtype Up", "Subtype Down", "Save", "Open", "Set Width", "Set Height", "Return", "" };
 std::vector<std::string> Menu::ttOptions = { "Play Game", "Menu", "Level Editor", "Quit" };
 std::vector< Texture* > Menu::muOptionTextures;
@@ -54,7 +54,6 @@ const int Menu::COPYRIGHT_INDEX = 3;
 Menu::Menu()
 {
 	int num = 0;
-	int controlMenuPos = 0;
 	MenuID["pause"] = (num = 0);
 	MenuID["settings"] = (++num);
 	MenuID["graphics"] = (++num);
@@ -66,10 +65,8 @@ Menu::Menu()
 	NumOptions[MenuID["settings"]] = 5;
 	NumOptions[MenuID["graphics"]] = 3;
 	NumOptions[MenuID["audio"]] = 3;
-	NumOptions[MenuID["gmcontrols"]] = 7;
+	NumOptions[MenuID["gmcontrols"]] = 9;
 	NumOptions[MenuID["lecontrols"]] = 15;
-
-	controlMenuPos = muGetMenuPos("gmcontrols");
 
 	ttTitleTexture = new Texture(0, 0, 0, 0);
 	ttTitleTexture->txLoadT(Game::gameTitle, Game::gTitleFont.font, Game::gTitleFont.color);
@@ -93,6 +90,43 @@ Menu::Menu()
 	muMiscTextures[COPYRIGHT_INDEX]->txRect.x = Game::DEFAULT_W;
 	muMiscTextures[COPYRIGHT_INDEX]->txRect.y = Game::WINDOW_H - muMiscTextures[COPYRIGHT_INDEX]->txRect.h - Game::DEFAULT_H;
 
+	muInitMenu();
+	for (int i = 0; i < ttOptions.size(); i++)
+	{
+		ttOptionTextures.resize(i + 1);
+		ttOptionTextures[i] = new Texture(0, 0, 0, 0);
+		ttOptionTextures[i]->txLoadT(ttOptions[i], Game::gHeadingFont.font, Game::gHeadingFont.color);
+		ttOptionTextures[i]->txRect.x = (Game::WINDOW_W - ttOptionTextures[i]->txRect.w) / 2;
+		if (i == 0)
+			ttOptionTextures[i]->txRect.y = (Game::WINDOW_H - ttOptionTextures[i]->txRect.w) / 2;
+		else
+			ttOptionTextures[i]->txRect.y = ttOptionTextures[i - 1]->txRect.y + ttOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H;
+	}
+
+	muGmControlTextures.resize(Game::gPlayer->plControls.size());
+	muLeControlTextures.resize(LevelEditor::leControls.size());
+	for (int i = 0; i < muGmControlTextures.size(); i++)
+		muGmControlTextures[i] = new Texture(0, 0, 0, 0);
+	for (int i = 0; i < muLeControlTextures.size(); i++)
+		muLeControlTextures[i] = new Texture(0, 0, 0, 0);
+}
+
+Menu::~Menu()
+{
+	delete menuTexture;
+	for (int i = 0; i < muOptionTextures.size(); i++)
+		if(muOptionTextures[i] != NULL)
+			delete muOptionTextures[i];
+	for (int i = 0; i < ttOptionTextures.size(); i++)
+		delete ttOptionTextures[i];
+	for (int i = 0; i < muMiscTextures.size(); i++)
+		delete muMiscTextures[i];
+}
+
+void Menu::muInitMenu(void)
+{
+	int controlMenuPos = 0;
+	controlMenuPos = muGetMenuPos("gmcontrols");
 	for (int i = 0; i < muOptions.size(); i++)
 	{
 		muOptionTextures.resize(i + 1);
@@ -135,36 +169,6 @@ Menu::Menu()
 		else
 			muOptionTextures[i] = NULL;
 	}
-	for (int i = 0; i < ttOptions.size(); i++)
-	{
-		ttOptionTextures.resize(i + 1);
-		ttOptionTextures[i] = new Texture(0, 0, 0, 0);
-		ttOptionTextures[i]->txLoadT(ttOptions[i], Game::gHeadingFont.font, Game::gHeadingFont.color);
-		ttOptionTextures[i]->txRect.x = (Game::WINDOW_W - ttOptionTextures[i]->txRect.w) / 2;
-		if (i == 0)
-			ttOptionTextures[i]->txRect.y = (Game::WINDOW_H - ttOptionTextures[i]->txRect.w) / 2;
-		else
-			ttOptionTextures[i]->txRect.y = ttOptionTextures[i - 1]->txRect.y + ttOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H;
-	}
-
-	muGmControlTextures.resize(Game::gPlayer->plControls.size());
-	muLeControlTextures.resize(LevelEditor::leControls.size());
-	for (int i = 0; i < muGmControlTextures.size(); i++)
-		muGmControlTextures[i] = new Texture(0, 0, 0, 0);
-	for (int i = 0; i < muLeControlTextures.size(); i++)
-		muLeControlTextures[i] = new Texture(0, 0, 0, 0);
-}
-
-Menu::~Menu()
-{
-	delete menuTexture;
-	for (int i = 0; i < muOptionTextures.size(); i++)
-		if(muOptionTextures[i] != NULL)
-			delete muOptionTextures[i];
-	for (int i = 0; i < ttOptionTextures.size(); i++)
-		delete ttOptionTextures[i];
-	for (int i = 0; i < muMiscTextures.size(); i++)
-		delete muMiscTextures[i];
 }
 
 void Menu::muCreateMenu(void)
@@ -322,9 +326,12 @@ bool Menu::muHandleMenu(SDL_Event* e)
 						}
 						else if (muMenu == MenuID["gmcontrols"])
 						{
-							if (muOptions[i] == "Return")
+							if (muOptions[i] == "Return" && i > muGetMenuPos("gmcontrols") && i < muGetMenuPos("gmcontrols") + NumOptions[MenuID["gmcontrols"]])
+							{
+								std::cout << i << std::endl;
 								muMenu -= 3;
-							else
+							}
+							else if(i > muGetMenuPos("gmcontrols") && i < muGetMenuPos("gmcontrols") + NumOptions[MenuID["gmcontrols"]])
 							{
 								if (!muIsMapping)
 									muIsMapping = true;

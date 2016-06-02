@@ -55,7 +55,7 @@ TOTAL_COLLECTIBLE_TYPES = #collectibleTypes
 particleTypes = { "Red", "Gray", "Blue", "BigRed", "BigGray", "BigBlue" }
 TOTAL_PARTICLE_TYPES = #particleTypes
 
-projectileTypes = { "Dot" }
+projectileTypes = { "Dot", "Redot" }
 TOTAL_PROJECTILE_TYPES = #projectileTypes
 
 -- {name, # frames or # frame sets}
@@ -66,7 +66,7 @@ graphicsIdentifiers = {
 	{ {"Bean", 5}, {"Daub", 5}, {"Cragore", 5} }, -- enemies (# frame SETS (5 by default))
 	{ {"Bit", 4}, {"Byte", 4}, {"Jumpbit", 4}, {"Strikebit", 4} }, -- collectibles (# frames)
 	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} }, -- particles (# frames)
-	{ {"Dot", 2} }	-- projectiles (# frames)
+	{ {"Dot", 2}, {"Redot", 2} }	-- projectiles (# frames)
 }
 
 tileSubIdentifiers = {
@@ -283,8 +283,14 @@ function Projectile:new(pType, px, py, pWhat, pDirection)
 	self.pjFrameInterval = 0
 	self.pjMaxFrames = graphicsIdentifiers[7][self.pjType][2]
 	
-	if projectileTypes[pType] == "Dot" then
-		self.pjPower = 5
+	if thingTypes[pWhat] == "player" then
+		pjPower = things[gPlayerUnit].plPower
+	elseif thingTypes[pWhat] == "enemy" then
+		if projectileTypes[pType] == "Dot" then
+			self.pjPower = 5
+		elseif projectileTypes[pType] == "Redot" then
+			self.pjPower = 10
+		end
 	end
 end
 
@@ -305,13 +311,15 @@ function Projectile:pjMove()
 	
 	if t == "Dot" then
 		self.pjRect.x = self.pjRect.x + self.pjSpeed
+	elseif t == "Redot" then
+		self.pjRect.x = self.pjRect.x + self.pjSpeed
 	end
 end
 
 function pjResolveCollision(whichProj, whichThing)
 	local t = projectileTypes[gProjectiles[whichProj].pjType]
 	
-	if t == "Dot" then
+	if t == "Dot" or t == "Redot" then
 		if whichThing ~= -1 and things[whichThing].tgType ~= "tile" then
 			playAudio(SFX_INDEX, "Hurt")
 		end

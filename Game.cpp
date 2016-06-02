@@ -416,14 +416,14 @@ void Game::newParticle(SDL_Rect* location, int type, SDL_Point* destination, int
 	gParticles[pos] = new Particle(&loc, type, pos, destination, -1, speedX, speedY);
 }
 
-void Game::newProjectile(SDL_Rect* location, int type, int power, int num, int what)
+void Game::newProjectile(SDL_Rect* location, int type, int power, int num, int what, int dir)
 {
 	int pos = (num == -1 ? gProjectiles.size() : num);
 	if (pos >= gProjectiles.size())
 		gProjectiles.resize(pos + 1);
 	else if (gProjectiles[pos] != NULL)
 		destroyProjectile(pos);
-	gProjectiles[pos] = new Projectile(location, type, power, num, what);
+	gProjectiles[pos] = new Projectile(location, type, power, num, what, dir);
 }
 
 void Game::destroyThing(int num)

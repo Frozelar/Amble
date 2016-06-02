@@ -48,6 +48,7 @@ public:
 	int plActionCounter = 0;
 	int plActionFrames = 1;
 	int plState = 0;
+	int plPower = 1;
 	int plOldVerticals = 0;
 	SDL_Rect plOldHitboxRect;
 	// ControlScheme plControls;

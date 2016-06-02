@@ -44,6 +44,8 @@ Player::Player(SDL_Rect* box, int unit) : Thing(box, Game::ThingType["player"], 
 	plControls["Down"] = SDLK_s;
 	plControls["Jump"] = SDLK_SPACE;
 	plControls["Pause"] = SDLK_p;
+	plControls["Shoot Left"] = SDLK_LEFT;
+	plControls["Shoot Right"] = SDLK_RIGHT;
 }
 
 void Player::plHandleEvent(SDL_Event* e)
@@ -74,6 +76,16 @@ void Player::plHandleEvent(SDL_Event* e)
 		else if(e->key.keysym.sym == plControls["Pause"])
 		{
 			Game::changeGameState(Game::GameState["menu"]);
+		}
+		else if (e->key.keysym.sym == plControls["Shoot Left"])
+		{
+			SDL_Rect projRect = { tgHitboxRect.x, tgHitboxRect.y + tgHitboxRect.h / 2, Game::DEFAULT_PARTICLE_W, Game::DEFAULT_PARTICLE_H };
+			Game::newProjectile(&projRect, Game::ProjectileType["Redot"], plPower, -1, Game::ThingType["player"], Game::Direction["left"]);
+		}
+		else if (e->key.keysym.sym == plControls["Shoot Right"])
+		{
+			SDL_Rect projRect = { tgHitboxRect.x + tgHitboxRect.w, tgHitboxRect.y + tgHitboxRect.h / 2, Game::DEFAULT_PARTICLE_W, Game::DEFAULT_PARTICLE_H };
+			Game::newProjectile(&projRect, Game::ProjectileType["Redot"], plPower, -1, Game::ThingType["player"], Game::Direction["right"]);
 		}
 	}
 	else if (e->type == SDL_KEYDOWN && e->key.repeat == NULL)
