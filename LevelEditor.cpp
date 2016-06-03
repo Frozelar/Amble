@@ -259,7 +259,7 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 				else if (mouseThing->tgType == Game::ThingType["enemy"])
 					mouseThing->tgSetSubtype(Game::EnemyType.size() - 1);
 				else if (mouseThing->tgType == Game::ThingType["tile"])
-					mouseThing->tgSetSubtype(Game::TileType.size() - 1);
+					mouseThing->tgSetSubtype((Game::TileType.size() - 1) * (Game::TileSubType.size() - 1));
 			}
 		}
 		else if (e->key.keysym.sym == leControls["Save"])

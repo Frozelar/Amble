@@ -1335,8 +1335,8 @@ int LuaBridge::labPushThings(void)
 			lua_setfield(L, -2, "tgSpeed");						// things table, specific thing
 			lua_pushnumber(L, Game::things[i]->tgHealth);		// things table, specific thing, tgHealth
 			lua_setfield(L, -2, "tgHealth");					// things table, specific thing
-			lua_pushnumber(L, Game::things[i]->tgDashing);		// things table, specific thing, tgDashing
-			lua_setfield(L, -2, "tgDashing");					// things table, specific thing
+			// lua_pushnumber(L, Game::things[i]->tgDashing);		// things table, specific thing, tgDashing
+			// lua_setfield(L, -2, "tgDashing");					// things table, specific thing
 			lua_getfield(L, -1, "tgHitbox");					// things table, specific thing, tgHitbox
 			lua_pushnumber(L, Game::things[i]->tgHitboxRect.x);	// things table, specific thing, tgHitbox, x
 			lua_setfield(L, -2, "x");							// things table, specific thing, tgHitbox

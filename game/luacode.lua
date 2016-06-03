@@ -38,7 +38,7 @@ direction = { "left", "right", "up", "down" }
 thingTypes = { "player", "tile", "enemy", "collectible" }
 
 -- TILE_OFFSET = 10
-tileTypes = { "dirtBlock", "dirtWall" }
+tileTypes = { "DirtBlock", "DirtWall", "CloudBlock" }
 TOTAL_TILE_TYPES = #tileTypes
 
 -- ENEMY_OFFSET = 100
@@ -55,18 +55,18 @@ TOTAL_COLLECTIBLE_TYPES = #collectibleTypes
 particleTypes = { "Red", "Gray", "Blue", "BigRed", "BigGray", "BigBlue" }
 TOTAL_PARTICLE_TYPES = #particleTypes
 
-projectileTypes = { "Dot", "Redot" }
+projectileTypes = { "Dot", "Redot", "Speedot" }
 TOTAL_PROJECTILE_TYPES = #projectileTypes
 
 -- {name, # frames or # frame sets}
 graphicsIdentifiers = { 
 	{ {"Title", 1}, {"Underground", 1}, {"Sky", 1}, {"Autumn", 1} }, -- backgrounds (# frames)
-	{ {"DirtBlock", 1}, {"DirtWall", 1} }, -- tiles (# frames (PER tile subidentifier))
+	{ {"DirtBlock", 1}, {"DirtWall", 1}, {"CloudBlock", 1} }, -- tiles (# frames (PER tile subidentifier))
 	{ {"" --[[ "Player" ]], 5} }, -- player states (# frame SETS (5 by default)
 	{ {"Bean", 5}, {"Daub", 5}, {"Cragore", 5} }, -- enemies (# frame SETS (5 by default))
 	{ {"Bit", 4}, {"Byte", 4}, {"Jumpbit", 4}, {"Strikebit", 4} }, -- collectibles (# frames)
 	{ {"Red", 2}, {"Gray", 2}, {"Blue", 2}, {"BigRed", 2}, {"BigGray", 2}, {"BigBlue", 2} }, -- particles (# frames)
-	{ {"Dot", 2}, {"Redot", 2} }	-- projectiles (# frames)
+	{ {"Dot", 2}, {"Redot", 2}, {"Speedot", 2} }	-- projectiles (# frames)
 }
 
 tileSubIdentifiers = {
@@ -266,10 +266,18 @@ function Projectile:new(pType, px, py, pWhat, pDirection)
 	self.pjType = pType
 	self.pjRect = Rectangle(px, py, DEFAULT_PROJECTILE_W, DEFAULT_PROJECTILE_H)
 	if pDirection == "right" then
-		self.pjSpeed = DEFAULT_SPEED
+		if projectileTypes[pType] == "Speedot" then
+			self.pjSpeed = DEFAULT_SPEED * 2
+		else
+			self.pjSpeed = DEFAULT_SPEED
+		end
 		self.pjVerticals = 0
 	elseif pDirection == "left" then
-		self.pjSpeed = -DEFAULT_SPEED
+		if projectileTypes[pType] == "Speedot" then
+			self.pjSpeed = -DEFAULT_SPEED * 2
+		else
+			self.pjSpeed = -DEFAULT_SPEED
+		end
 		self.pjVerticals = 0
 	elseif pDirection == "up" then
 		self.pjSpeed = 0
@@ -289,6 +297,8 @@ function Projectile:new(pType, px, py, pWhat, pDirection)
 		if projectileTypes[pType] == "Dot" then
 			self.pjPower = 5
 		elseif projectileTypes[pType] == "Redot" then
+			self.pjPower = 10
+		elseif projectileTypes[pType] == "Speedot" then
 			self.pjPower = 10
 		end
 	end
@@ -313,13 +323,15 @@ function Projectile:pjMove()
 		self.pjRect.x = self.pjRect.x + self.pjSpeed
 	elseif t == "Redot" then
 		self.pjRect.x = self.pjRect.x + self.pjSpeed
+	elseif t == "Speedot" then
+		self.pjRect.x = self.pjRect.x + self.pjSpeed
 	end
 end
 
 function pjResolveCollision(whichProj, whichThing)
 	local t = projectileTypes[gProjectiles[whichProj].pjType]
 	
-	if t == "Dot" or t == "Redot" then
+	if t == "Dot" or t == "Redot" or t == "Speedot" then
 		if whichThing ~= -1 and things[whichThing].tgType ~= "tile" then
 			playAudio(SFX_INDEX, "Hurt")
 		end
@@ -543,11 +555,15 @@ function Tile:new(levelUnit)
 end
 
 function Tile:tiHandleAI()
-   if tileTypes[self.tgSubtype] == "dirtBlock" then
+--[[
+   if tileTypes[self.tgSubtype] == "DirtBlock" then
         -- instead of doing this, just include the things that actually need AI??
-  elseif tileTypes[self.tgSubtype] == "dirtWall" then
+  elseif tileTypes[self.tgSubtype] == "DirtWall" then
         
+  elseif tileTypes[self.tgSubtype] == "CloudBlock" then
+	
   end
+  ]]
 end
 
 function Tile:tiCycleFrames()
@@ -697,6 +713,14 @@ function Enemy:enHandleAI()
 	end
 	if self.tgSpeed < 0 and self.tgSpeed ~= -DEFAULT_SPEED then
 		self.tgSpeed = -DEFAULT_SPEED
+	end
+	if self.enCooldown <= 0 then
+		if self.tgSpeed > 0 then
+			spawnProjectile(self.tgHitbox.x + self.tgHitbox.w, self.tgHitbox.y, 3, self.tgType, "right")
+		elseif self.tgSpeed < 0 then
+			spawnProjectile(self.tgHitbox.x, self.tgHitbox.y, 3, self.tgType, "left")
+		end
+		self.enCooldown = DEFAULT_COOLDOWN / 4
 	end
   end
 end

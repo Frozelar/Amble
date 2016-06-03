@@ -46,7 +46,7 @@ public:
 
 	int plJumps = 0;
 	int plActionCounter = 0;
-	int plActionFrames = 1;
+	int plActionFrames = 0;
 	int plState = 0;
 	int plPower = 1;
 	int plOldVerticals = 0;
