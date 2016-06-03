@@ -331,18 +331,18 @@ void Graphics::gxRender(bool updateRenderer)
 		}
 	}
 
-	for (int i = 0; i < Game::gParticles.size(); i++)
-		if (Game::gParticles[i] != NULL)
-			if(Game::checkCollisionRects(&Game::gParticles[i]->ptRect, &cameraRect))
-				Game::gParticles[i]->ptRender();
-
-	for (int i = 0; i < Game::gProjectiles.size(); i++)
-		if (Game::gProjectiles[i] != NULL)
-			if (Game::checkCollisionRects(&Game::gProjectiles[i]->pjRect, &cameraRect))
-				Game::gProjectiles[i]->pjRender();
-
 	if (Game::gState == Game::GameState["game"])
 	{
+		for (int i = 0; i < Game::gParticles.size(); i++)
+			if (Game::gParticles[i] != NULL)
+				if (Game::checkCollisionRects(&Game::gParticles[i]->ptRect, &cameraRect))
+					Game::gParticles[i]->ptRender();
+
+		for (int i = 0; i < Game::gProjectiles.size(); i++)
+			if (Game::gProjectiles[i] != NULL)
+				if (Game::checkCollisionRects(&Game::gProjectiles[i]->pjRect, &cameraRect))
+					Game::gProjectiles[i]->pjRender();
+
 		for (int i = 0; i < Game::gPlayer->tgHealth; i++)
 		{
 			healthTexture->txRect.x -= healthTexture->txRect.w * i;

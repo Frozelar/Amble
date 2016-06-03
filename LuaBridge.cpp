@@ -814,6 +814,38 @@ int LuaBridge::labChangeLevel()
 	lua_pop(L, 1);
 	labInitThings();
 
+	/*
+	lua_getglobal(L, "totalParticles");					// totalParticles
+	for (int i = 0; i < lua_tonumber(L, -1); i++)
+	{
+		lua_getglobal(L, "deleteParticle");				// totalParticles, deleteParticle()
+		lua_pushnumber(L, i + 1);						// totalParticles, deleteParticle(), i
+		lua_call(L, 1, 0);								// totalParticles
+		/*
+		lua_getglobal(L, "gParticles");					// totalParticles, gParticles
+		lua_pushnumber(L, i + 1);						// totalParticles, gParticles, i
+		lua_pushnil(L);									// totalParticles, gParticles, i, nil
+		lua_settable(L, -3);							// totalParticles, gParticles
+		lua_pop(L, 1);									// totalParticles
+		
+	}
+
+	lua_getglobal(L, "totalProjectiles");				// totalProjectiles
+	for (int i = 0; i < lua_tonumber(L, -1); i++)
+	{
+		lua_getglobal(L, "deleteProjectile");			// totalProjectiles, deleteProjectile()
+		lua_pushnumber(L, i + 1);						// totalProjectiles, deleteProjectile(), i
+		lua_call(L, 1, 0);								// totalProjectiles
+		/*
+		lua_getglobal(L, "gProjectiles");				// totalProjectiles, gProjectiles
+		lua_pushnumber(L, i + 1);						// totalProjectiles, gProjectiles, i
+		lua_pushnil(L);									// totalProjectiles, gProjectiles, i, nil
+		lua_settable(L, -3);							// totalProjectiles, gProjectiles
+		lua_pop(L, 1);									// totalProjectiles
+		
+	}
+	*/
+
 	return 0;
 }
 
@@ -912,7 +944,7 @@ int LuaBridge::labHandleEnvironment(void)
 			{
 				lua_pop(L, 1);										// 
 				lua_getglobal(L, "gProjectiles");					// gProjectiles
-				lua_pushnumber(L, i + 1);							// gProjectiles, i + 1
+				lua_pushnumber(L, i + 1);							// gProjectiles, i
 				lua_gettable(L, -2);								// gProjectiles, specific projectile
 				if (lua_isnil(L, -1) <= 0)
 				{

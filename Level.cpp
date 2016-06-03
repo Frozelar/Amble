@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Audio.h"
 #include "Particle.h"
 #include "Projectile.h"
+#include "Graphics.h"
 
 // default units in the level
 int Level::LEVEL_UNITS = Level::levelW() * Level::levelH();
@@ -212,6 +213,12 @@ void Level::closeLevel()
 			Game::things[i] = NULL;
 		}
 	}
+	for (int i = 0; i < Game::gParticles.size(); i++)
+		if (Game::gParticles[i] != NULL)
+			Game::gParticles[i]->ptLife = 0; // Game::destroyParticle(i);
+	for (int i = 0; i < Game::gProjectiles.size(); i++)
+		if (Game::gProjectiles[i] != NULL)
+			Game::gProjectiles[i]->pjLife = 0; //Game::destroyProjectile(i);
 }
 
 const int Level::levelW(void)

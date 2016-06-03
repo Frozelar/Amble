@@ -1178,7 +1178,11 @@ function spawnProjectile(px, py, ptype, pwhat, pdirection)
 end
 
 function deleteProjectile(which)
-	table.remove(gProjectiles, which)
+	if which > #gProjectiles then
+		gProjectiles[which] = nil
+	else
+		table.remove(gProjectiles, which)
+	end
 end
 
 --[[
