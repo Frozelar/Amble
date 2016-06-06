@@ -231,13 +231,13 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 	}
 	if (e->type == SDL_KEYUP)
 	{
-		if (e->key.keysym.sym == leControls["Up"] && leLvlMoveY < 0)
+		if (e->key.keysym.sym == leControls["Up"] && leLvlMoveY > 0)
 			leLvlMoveY = 0;
-		else if (e->key.keysym.sym == leControls["Down"] && leLvlMoveY > 0)
+		else if (e->key.keysym.sym == leControls["Down"] && leLvlMoveY < 0)
 			leLvlMoveY = 0;
-		else if (e->key.keysym.sym == leControls["Left"] && leLvlMoveX < 0)
+		else if (e->key.keysym.sym == leControls["Left"] && leLvlMoveX > 0)
 			leLvlMoveX = 0;
-		else if (e->key.keysym.sym == leControls["Right"] && leLvlMoveX > 0)
+		else if (e->key.keysym.sym == leControls["Right"] && leLvlMoveX < 0)
 			leLvlMoveX = 0;
 		else if (e->key.keysym.sym == leControls["Type Up"])
 		{
