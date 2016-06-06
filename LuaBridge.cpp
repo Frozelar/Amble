@@ -854,7 +854,7 @@ int LuaBridge::labInitThings(void)
 	//Game::centerCamera();
 	lua_getglobal(L, "initThings");
 	lua_call(L, 0, 0);
-	labPullThings(false);
+	//labPullThings(false);
 
 	for (int i = 0; i < Level::LEVEL_UNITS; i++)
 	{

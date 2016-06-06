@@ -464,15 +464,15 @@ void Graphics::gxIncScale(bool gfxscale)
 	STAT_BAR_H *= GFX_MULT;
 	healthTexture->txRect = multDimensions(healthTexture->txRect, GFX_MULT);
 
-	//TTF_CloseFont(Game::gHeadingFont.font);
-	//TTF_CloseFont(Game::gBodyFont.font);
-	//TTF_CloseFont(Game::gTitleFont.font);
-	//Game::gHeadingFont.size *= GFX_MULT;
-	//Game::gBodyFont.size *= GFX_MULT;
-	//Game::gTitleFont.size *= GFX_MULT;
-	//Game::gHeadingFont.font = TTF_OpenFont(hfont.c_str(), Game::gHeadingFont.size);
-	//Game::gBodyFont.font = TTF_OpenFont(bfont.c_str(), Game::gBodyFont.size);
-	//Game::gTitleFont.font = TTF_OpenFont(tfont.c_str(), Game::gTitleFont.size);
+	TTF_CloseFont(Game::gHeadingFont.font);
+	TTF_CloseFont(Game::gBodyFont.font);
+	TTF_CloseFont(Game::gTitleFont.font);
+	Game::gHeadingFont.size *= GFX_MULT;
+	Game::gBodyFont.size *= GFX_MULT;
+	Game::gTitleFont.size *= GFX_MULT;
+	Game::gHeadingFont.font = TTF_OpenFont(hfont.c_str(), Game::gHeadingFont.size);
+	Game::gBodyFont.font = TTF_OpenFont(bfont.c_str(), Game::gBodyFont.size);
+	Game::gTitleFont.font = TTF_OpenFont(tfont.c_str(), Game::gTitleFont.size);
 
 	Game::gCamera = multDimensions(Game::gCamera, GFX_MULT);
 	// Game::gCamera.x *= GFX_MULT;
@@ -505,6 +505,7 @@ void Graphics::gxIncScale(bool gfxscale)
 	for (int i = 0; i < Game::floatArray.size(); i++)
 		Game::floatArray[i] *= GFX_MULT;
 
+	/*
 	Menu::ttTitleTexture->txRect = multDimensions(Menu::ttTitleTexture->txRect, GFX_MULT);
 	Menu::menuTexture->txRect = multDimensions(Menu::menuTexture->txRect, GFX_MULT);
 	for (int i = 0; i < Menu::muOptionTextures.size(); i++)
@@ -519,10 +520,15 @@ void Graphics::gxIncScale(bool gfxscale)
 		Menu::muGmControlTextures[i]->txRect = multDimensions(Menu::muGmControlTextures[i]->txRect, GFX_MULT);
 	for (int i = 0; i < Menu::muLeControlTextures.size(); i++)
 		Menu::muLeControlTextures[i]->txRect = multDimensions(Menu::muLeControlTextures[i]->txRect, GFX_MULT);
+		*/
+	delete Game::gMenu;
+	Game::gMenu = new Menu();
+
 	LevelEditor::mouseThing->tgHitboxRect = multDimensions(LevelEditor::mouseThing->tgHitboxRect, GFX_MULT);
 	LevelEditor::mouseThing->tgGFXrect = multDimensions(LevelEditor::mouseThing->tgGFXrect, GFX_MULT);
-	for (int i = 0; i < LevelEditor::leMsgTextures.size(); i++)
-		LevelEditor::leMsgTextures[i]->txRect = multDimensions(LevelEditor::leMsgTextures[i]->txRect, GFX_MULT);
+	// for (int i = 0; i < LevelEditor::leMsgTextures.size(); i++)
+	// 	LevelEditor::leMsgTextures[i]->txRect = multDimensions(LevelEditor::leMsgTextures[i]->txRect, GFX_MULT);
+	LevelEditor::leLoadMsgs();
 	LevelEditor::DEFAULT_LVL_MOVE *= GFX_MULT;
 	LevelEditor::leTotMoveX *= GFX_MULT;
 	LevelEditor::leTotMoveY *= GFX_MULT;

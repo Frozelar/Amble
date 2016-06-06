@@ -65,26 +65,10 @@ LevelEditor::LevelEditor()
 	leMsgs["Open"] = ++num;
 	leMsgs["Set Width"] = ++num;
 	leMsgs["Set Height"] = ++num;
+
 	leMsgTextures.resize(leMsgs.size());
 	leMsgTimers.resize(leMsgTextures.size());
-	for (int i = 0; i < leMsgTextures.size(); i++)
-	{
-		leMsgTextures[i] = new Texture(0, 0, 0, 0);
-		leMsgTimers[i] = 0;
-	}
-	leMsgTextures[leMsgs["Save"]]->txLoadT("Level Saved (output.map)", Game::gBodyFont.font, Game::gBodyFont.color);
-	leMsgTextures[leMsgs["Save"]]->txRect.x = Game::WINDOW_W - leMsgTextures[leMsgs["Save"]]->txRect.w - Game::DEFAULT_W;
-	leMsgTextures[leMsgs["Save"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Save"]]->txRect.h - Game::DEFAULT_H;
-	leMsgTextures[leMsgs["Open"]]->txLoadT("Level Opened (output.map)", Game::gBodyFont.font, Game::gBodyFont.color);
-	leMsgTextures[leMsgs["Open"]]->txRect.x = Game::WINDOW_W - leMsgTextures[leMsgs["Open"]]->txRect.w - Game::DEFAULT_W;
-	leMsgTextures[leMsgs["Open"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Open"]]->txRect.h - Game::DEFAULT_H;
-	leMsgTextures[leMsgs["Set Width"]]->txLoadT("Enter Level Width: ", Game::gBodyFont.font, Game::gBodyFont.color);
-	leMsgTextures[leMsgs["Set Width"]]->txRect.x = Game::DEFAULT_W;
-	leMsgTextures[leMsgs["Set Width"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Set Width"]]->txRect.h - Game::DEFAULT_H;
-	leMsgTextures[leMsgs["Set Height"]]->txLoadT("Enter Level Height: ", Game::gBodyFont.font, Game::gBodyFont.color);
-	leMsgTextures[leMsgs["Set Height"]]->txRect.x = Game::DEFAULT_W;
-	leMsgTextures[leMsgs["Set Height"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Set Height"]]->txRect.h - Game::DEFAULT_H;
-	leInputTexture = new Texture(0, 0, 0, 0);
+	leLoadMsgs();
 }
 
 LevelEditor::~LevelEditor()
@@ -107,6 +91,36 @@ LevelEditor::~LevelEditor()
 		delete leInputTexture;
 		leInputTexture = NULL;
 	}
+}
+
+// assumes that leMsgTextures is already properly sized; written this way to simplify code in Graphics::gxIncScale()
+void LevelEditor::leLoadMsgs()
+{
+	for (int i = 0; i < leMsgTextures.size(); i++)
+	{
+		if (leMsgTextures[i] != NULL)
+		{
+			delete leMsgTextures[i];
+			leMsgTextures[i] = NULL;
+		}
+		leMsgTextures[i] = new Texture(0, 0, 0, 0);
+		leMsgTimers[i] = 0;
+	}
+	leMsgTextures[leMsgs["Save"]]->txLoadT("Level Saved (output.map)", Game::gBodyFont.font, Game::gBodyFont.color);
+	leMsgTextures[leMsgs["Save"]]->txRect.x = Game::WINDOW_W - leMsgTextures[leMsgs["Save"]]->txRect.w - Game::DEFAULT_W;
+	leMsgTextures[leMsgs["Save"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Save"]]->txRect.h - Game::DEFAULT_H;
+	leMsgTextures[leMsgs["Open"]]->txLoadT("Level Opened (output.map)", Game::gBodyFont.font, Game::gBodyFont.color);
+	leMsgTextures[leMsgs["Open"]]->txRect.x = Game::WINDOW_W - leMsgTextures[leMsgs["Open"]]->txRect.w - Game::DEFAULT_W;
+	leMsgTextures[leMsgs["Open"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Open"]]->txRect.h - Game::DEFAULT_H;
+	leMsgTextures[leMsgs["Set Width"]]->txLoadT("Enter Level Width: ", Game::gBodyFont.font, Game::gBodyFont.color);
+	leMsgTextures[leMsgs["Set Width"]]->txRect.x = Game::DEFAULT_W;
+	leMsgTextures[leMsgs["Set Width"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Set Width"]]->txRect.h - Game::DEFAULT_H;
+	leMsgTextures[leMsgs["Set Height"]]->txLoadT("Enter Level Height: ", Game::gBodyFont.font, Game::gBodyFont.color);
+	leMsgTextures[leMsgs["Set Height"]]->txRect.x = Game::DEFAULT_W;
+	leMsgTextures[leMsgs["Set Height"]]->txRect.y = Game::WINDOW_H - leMsgTextures[leMsgs["Set Height"]]->txRect.h - Game::DEFAULT_H;
+	if(leInputTexture != NULL)
+		delete leInputTexture;
+	leInputTexture = new Texture(0, 0, 0, 0);
 }
 
 /*
@@ -145,7 +159,9 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 	SDL_GetMouseState(&mx, &my);
 	// i = (mx * my) / (Game::DEFAULT_W * Game::DEFAULT_H);
 	i = ((my - leTotMoveY) / Game::DEFAULT_H * Level::LEVEL_W) + ((mx - leTotMoveX) / Game::DEFAULT_W);
-	//std::cout << i << std::endl;
+	// if (i > Level::LEVEL_W)
+	// 	i--;
+
 	if (leTakingInput > 0)
 	{
 		leAcceptInput(e);
@@ -167,8 +183,12 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 			{
 				if (mouseThing != NULL)
 				{
-					if (Game::things[i] == NULL)
+					std::cout << i << std::endl;
+					if (Game::things[i] == NULL) {
 						Game::newThing(mouseThing->tgType, i, mouseThing->tgHitboxRect.x, mouseThing->tgHitboxRect.y, mouseThing->tgGetSubtype());
+
+						std::cout << i << std::endl;
+					}
 				}
 				else
 				{
@@ -188,6 +208,7 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 				if (Game::things[i] != NULL)
 					if (Game::things[i]->tgType != Game::ThingType["player"])
 						Game::destroyThing(i);
+				std::cout << i << std::endl;
 			}
 			isDragging = leControls["Delete"];
 		}
@@ -200,13 +221,13 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 	if (e->type == SDL_KEYDOWN)
 	{
 		if (e->key.keysym.sym == leControls["Up"])
-			leLvlMoveY = -DEFAULT_LVL_MOVE;
-		else if (e->key.keysym.sym == leControls["Down"])
 			leLvlMoveY = DEFAULT_LVL_MOVE;
+		else if (e->key.keysym.sym == leControls["Down"])
+			leLvlMoveY = -DEFAULT_LVL_MOVE;
 		else if (e->key.keysym.sym == leControls["Left"])
-			leLvlMoveX = -DEFAULT_LVL_MOVE;
-		else if (e->key.keysym.sym == leControls["Right"])
 			leLvlMoveX = DEFAULT_LVL_MOVE;
+		else if (e->key.keysym.sym == leControls["Right"])
+			leLvlMoveX = -DEFAULT_LVL_MOVE;
 	}
 	if (e->type == SDL_KEYUP)
 	{
@@ -454,7 +475,7 @@ void LevelEditor::leChangeDimensions(int w, int h)
 			if (irow % Level::LEVEL_W == 0)
 			{
 				for (; irow % w != 0; i++, irow++)
-					Game::things.insert(Game::things.begin() + i, NULL);
+					Game::things.insert(Game::things.begin() + i - 1, NULL);
 				irow = 0;
 			}
 		}
@@ -494,6 +515,4 @@ void LevelEditor::leChangeDimensions(int w, int h)
 	Game::gColliding.resize(Level::LEVEL_UNITS);
 	level.w = Level::LEVEL_W_PIXELS;
 	level.h = Level::LEVEL_H_PIXELS;
-
-	std::cout << Game::things.size() << " " << Level::LEVEL_UNITS << std::endl;
 }

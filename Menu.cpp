@@ -285,8 +285,8 @@ bool Menu::muHandleMenu(SDL_Event* e)
 								muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.w = 0; muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.h = 0;
 								muMiscTextures[Audio::SFX_VOL_INDEX]->txLoadT(std::to_string(Audio::volume[Audio::SFX_VOL_INDEX]), Game::gHeadingFont.font, Game::gHeadingFont.color);
 								muMiscTextures[Audio::MUSIC_VOL_INDEX]->txLoadT(std::to_string(Audio::volume[Audio::MUSIC_VOL_INDEX]), Game::gHeadingFont.font, Game::gHeadingFont.color);
-								Menu::muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.h *= Graphics::GFX_MULT;
-								Menu::muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.h *= Graphics::GFX_MULT;
+								//Menu::muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::SFX_VOL_INDEX]->txRect.h *= Graphics::GFX_MULT;
+								//Menu::muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.w *= Graphics::GFX_MULT; Menu::muMiscTextures[Audio::MUSIC_VOL_INDEX]->txRect.h *= Graphics::GFX_MULT;
 								muMenu = MenuID["audio"];
 							}
 							else if (muOptions[i] == "Game Controls")

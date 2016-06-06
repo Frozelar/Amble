@@ -350,6 +350,7 @@ void Game::centerCamera(void)
 void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 {
 	SDL_Rect trect = { 0, 0, 0, 0 };
+	trect = { x / DEFAULT_W * DEFAULT_W, y / DEFAULT_H * DEFAULT_H, 0, 0 };
 	if (x == -1 || y == -1)
 	{
 		x = (levelunit - ((levelunit / Level::LEVEL_W) * Level::LEVEL_W)) * DEFAULT_W;
@@ -365,11 +366,11 @@ void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 			things[levelunit] = gPlayer;
 		}
 		else if (type > OFFSET["TILE"] && type < OFFSET["ENEMY"])
-			things[levelunit] = new Tile(NULL, type - OFFSET["TILE"], levelunit);
+			things[levelunit] = new Tile(&trect, type - OFFSET["TILE"], levelunit);
 		else if (type > OFFSET["ENEMY"] && type < OFFSET["COLLECTIBLE"])
-			things[levelunit] = new Enemy(NULL, type - OFFSET["ENEMY"], levelunit);
+			things[levelunit] = new Enemy(&trect, type - OFFSET["ENEMY"], levelunit);
 		else if (type > OFFSET["COLLECTIBLE"])
-			things[levelunit] = new Collectible(NULL, type - OFFSET["COLLECTIBLE"], levelunit);
+			things[levelunit] = new Collectible(&trect, type - OFFSET["COLLECTIBLE"], levelunit);
 		/*
 		else if (type > TILE_TYPE_OFFSET && type < TILE_TYPE_OFFSET + TileType["total"])
 			things[levelunit] = new Tile(NULL, type - TILE_TYPE_OFFSET, levelunit);
@@ -381,7 +382,6 @@ void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 	}
 	else if (levelunit > -1 && type > -1 && thingtype > -1)
 	{
-		trect = { x / DEFAULT_W * DEFAULT_W, y / DEFAULT_H * DEFAULT_H, 0, 0 };
 		if (gCamera.x != 0 || gCamera.y != 0)
 		{
 			trect.x += gCamera.x;

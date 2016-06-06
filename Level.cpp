@@ -69,7 +69,7 @@ bool Level::generateLevel(int whichLevel)
 	std::string ext = ".map";
 	int x = 0, y = 0;
 	int unitType = -1;
-	int unit = -1;
+	int unit = 0;
 	std::ifstream levelMap;
 	bool blockIsAnimated = false;
 	SDL_Rect playerRect{ 0, 0, Game::PLAYER_W, Game::PLAYER_H };
@@ -100,7 +100,7 @@ bool Level::generateLevel(int whichLevel)
 	levelMap >> unitType;
 	levelTrack = unitType /* - Game::OFFSET["MUSIC"] */ - 1;
 
-	for (int i = 0, j = 0; i < LEVEL_PIXELS;)
+	for (int i = 0; i < LEVEL_PIXELS;)
 	{
 		unitType = -1;
 
@@ -114,20 +114,18 @@ bool Level::generateLevel(int whichLevel)
 
 		if (unitType != -1)
 		{
-			unit++;
-			if(unitType != 0)
+			if (unitType != 0)
 				Game::newThing(unitType, unit, x, y, -1);
 
 			i += Game::DEFAULT_W;
-			j++;
 
-			if (x + Game::DEFAULT_W >= LEVEL_W * Game::DEFAULT_W)
+			x += Game::DEFAULT_W;
+			if (x >= LEVEL_W_PIXELS)
 			{
 				x = 0;
 				y += Game::DEFAULT_H;
 			}
-			else
-				x += Game::DEFAULT_W;
+			unit++;
 		}
 	}
 

@@ -41,6 +41,7 @@ public:
 	static Texture* leInputTexture;
 
 	// static bool leInitLevel(void);
+	static void leLoadMsgs(void);
 	static bool leEnter(void);
 	static bool leExit(void);
 	static bool leHandleEnvironment(SDL_Event*);
