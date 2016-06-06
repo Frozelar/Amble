@@ -327,10 +327,7 @@ bool Menu::muHandleMenu(SDL_Event* e)
 						else if (muMenu == MenuID["gmcontrols"])
 						{
 							if (muOptions[i] == "Return" && i > muGetMenuPos("gmcontrols") && i < muGetMenuPos("gmcontrols") + NumOptions[MenuID["gmcontrols"]])
-							{
-								std::cout << i << std::endl;
 								muMenu -= 3;
-							}
 							else if(i > muGetMenuPos("gmcontrols") && i < muGetMenuPos("gmcontrols") + NumOptions[MenuID["gmcontrols"]])
 							{
 								if (!muIsMapping)

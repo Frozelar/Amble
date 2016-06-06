@@ -134,11 +134,9 @@ int main(int argc, char** argv)
 		}
 
 		if (!needtoinitlevel && (/* Game::gState == Game::GameState["editor"] || */ Game::gState == Game::GameState["title"]))
-		{
 			needtoinitlevel = true;
-			if (Game::gOldState == Game::GameState["editor"])
-				LevelEditor::leExit();
-		}
+			// if (Game::gOldState == Game::GameState["editor"])
+			// 	LevelEditor::leExit();
 	}
 
 	close();

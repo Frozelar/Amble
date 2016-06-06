@@ -457,6 +457,8 @@ void Game::destroyProjectile(int num)
 
 void Game::changeGameState(int newState)
 {
+	if (gOldState == Game::GameState["editor"])
+		LevelEditor::leExit();
 	gOldState = gState;
 	if (Game::gState != newState && newState >= 0 && newState < GameState.size())
 		Game::gState = newState;
