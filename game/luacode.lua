@@ -115,21 +115,21 @@ GFX_SCALE = 1.0
 GFX_MULT = 1.0
 WINDOW_W = 960
 WINDOW_H = 540
-DEFAULT_W = 8
-DEFAULT_H = 8
-PLAYER_W = 8
-PLAYER_H = 16
-DEFAULT_ENEMY_W = 8
-DEFAULT_ENEMY_H = 8
-DEFAULT_COLLECTIBLE_W = 8
-DEFAULT_COLLECTIBLE_H = 8
-DEFAULT_GFX_OFFSET = 2
+DEFAULT_W = 8 * 2
+DEFAULT_H = 8 * 2
+PLAYER_W = 8 * 2
+PLAYER_H = 16 * 2
+DEFAULT_ENEMY_W = 8 * 2
+DEFAULT_ENEMY_H = 8 * 2
+DEFAULT_COLLECTIBLE_W = 8 * 2
+DEFAULT_COLLECTIBLE_H = 8 * 2
+DEFAULT_GFX_OFFSET = 2 * 2
 DEFAULT_SPEED = 2
 DEFAULT_COOLDOWN = 128
-DEFAULT_PARTICLE_W = 1
-DEFAULT_PARTICLE_H = 1
-DEFAULT_PROJECTILE_W = 2
-DEFAULT_PROJECTILE_H = 2
+DEFAULT_PARTICLE_W = 1 * 2
+DEFAULT_PARTICLE_H = 1 * 2
+DEFAULT_PROJECTILE_W = 2 * 2
+DEFAULT_PROJECTILE_H = 2 * 2
 DEFAULT_PROJECTILE_LIFE = 300
 
 LEVEL_UNITS = 0
@@ -1202,9 +1202,9 @@ function spawnProjectile(px, py, ptype, pwhat, pdirection)
 end
 
 function deleteProjectile(which)
-	if which > #gProjectiles then
-		gProjectiles[which] = nil
-	else
+	--if which > #gProjectiles then
+	--	gProjectiles[which] = nil
+	if which <= #gProjectiles then
 		table.remove(gProjectiles, which)
 	end
 end

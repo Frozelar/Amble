@@ -50,55 +50,55 @@ std::map<std::string, int> Game::ProjectileType;
 std::map<std::string, int> Game::GameState;
 
 // window width (in pixels)
-int Game::WINDOW_W = 800;
+int Game::WINDOW_W = 960;
 
 // window height (in pixels)
-int Game::WINDOW_H = 600;
+int Game::WINDOW_H = 540;
 
 // default unit width (in pixels)
-int Game::DEFAULT_W = 8;
+int Game::DEFAULT_W = 8 * 2;
 
 // default unit height (in pixels)
-int Game::DEFAULT_H = 8;
+int Game::DEFAULT_H = 8 * 2;
 
 // maximum level size
 // const int Game::LEVEL_MAX = 16384;
 
 // player hitbox width
-int Game::PLAYER_W = 8;
+int Game::PLAYER_W = 8 * 2;
 
 // player hitbox height
-int Game::PLAYER_H = 16;
+int Game::PLAYER_H = 16 * 2;
 
 // default enemy hitbox width
-int Game::DEFAULT_ENEMY_W = 8;
+int Game::DEFAULT_ENEMY_W = 8 * 2;
 
 // default enemy hitbox height
-int Game::DEFAULT_ENEMY_H = 8;
+int Game::DEFAULT_ENEMY_H = 8 * 2;
 
 // default collectible hitbox width
-int Game::DEFAULT_COLLECTIBLE_W = 8;
+int Game::DEFAULT_COLLECTIBLE_W = 8 * 2;
 
 // default collectible hitbox height
-int Game::DEFAULT_COLLECTIBLE_H = 8;
+int Game::DEFAULT_COLLECTIBLE_H = 8 * 2;
 
 // default particle width
-int Game::DEFAULT_PARTICLE_W = 1;
+int Game::DEFAULT_PARTICLE_W = 1 * 2;
 
 // default particle height
-int Game::DEFAULT_PARTICLE_H = 1;
+int Game::DEFAULT_PARTICLE_H = 1 * 2;
 
 // default projectile width
-int Game::DEFAULT_PROJECTILE_W = 2;
+int Game::DEFAULT_PROJECTILE_W = 2 * 2;
 
 // default projectile height
-int Game::DEFAULT_PROJECTILE_H = 2;
+int Game::DEFAULT_PROJECTILE_H = 2 * 2;
 
 // default time before projectiles will despawn if they do not hit anything
 int Game::DEFAULT_PROJECTILE_LIFE = 300;
 
 // default offset value for graphics
-int Game::DEFAULT_GFX_OFFSET = 2;
+int Game::DEFAULT_GFX_OFFSET = 2 * 2;
 
 // the default speed for movement
 int Game::DEFAULT_SPEED = 2;

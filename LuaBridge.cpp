@@ -1134,16 +1134,26 @@ int LuaBridge::labHandleEnvironment(void)
 			}
 			else if (Game::gProjectiles[i] != NULL)
 			{
-				lua_getfield(L, -1, "pjRect");							// totalProjectiles, gProjectiles, specific projectile, pjRect
-				lua_getfield(L, -1, "x");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x
-				lua_getfield(L, -2, "y");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x, y
-				lua_getfield(L, -3, "w");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x, y, w
-				lua_getfield(L, -4, "h");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x, y, w, h
-				Game::gProjectiles[i]->pjRect = { (int)lua_tonumber(L, -4), (int)lua_tonumber(L, -3), (int)lua_tonumber(L, -2), (int)lua_tonumber(L, -1) };
-				lua_pop(L, 5);											// totalProjectiles, gProjectiles, specific projectile
-				lua_getfield(L, -1, "pjFrame");							// totalProjectiles, gProjectiles, specific projectile, pjFrame
-				Game::gProjectiles[i]->pjFrame = lua_tonumber(L, -1) - 1;
-				lua_pop(L, 1);											// totalProjectiles, gProjectiles, specific projectile
+				lua_getfield(L, -1, "pjType");
+				if (Game::gProjectiles[i]->pjType == lua_tonumber(L, -1) - 1)
+				{
+					lua_pop(L, 1);
+					lua_getfield(L, -1, "pjRect");							// totalProjectiles, gProjectiles, specific projectile, pjRect
+					lua_getfield(L, -1, "x");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x
+					lua_getfield(L, -2, "y");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x, y
+					lua_getfield(L, -3, "w");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x, y, w
+					lua_getfield(L, -4, "h");								// totalProjectiles, gProjectiles, specific projectile, pjRect, x, y, w, h
+					Game::gProjectiles[i]->pjRect = { (int)lua_tonumber(L, -4), (int)lua_tonumber(L, -3), (int)lua_tonumber(L, -2), (int)lua_tonumber(L, -1) };
+					lua_pop(L, 5);											// totalProjectiles, gProjectiles, specific projectile
+					lua_getfield(L, -1, "pjFrame");							// totalProjectiles, gProjectiles, specific projectile, pjFrame
+					Game::gProjectiles[i]->pjFrame = lua_tonumber(L, -1) - 1;
+					lua_pop(L, 1);											// totalProjectiles, gProjectiles, specific projectile
+				}
+				else
+				{
+					lua_pop(L, 1);
+					Game::gProjectiles[i]->pjLife = 0;
+				}
 			}
 		}
 		lua_pop(L, 2);													// totalProjectiles

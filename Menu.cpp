@@ -146,10 +146,10 @@ void Menu::muInitMenu(void)
 			}
 			else
 			{
-				if (muOptionTextures[i - 1]->txRect.y + muOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H + muOptionTextures[i]->txRect.h >= menuTexture->txRect.y + menuTexture->txRect.h)
+				if (muOptionTextures[i - 1]->txRect.y + muOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H / 2 + muOptionTextures[i]->txRect.h >= menuTexture->txRect.y + menuTexture->txRect.h)
 				{
 					muOptionTextures[i]->txRect.x = menuTexture->txRect.x + menuTexture->txRect.w / 2; // menuTexture->txRect.x + menuTexture->txRect.w - muOptionTextures[i]->txRect.w - Game::DEFAULT_W;
-					muOptionTextures[i]->txRect.y = menuTexture->txRect.y + Game::DEFAULT_H;
+					muOptionTextures[i]->txRect.y = menuTexture->txRect.y + Game::DEFAULT_H / 2;
 				}
 				else
 				{
@@ -157,7 +157,7 @@ void Menu::muInitMenu(void)
 						muOptionTextures[i]->txRect.x = menuTexture->txRect.x + menuTexture->txRect.w / 2; // menuTexture->txRect.x + menuTexture->txRect.w - muOptionTextures[i]->txRect.w - Game::DEFAULT_W;
 					else
 						muOptionTextures[i]->txRect.x = menuTexture->txRect.x + Game::DEFAULT_W;
-					muOptionTextures[i]->txRect.y = muOptionTextures[i - 1]->txRect.y + muOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H;
+					muOptionTextures[i]->txRect.y = muOptionTextures[i - 1]->txRect.y + muOptionTextures[i - 1]->txRect.h + Game::DEFAULT_H / 2;
 				}
 			}
 			if (muOptions[i] == "Music" || muOptions[i] == "Sound Effects")
