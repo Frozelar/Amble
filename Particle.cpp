@@ -68,12 +68,15 @@ void Particle::ptMove()
 {
 	ptRect.x += ptSpeedX;
 	ptRect.y += ptSpeedY;
-	// std::cout << ptNumber << " | " << ptRect.x << " " << ptDestination.x << " | " << ptRect.y << " " << ptDestination.y << std::endl;
-	if ((((ptSpeedX > 0 && ptRect.x > ptDestination.x) || (ptSpeedX < 0 && ptRect.x < ptDestination.x)) && 
-		((ptSpeedY > 0 && ptRect.y > ptDestination.y) || (ptSpeedY < 0 && ptRect.y < ptDestination.y))) || 
-		((ptSpeedX == 0 && ptSpeedY > 0 && ptRect.y > ptDestination.y) || (ptSpeedX == 0 && ptSpeedY < 0 && ptRect.y < ptDestination.y) || 
+	if ((((ptSpeedX > 0 && ptRect.x > ptDestination.x) || (ptSpeedX < 0 && ptRect.x < ptDestination.x)) &&
+		((ptSpeedY > 0 && ptRect.y > ptDestination.y) || (ptSpeedY < 0 && ptRect.y < ptDestination.y))) ||
+		((ptSpeedX == 0 && ptSpeedY > 0 && ptRect.y > ptDestination.y) || (ptSpeedX == 0 && ptSpeedY < 0 && ptRect.y < ptDestination.y) ||
 		(ptSpeedY == 0 && ptSpeedX > 0 && ptRect.x > ptDestination.x) || (ptSpeedY == 0 && ptSpeedX < 0 && ptRect.x < ptDestination.x)))
-		ptLife = 0; // Game::destroyParticle(ptNumber);
+		ptLife = 1; // ptLife = 0; // Game::destroyParticle(ptNumber);
+	if (ptLife == 1)
+		ptAlpha -= 15;
+	if (ptAlpha <= 0)
+		ptLife = 0;
 	// else if (ptRect.x % 15 == 0 || ptRect.y % 15 == 0)
 	// 	ptAlpha -= 17;
 }
