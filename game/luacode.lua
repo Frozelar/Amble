@@ -111,6 +111,7 @@ TOTAL_DASH_ARRAY_UNITS = #dashArray
 floatArray = { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, -1, -1 }
 TOTAL_FLOAT_ARRAY_UNITS = #floatArray
 
+FPS = 60
 GFX_SCALE = 1.0
 GFX_MULT = 1.0
 WINDOW_W = 960

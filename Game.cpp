@@ -49,6 +49,9 @@ std::map<std::string, int> Game::ParticleType;
 std::map<std::string, int> Game::ProjectileType;
 std::map<std::string, int> Game::GameState;
 
+// target fps
+int Game::FPS = 60;
+
 // window width (in pixels)
 int Game::WINDOW_W = 960;
 
@@ -143,7 +146,7 @@ Font Game::gTitleFont;
 
 bool Game::initialized = init();
 SDL_Window* Game::gWindow = SDL_CreateWindow("Hey There Guy", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Game::WINDOW_W, Game::WINDOW_H, SDL_WINDOW_SHOWN);
-SDL_Renderer* Game::gRenderer = SDL_CreateRenderer(Game::gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+SDL_Renderer* Game::gRenderer = SDL_CreateRenderer(Game::gWindow, -1, SDL_RENDERER_ACCELERATED /* | SDL_RENDERER_PRESENTVSYNC */);
 SDL_Event* Game::gEvent;
 std::vector<Collision*> Game::gColliding;
 
@@ -327,23 +330,26 @@ bool Game::applyAI(void)
 
 void Game::centerCamera(void)
 {
-	int differenceX = -1;
-	int differenceY = -1;
-	if (gPlayer->tgHitboxRect.x + gPlayer->tgHitboxRect.w / 2 != WINDOW_W / 2 ||
-		gPlayer->tgHitboxRect.y + gPlayer->tgHitboxRect.h / 2 != WINDOW_H / 2)
+	int differenceX = 0;
+	int differenceY = 0;
+	if (gCamera.x > 0 && gCamera.x + gCamera.w < Level::LEVEL_W_PIXELS && gCamera.y > 0 && gCamera.y + gCamera.h < Level::LEVEL_H_PIXELS)
 	{
-		differenceX = WINDOW_W / 2 - (gPlayer->tgHitboxRect.x + gPlayer->tgHitboxRect.w / 2);
-		differenceY = WINDOW_H / 2 - (gPlayer->tgHitboxRect.y + gPlayer->tgHitboxRect.h / 2);
-		for (int i = 0; i < (int)things.size(); i++)
+		if (gPlayer->tgHitboxRect.x + gPlayer->tgHitboxRect.w / 2 != WINDOW_W / 2 ||
+			gPlayer->tgHitboxRect.y + gPlayer->tgHitboxRect.h / 2 != WINDOW_H / 2)
 		{
-			if (things[i] != NULL)
+			differenceX = WINDOW_W / 2 - (gPlayer->tgHitboxRect.x + gPlayer->tgHitboxRect.w / 2);
+			differenceY = WINDOW_H / 2 - (gPlayer->tgHitboxRect.y + gPlayer->tgHitboxRect.h / 2);
+			for (int i = 0; i < (int)things.size(); i++)
 			{
-				things[i]->tgHitboxRect.x += differenceX;
-				things[i]->tgHitboxRect.y += differenceY;
+				if (things[i] != NULL)
+				{
+					things[i]->tgHitboxRect.x += differenceX;
+					things[i]->tgHitboxRect.y += differenceY;
+				}
 			}
 		}
 	}
-	gCamera = { differenceX, differenceY, Level::LEVEL_W_PIXELS, Level::LEVEL_H_PIXELS };
+	gCamera = { gCamera.x + differenceX, gCamera.y + differenceY, WINDOW_W, WINDOW_H }; // Level::LEVEL_W_PIXELS, Level::LEVEL_H_PIXELS };
 }
 
 // if type has the offset built-in, then do NOT give the final thingtype argument; otherwise, give a thingtype

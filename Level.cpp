@@ -142,13 +142,44 @@ void Level::moveLevel(void)
 {
 	// if (Game::gPlayer.tgSpeed != 0)
 	// 	Level::gLevelMovementsX -= Game::gPlayer.tgSpeed;
+	int movex = (Game::gPlayer->plOldHitboxRect.x - Game::gPlayer->tgHitboxRect.x);
+	int movey = (Game::gPlayer->plOldHitboxRect.y - Game::gPlayer->tgHitboxRect.y);
 	if (Game::gPlayer->tgHitboxRect.x != Game::gPlayer->plOldHitboxRect.x)
-		gLevelMovementsX += (Game::gPlayer->plOldHitboxRect.x - Game::gPlayer->tgHitboxRect.x);
+	{
+		if (Game::gCamera.x <= 0 || Game::gCamera.x + Game::gCamera.w >= Level::LEVEL_W_PIXELS)
+		{
+			if (Game::gCamera.x < 0)
+				Game::gCamera.x = 0;
+			else if (Game::gCamera.x + Game::gCamera.w > Level::LEVEL_W_PIXELS)
+				Game::gCamera.x = Level::LEVEL_W_PIXELS - Game::gCamera.w;
+			// Game::gPlayer->tgHitboxRect.x += movex;
+			if ((Game::gCamera.x == 0 && Game::gPlayer->tgHitboxRect.x + Game::gPlayer->tgHitboxRect.w / 2 > Game::WINDOW_W / 2) || 
+				(Game::gCamera.x == Level::LEVEL_W_PIXELS - Game::gCamera.w && Game::gPlayer->tgHitboxRect.x + Game::gPlayer->tgHitboxRect.w / 2 < Game::WINDOW_W / 2))
+				gLevelMovementsX += movex;
+		}
+		else
+			gLevelMovementsX += movex;
+	}
 	if (Game::gPlayer->tgHitboxRect.y != Game::gPlayer->plOldHitboxRect.y)
-		gLevelMovementsY += (Game::gPlayer->plOldHitboxRect.y - Game::gPlayer->tgHitboxRect.y);
+	{
+		if (Game::gCamera.y <= 0 || Game::gCamera.y + Game::gCamera.h >= Level::LEVEL_H_PIXELS)
+		{
+			if (Game::gCamera.y < 0)
+				Game::gCamera.y = 0;
+			else if (Game::gCamera.y + Game::gCamera.h > Level::LEVEL_H_PIXELS)
+				Game::gCamera.y = Level::LEVEL_H_PIXELS - Game::gCamera.h;
+			// Game::gPlayer->tgHitboxRect.y += movey;
+			if ((Game::gCamera.y == 0 && Game::gPlayer->tgHitboxRect.y + Game::gPlayer->tgHitboxRect.h / 2 > Game::WINDOW_H / 2) ||
+				(Game::gCamera.y == Level::LEVEL_H_PIXELS - Game::gCamera.h && Game::gPlayer->tgHitboxRect.y + Game::gPlayer->tgHitboxRect.h / 2 < Game::WINDOW_H / 2))
+				gLevelMovementsY += movey;
+		}
+		else
+			gLevelMovementsY += movey;
+	}
 	// if (Game::gPlayer.tgVerticals != 0)
 	// 	Level::gLevelMovementsY += (Game::gPlayer.plOldHitboxRect.y - (Game::gPlayer.tgHitboxRect.y +
 	// 	(Game::gPlayer.tgVerticals > 0 ? Game::gravityArray[Game::gPlayer.tgVerticals] : -Game::jumpArray[-Game::gPlayer.tgVerticals])));
+	/*
 	if (gLevelMovementsX != 0 || gLevelMovementsY != 0)
 	{
 		for (int i = 0; i < LEVEL_UNITS; i++)
@@ -175,12 +206,48 @@ void Level::moveLevel(void)
 				Game::gProjectiles[i]->pjRect.y += gLevelMovementsY;
 			}
 		}
+		Game::gCamera = { Game::gCamera.x + gLevelMovementsX, Game::gCamera.y + gLevelMovementsY, Game::WINDOW_W, Game::WINDOW_H };
+		gLevelMovementsX = 0;
+		gLevelMovementsY = 0;
+		Game::gPlayer->tgHitboxRect = Game::gPlayer->plOldHitboxRect;
 	}
-	Game::gCamera.x += gLevelMovementsX;
-	Game::gCamera.y += gLevelMovementsY;
-	gLevelMovementsX = 0;
-	gLevelMovementsY = 0;
-	Game::gPlayer->tgHitboxRect = Game::gPlayer->plOldHitboxRect;
+	else
+		Game::gPlayer->plOldHitboxRect = Game::gPlayer->tgHitboxRect;
+	*/
+	if (gLevelMovementsX != 0)
+	{
+		for (int i = 0; i < LEVEL_UNITS; i++)
+			if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
+				Game::things[i]->tgHitboxRect.x += gLevelMovementsX;
+		for (int i = 0; i < Game::gParticles.size(); i++)
+			if (Game::gParticles[i] != NULL)
+				Game::gParticles[i]->ptRect.x += gLevelMovementsX;
+		for (int i = 0; i < Game::gProjectiles.size(); i++)
+			if (Game::gProjectiles[i] != NULL)
+				Game::gProjectiles[i]->pjRect.x += gLevelMovementsX;
+		Game::gCamera = { Game::gCamera.x + gLevelMovementsX, Game::gCamera.y, Game::WINDOW_W, Game::WINDOW_H };
+		gLevelMovementsX = 0;
+		Game::gPlayer->tgHitboxRect.x = Game::gPlayer->plOldHitboxRect.x;
+	}
+	else
+		Game::gPlayer->plOldHitboxRect.x = Game::gPlayer->tgHitboxRect.x;
+	if (gLevelMovementsY != 0)
+	{
+		for (int i = 0; i < LEVEL_UNITS; i++)
+			if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
+				Game::things[i]->tgHitboxRect.y += gLevelMovementsY;
+		for (int i = 0; i < Game::gParticles.size(); i++)
+			if (Game::gParticles[i] != NULL)
+				Game::gParticles[i]->ptRect.y += gLevelMovementsY;
+		for (int i = 0; i < Game::gProjectiles.size(); i++)
+			if (Game::gProjectiles[i] != NULL)
+				Game::gProjectiles[i]->pjRect.y += gLevelMovementsY;
+		Game::gCamera = { Game::gCamera.x, Game::gCamera.y + gLevelMovementsY, Game::WINDOW_W, Game::WINDOW_H };
+		gLevelMovementsY = 0;
+		Game::gPlayer->tgHitboxRect.y = Game::gPlayer->plOldHitboxRect.y;
+	}
+	else
+		Game::gPlayer->plOldHitboxRect.y = Game::gPlayer->tgHitboxRect.y;
 
 	// if ((Game::gPlayer.tgSpeed > 0 && Game::gPlayer.tgDirection == LEFT) || 
 	// 	(Game::gPlayer.tgSpeed < 0 && Game::gPlayer.tgDirection == RIGHT))

@@ -183,12 +183,8 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 			{
 				if (mouseThing != NULL)
 				{
-					std::cout << i << std::endl;
-					if (Game::things[i] == NULL) {
+					if (Game::things[i] == NULL)
 						Game::newThing(mouseThing->tgType, i, mouseThing->tgHitboxRect.x, mouseThing->tgHitboxRect.y, mouseThing->tgGetSubtype());
-
-						std::cout << i << std::endl;
-					}
 				}
 				else
 				{
@@ -204,12 +200,9 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 		else if (e->button.button == leControls["Delete"] || isDragging == leControls["Delete"])
 		{
 			if (mx >= 0 + leTotMoveX && my >= 0 + leTotMoveY && mx < Level::LEVEL_W_PIXELS + leTotMoveX && my < Level::LEVEL_H_PIXELS + leTotMoveY)
-			{
 				if (Game::things[i] != NULL)
 					if (Game::things[i]->tgType != Game::ThingType["player"])
 						Game::destroyThing(i);
-				std::cout << i << std::endl;
-			}
 			isDragging = leControls["Delete"];
 		}
 	}

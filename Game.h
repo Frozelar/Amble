@@ -161,6 +161,7 @@ public:
 	// static const int BACKGROUND_TYPE_OFFSET = 4000;
 	// static const int MUSIC_TYPE_OFFSET = 5000;
 	static std::map< std::string, int > OFFSET;
+	static int FPS;
 	static int WINDOW_W;
 	static int WINDOW_H;
 	static int DEFAULT_W;

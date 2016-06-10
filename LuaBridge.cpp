@@ -156,6 +156,8 @@ int LuaBridge::labInitValues(void)
 	}
 	lua_pop(L, 2);
 
+	lua_getglobal(L, "FPS");
+	Game::FPS = lua_tonumber(L, -1);
 	lua_getglobal(L, "DEFAULT_W");
 	Game::DEFAULT_W = lua_tonumber(L, -1);
 	lua_getglobal(L, "DEFAULT_H");
@@ -204,7 +206,7 @@ int LuaBridge::labInitValues(void)
 	// Player* pl = &Game::gPlayer;
 	// lua_pushlightuserdata(L, pl);
 	// lua_settable(L, LUA_REGISTRYINDEX);
-	lua_pop(L, 19);
+	lua_pop(L, 20);
 
 	/*
 	lua_getglobal(L, "textColor");						// textColor

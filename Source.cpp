@@ -32,6 +32,7 @@ int main(int argc, char** argv)
 {
 	bool quit = false;
 	bool needtoinitlevel = true;
+	Uint32 curfps = 0;
 	
 	Game::gEvent = new SDL_Event();
 	Game::gGame = new Game();
@@ -58,6 +59,7 @@ int main(int argc, char** argv)
 	Game::gState = Game::GameState["title"];
 	while (!quit)
 	{
+		curfps = SDL_GetTicks();
 		if (Game::gState == Game::GameState["game"])
 		{
 			if (needtoinitlevel)
@@ -133,12 +135,14 @@ int main(int argc, char** argv)
 			LevelEditor::leRender();
 		}
 
+		if (1000 / Game::FPS > SDL_GetTicks() - curfps)
+			SDL_Delay((1000 / Game::FPS) - (SDL_GetTicks() - curfps));
+
 		if (!needtoinitlevel && (/* Game::gState == Game::GameState["editor"] || */ Game::gState == Game::GameState["title"]))
 			needtoinitlevel = true;
 			// if (Game::gOldState == Game::GameState["editor"])
 			// 	LevelEditor::leExit();
 	}
-
 	close();
 
 	return 0;
