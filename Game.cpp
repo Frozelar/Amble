@@ -247,7 +247,7 @@ bool Game::checkCollision(Thing* thingOne, Thing* thingTwo, int levelunit, bool 
 	// clear out gColliding so that results are not reused
 	if (outputCollision)
 	{
-		for (int i = 0; i < Level::LEVEL_UNITS; i++)
+		for (int i = 0; i < gColliding.size(); i++)
 		{
 			if (gColliding[i] != NULL)
 			{
@@ -260,9 +260,9 @@ bool Game::checkCollision(Thing* thingOne, Thing* thingTwo, int levelunit, bool 
 	// if we need to check for collision with everything in the level
 	if (thingTwo == NULL)
 	{
-		for (int i = 0; i < Level::LEVEL_UNITS; i++)
+		for (int i = 0; i < things.size(); i++)
 		{
-			if (things[i] != NULL && i != levelunit)
+			if (things[i] != NULL && things[i]->tgLevelUnit != levelunit)
 			{
 				if ((thingOne->tgHitboxRect.x + thingOne->tgHitboxRect.w > things[i]->tgHitboxRect.x &&
 					thingOne->tgHitboxRect.x < things[i]->tgHitboxRect.x + things[i]->tgHitboxRect.w) &&
@@ -308,6 +308,7 @@ bool Game::applyAI(void)
 	{
 		if (things[i] != NULL && things[i]->tgType != ThingType["temp"])
 		{
+			things[i]->tgThingsUnit = i;
 			if (things[i]->tgType != ThingType["player"])
 				things[i]->tgApplyAI();
 			if (things[i]->tgHealth <= 0)
@@ -315,7 +316,7 @@ bool Game::applyAI(void)
 				if (things[i]->tgType == ThingType["player"])
 					return false;
 				else
-					destroyThing(i);
+					i = destroyThing(i);
 			}
 		}
 	}
@@ -339,7 +340,7 @@ void Game::centerCamera(void)
 		{
 			differenceX = WINDOW_W / 2 - (gPlayer->tgHitboxRect.x + gPlayer->tgHitboxRect.w / 2);
 			differenceY = WINDOW_H / 2 - (gPlayer->tgHitboxRect.y + gPlayer->tgHitboxRect.h / 2);
-			for (int i = 0; i < (int)things.size(); i++)
+			for (int i = 0; i < things.size(); i++)
 			{
 				if (things[i] != NULL)
 				{
@@ -355,8 +356,15 @@ void Game::centerCamera(void)
 // if type has the offset built-in, then do NOT give the final thingtype argument; otherwise, give a thingtype
 void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 {
-	SDL_Rect trect = { 0, 0, 0, 0 };
-	trect = { x / DEFAULT_W * DEFAULT_W, y / DEFAULT_H * DEFAULT_H, 0, 0 };
+	SDL_Rect trect = { x / DEFAULT_W * DEFAULT_W, y / DEFAULT_H * DEFAULT_H, 0, 0 };
+	int index = -1;
+	for (int i = 0; i < things.size(); i++)
+		if (things[i] != NULL)
+			if (things[i]->tgLevelUnit > levelunit)
+				index = i;
+	if (index == -1)
+		index = things.size();
+
 	if (x == -1 || y == -1)
 	{
 		x = (levelunit - ((levelunit / Level::LEVEL_W) * Level::LEVEL_W)) * DEFAULT_W;
@@ -369,14 +377,24 @@ void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 			gPlayer->tgHitboxRect.x = x;
 			gPlayer->tgHitboxRect.y = y;
 			gPlayer->tgLevelUnit = levelunit;
-			things[levelunit] = gPlayer;
+			gPlayer->tgThingsUnit = index;
+			things.insert(things.begin() + index, gPlayer);
+			// things[levelunit] = gPlayer;
 		}
+		else if (type > OFFSET["TILE"] && type < OFFSET["ENEMY"])
+			things.insert(things.begin() + index, new Tile(&trect, type - OFFSET["TILE"], levelunit, index));
+		else if (type > OFFSET["ENEMY"] && type < OFFSET["COLLECTIBLE"])
+			things.insert(things.begin() + index, new Enemy(&trect, type - OFFSET["ENEMY"], levelunit, index));
+		else if (type > OFFSET["COLLECTIBLE"])
+			things.insert(things.begin() + index, new Collectible(&trect, type - OFFSET["COLLECTIBLE"], levelunit, index));
+		/*
 		else if (type > OFFSET["TILE"] && type < OFFSET["ENEMY"])
 			things[levelunit] = new Tile(&trect, type - OFFSET["TILE"], levelunit);
 		else if (type > OFFSET["ENEMY"] && type < OFFSET["COLLECTIBLE"])
 			things[levelunit] = new Enemy(&trect, type - OFFSET["ENEMY"], levelunit);
 		else if (type > OFFSET["COLLECTIBLE"])
 			things[levelunit] = new Collectible(&trect, type - OFFSET["COLLECTIBLE"], levelunit);
+		*/
 		/*
 		else if (type > TILE_TYPE_OFFSET && type < TILE_TYPE_OFFSET + TileType["total"])
 			things[levelunit] = new Tile(NULL, type - TILE_TYPE_OFFSET, levelunit);
@@ -398,14 +416,24 @@ void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 			gPlayer->tgHitboxRect.x = x;
 			gPlayer->tgHitboxRect.y = y;
 			gPlayer->tgLevelUnit = levelunit;
-			things[levelunit] = gPlayer;
+			gPlayer->tgThingsUnit = index;
+			things.insert(things.begin() + index, gPlayer);
+			// things[levelunit] = gPlayer;
 		}
+		else if (type == ThingType["tile"])
+			things.insert(things.begin() + index, new Tile(&trect, thingtype, levelunit, index));
+		else if (type == ThingType["enemy"])
+			things.insert(things.begin() + index, new Enemy(&trect, thingtype, levelunit, index));
+		else if (type == ThingType["collectible"])
+			things.insert(things.begin() + index, new Collectible(&trect, thingtype, levelunit, index));
+		/*
 		else if (type == ThingType["tile"])
 			things[levelunit] = new Tile(&trect, thingtype, levelunit);
 		else if (type == ThingType["enemy"])
 			things[levelunit] = new Enemy(&trect, thingtype, levelunit);
 		else if (type == ThingType["collectible"])
 			things[levelunit] = new Collectible(&trect, thingtype, levelunit);
+		*/
 	}
 }
 
@@ -432,13 +460,16 @@ void Game::newProjectile(SDL_Rect* location, int type, int power, int num, int w
 	gProjectiles[pos] = new Projectile(location, type, power, num, what, dir);
 }
 
-void Game::destroyThing(int num)
+// if looping through things, returns the index that you should use so that you can do (i = destroyThing(i);) instead of (destroyThing(i); i--;)
+int Game::destroyThing(int num)
 {
 	if (num >= 0 && num < things.size())
 	{
 		delete things[num];
 		things[num] = NULL;
+		things.erase(things.begin() + num);
 	}
+	return num - 1;
 }
 
 void Game::destroyParticle(int num)

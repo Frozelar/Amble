@@ -23,14 +23,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Level.h"
 #include "Texture.h"
 
-Collectible::Collectible(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType["collectible"], unit)
+Collectible::Collectible(SDL_Rect* box, int subtype, int lunit, int tunit) : Thing(box, Game::ThingType["collectible"], lunit, tunit)
 {
 	tgHitboxRect.w = Game::DEFAULT_COLLECTIBLE_W;
 	tgHitboxRect.h = Game::DEFAULT_COLLECTIBLE_H;
 	// tgHitboxRect.x = (box == NULL ? ((unit - ((unit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W) : box->x);
 	// tgHitboxRect.y = (box == NULL ? ((unit / Level::LEVEL_W) * Game::DEFAULT_H) : box->y);
-	tgHitboxRect.x = (box == NULL ? unit * Game::DEFAULT_W / Game::DEFAULT_W : box->x);
-	tgHitboxRect.y = (box == NULL ? unit * Game::DEFAULT_H / Game::DEFAULT_H : box->y);
+	tgHitboxRect.x = (box == NULL ? lunit * Game::DEFAULT_W / Game::DEFAULT_W : box->x);
+	tgHitboxRect.y = (box == NULL ? lunit * Game::DEFAULT_H / Game::DEFAULT_H : box->y);
 	tgGFXrect.x = tgHitboxRect.x - Game::DEFAULT_GFX_OFFSET;
 	tgGFXrect.y = tgHitboxRect.y - Game::DEFAULT_GFX_OFFSET;
 	tgGFXrect.w = Game::DEFAULT_ENEMY_W + Game::DEFAULT_GFX_OFFSET * 2;
@@ -79,12 +79,13 @@ void Collectible::clCollect(void)
 }
 */
 
-void Collectible::tgResolveCollision(Thing* thing, int dir)
+void Collectible::tgResolveCollision(int thingsunit, int dir)
 {
 	// tgColliding[dir].thing1 = Game::things[tgLevelUnit];
-	tgColliding[dir] = thing->tgLevelUnit;
+	// tgColliding[dir] = thing->tgLevelUnit;
+	tgColliding[dir] = thingsunit;
 
-	if (thing->tgType == Game::ThingType["player"])
+	if (Game::things[thingsunit]->tgType == Game::ThingType["player"])
 		tgHealth = 0;
 }
 
@@ -93,7 +94,7 @@ void Collectible::tgApplyAI(void)
 	// if (tgHealth == 0)
 	//	clCollect();
 
-	if (!Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, false))
+	if (!Game::checkCollision(this, NULL, tgLevelUnit, false))
 		for (int i = 0; i < tgColliding.size(); i++)
 			tgColliding[i] = -1;
 }

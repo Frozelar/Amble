@@ -480,16 +480,7 @@ void Graphics::gxIncScale(bool gfxscale)
 	// Game::gCamera.w *= GFX_MULT;
 	// Game::gCamera.h *= GFX_MULT;
 
-	Game::gPlayer->tgHitboxRect = multDimensions(Game::gPlayer->tgHitboxRect, GFX_MULT);
-	Game::gPlayer->tgGFXrect = multDimensions(Game::gPlayer->tgGFXrect, GFX_MULT);
-	for (int i = 0; i < Game::things.size(); i++)
-	{
-		if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
-		{
-			Game::things[i]->tgHitboxRect = multDimensions(Game::things[i]->tgHitboxRect, GFX_MULT);
-			Game::things[i]->tgGFXrect = multDimensions(Game::things[i]->tgGFXrect, GFX_MULT);
-		}
-	}
+	gxUpdateThingScale();
 	for (int i = 0; i < Game::gParticles.size(); i++)
 		if (Game::gParticles[i] != NULL)
 			Game::gParticles[i]->ptRect = multDimensions(Game::gParticles[i]->ptRect, GFX_MULT);

@@ -23,14 +23,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Thing
 {
 public:
-	// SDL_Rect = hitbox rect; int = thing type; int = thing subtype; int = level unit
-	Thing(SDL_Rect* = NULL, int = -1, int = -1);
+	// SDL_Rect = hitbox rect; int = thing type; int = thing subtype; int = level unit; int = things unit
+	Thing(SDL_Rect* = NULL, int = -1, int = -1, int = -1);
 	~Thing();
 
 	virtual void tgRender(void);
 
-	// Thing* = thing being collided with, int = direction of collision relative to this thing (not the passed thing)
-	virtual void tgResolveCollision(Thing*, int);
+	// int = things[] unit of thing being collided with, int = direction of collision relative to this thing (not the passed thing)
+	virtual void tgResolveCollision(int, int);
 
 	// uses default gravity and jumping
 	virtual void tgHandleVerticals(void);
@@ -47,6 +47,7 @@ public:
 	int tgSpeed;
 	int tgFrame;
 	// int tgFrameWaitCounter;
+	int tgThingsUnit;
 	int tgLevelUnit;
 	int tgVerticals;
 	int tgDashing;

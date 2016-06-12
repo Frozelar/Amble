@@ -23,12 +23,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Level.h"
 #include "Texture.h"
 
-Tile::Tile(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType["tile"], unit)
+Tile::Tile(SDL_Rect* box, int subtype, int lunit, int tunit) : Thing(box, Game::ThingType["tile"], lunit, tunit)
 {
 	// tgHitboxRect.x = (box == NULL ? ((unit - ((unit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W) : box->x);
 	// tgHitboxRect.y = (box == NULL ? ((unit / Level::LEVEL_W) * Game::DEFAULT_H) : box->y);
-	tgHitboxRect.x = (box == NULL ? unit * Game::DEFAULT_W / Game::DEFAULT_W : box->x);
-	tgHitboxRect.y = (box == NULL ? unit * Game::DEFAULT_H / Game::DEFAULT_H : box->y);
+	tgHitboxRect.x = (box == NULL ? lunit * Game::DEFAULT_W / Game::DEFAULT_W : box->x);
+	tgHitboxRect.y = (box == NULL ? lunit * Game::DEFAULT_H / Game::DEFAULT_H : box->y);
 	tgHitboxRect.w = Game::DEFAULT_W;
 	tgHitboxRect.h = Game::DEFAULT_H;
 	tgGFXrect.x = tgHitboxRect.x;
@@ -76,7 +76,7 @@ void Tile::tgResolveCollision(Thing* thing)
 }
 */
 
-void Tile::tgResolveCollision(Thing* thing, int dir)
+void Tile::tgResolveCollision(int thingsunit, int dir)
 {
 	// thing->tgColliding = tgType;
 	// thing->tgColDir = dir;
@@ -84,60 +84,60 @@ void Tile::tgResolveCollision(Thing* thing, int dir)
 	// tgColliding[dir].thing1 = Game::things[tgLevelUnit];
 	// tgColliding[dir] = thing->tgLevelUnit;
 	// int direction = invertDir(dir);
-	thing->tgColliding[dir] = tgLevelUnit;
+	Game::things[thingsunit]->tgColliding[dir] = tgThingsUnit;
 
 	if (tiIsSolid)
 	{
-		if (thing->tgType == Game::ThingType["player"] && dir == Game::Direction["right"])
+		if (Game::things[thingsunit]->tgType == Game::ThingType["player"] && dir == Game::Direction["right"])
 		{
 			// if (thing->tgSpeed > 0)
 				// thing->tgSpeed = 0;
-			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
-				thing->tgHitboxRect.x--;
+			while (Game::checkCollision(Game::things[thingsunit], this))
+				Game::things[thingsunit]->tgHitboxRect.x--;
 			// thing->tgHitboxRect.x++;
 		}
-		else if (thing->tgType == Game::ThingType["player"] && dir == Game::Direction["left"])
+		else if (Game::things[thingsunit]->tgType == Game::ThingType["player"] && dir == Game::Direction["left"])
 		{
 			// if (thing->tgSpeed < 0)
 				// thing->tgSpeed = 0;
-			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
-				thing->tgHitboxRect.x++;
+			while (Game::checkCollision(Game::things[thingsunit], this))
+				Game::things[thingsunit]->tgHitboxRect.x++;
 			// thing->tgHitboxRect.x--;
 		}
-		else if (thing->tgType == Game::ThingType["enemy"] && dir == Game::Direction["right"])
+		else if (Game::things[thingsunit]->tgType == Game::ThingType["enemy"] && dir == Game::Direction["right"])
 		{
-			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
-				thing->tgHitboxRect.x--;
+			while (Game::checkCollision(Game::things[thingsunit], this))
+				Game::things[thingsunit]->tgHitboxRect.x--;
 			// thing->tgHitboxRect.x++;
 			// thing->tgDirection = invertDir(thing->tgDirection);
-			thing->tgSpeed = -thing->tgSpeed;
+			Game::things[thingsunit]->tgSpeed = -Game::things[thingsunit]->tgSpeed;
 		}
-		else if (thing->tgType == Game::ThingType["enemy"] && dir == Game::Direction["left"])
+		else if (Game::things[thingsunit]->tgType == Game::ThingType["enemy"] && dir == Game::Direction["left"])
 		{
-			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
-				thing->tgHitboxRect.x++;
+			while (Game::checkCollision(Game::things[thingsunit], this))
+				Game::things[thingsunit]->tgHitboxRect.x++;
 			// thing->tgHitboxRect.x--;
 			// thing->tgDirection = invertDir(thing->tgDirection);
-			thing->tgSpeed = -thing->tgSpeed;
+			Game::things[thingsunit]->tgSpeed = -Game::things[thingsunit]->tgSpeed;
 		}
 		else if (dir == Game::Direction["down"])
 		{
-			if (thing->tgVerticals > 0)
-				thing->tgVerticals = 0;
-			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
-				thing->tgHitboxRect.y--;
+			if (Game::things[thingsunit]->tgVerticals > 0)
+				Game::things[thingsunit]->tgVerticals = 0;
+			while (Game::checkCollision(Game::things[thingsunit], this))
+				Game::things[thingsunit]->tgHitboxRect.y--;
 			// thing->tgHitboxRect.y++;
 		}
 		else if (dir == Game::Direction["up"])
 		{
-			if (thing->tgVerticals < 0)
-				thing->tgVerticals = 0;
-			while (Game::checkCollision(thing, Game::things[tgLevelUnit]))
-				thing->tgHitboxRect.y++;
+			if (Game::things[thingsunit]->tgVerticals < 0)
+				Game::things[thingsunit]->tgVerticals = 0;
+			while (Game::checkCollision(Game::things[thingsunit], this))
+				Game::things[thingsunit]->tgHitboxRect.y++;
 			// thing->tgHitboxRect.y--;
 		}
 		else
-			std::cout << "Collision error: " << tgLevelUnit << " " << thing->tgLevelUnit << std::endl;
+			std::cout << "Collision error: " << tgLevelUnit << " " << Game::things[thingsunit]->tgLevelUnit << std::endl;
 	}
 }
 
@@ -171,7 +171,7 @@ void Tile::tgRender(void)
 
 void Tile::tgApplyAI(void)
 {
-	if (!Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, false))
+	if (!Game::checkCollision(this, NULL, tgLevelUnit, false))
 		for (int i = 0; i < tgColliding.size(); i++)
 			tgColliding[i] = -1;
 }

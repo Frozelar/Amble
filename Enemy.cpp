@@ -23,14 +23,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Level.h"
 #include "Texture.h"
 
-Enemy::Enemy(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType["enemy"], unit)
+Enemy::Enemy(SDL_Rect* box, int subtype, int lunit, int tunit) : Thing(box, Game::ThingType["enemy"], lunit, tunit)
 {
 	tgHitboxRect.w = Game::DEFAULT_ENEMY_W;
 	tgHitboxRect.h = Game::DEFAULT_ENEMY_H;
 	// tgHitboxRect.x = (box == NULL ? ((unit - ((unit / Level::LEVEL_W) * Level::LEVEL_W)) * Game::DEFAULT_W) : box->x);
 	// tgHitboxRect.y = (box == NULL ? ((unit / Level::LEVEL_W) * Game::DEFAULT_H) : box->y);
-	tgHitboxRect.x = (box == NULL ? unit * Game::DEFAULT_W / Game::DEFAULT_W : box->x);
-	tgHitboxRect.y = (box == NULL ? unit * Game::DEFAULT_H / Game::DEFAULT_H : box->y);
+	tgHitboxRect.x = (box == NULL ? lunit * Game::DEFAULT_W / Game::DEFAULT_W : box->x);
+	tgHitboxRect.y = (box == NULL ? lunit * Game::DEFAULT_H / Game::DEFAULT_H : box->y);
 	tgGFXrect.x = tgHitboxRect.x - Game::DEFAULT_GFX_OFFSET;
 	tgGFXrect.y = tgHitboxRect.y - Game::DEFAULT_GFX_OFFSET;
 	tgGFXrect.w = Game::DEFAULT_ENEMY_W + Game::DEFAULT_GFX_OFFSET * 2;
@@ -38,13 +38,13 @@ Enemy::Enemy(SDL_Rect* box, int subtype, int unit) : Thing(box, Game::ThingType[
 	enType = subtype;
 }
 
-void Enemy::tgResolveCollision(Thing* thing, int dir)
+void Enemy::tgResolveCollision(int thingsunit, int dir)
 {
 	// tgColliding[dir].thing1 = Game::things[tgLevelUnit];
 	for (int i = 0; i < tgColliding.size(); i++)
-		if (tgColliding[i] == thing->tgLevelUnit)
+		if (tgColliding[i] == thingsunit)
 			return;
-	tgColliding[dir] = thing->tgLevelUnit;
+	tgColliding[dir] = thingsunit;
 
 	/*
 	if (thing->tgType == Game::ThingType["player"] || thing->tgType == Game::ThingType["enemy"])
@@ -131,7 +131,7 @@ void Enemy::tgApplyAI(void)
 	if (tgVerticals == 0)
 	{
 		tgHitboxRect.y++;
-		if (!Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+		if (!Game::checkCollision(this, NULL, tgLevelUnit, true))
 			tgVerticals++;
 		else
 		{
@@ -150,7 +150,7 @@ void Enemy::tgApplyAI(void)
 	if (tgVerticals != 0)
 	{
 		tgHitboxRect.y += (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]);
-		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+		if (Game::checkCollision(this, NULL, tgLevelUnit, true))
 		{
 			for (int i = 0; i < Game::gColliding.size(); i++)
 				if (Game::gColliding[i] != NULL)
@@ -160,7 +160,7 @@ void Enemy::tgApplyAI(void)
 					else if (tgVerticals < 0)
 						up = true;
 					// collided = true;
-					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgVerticals > 0 ? Game::Direction["down"] : Game::Direction["up"]));
+					Game::gColliding[i]->thing2->tgResolveCollision(tgThingsUnit /* this */, (tgVerticals > 0 ? Game::Direction["down"] : Game::Direction["up"]));
 				}
 		}
 	}
@@ -172,7 +172,7 @@ void Enemy::tgApplyAI(void)
 	if (tgSpeed != 0)
 	{
 		tgHitboxRect.x += tgSpeed;
-		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+		if (Game::checkCollision(this, NULL, tgLevelUnit, true))
 			for (int i = 0; i < Game::gColliding.size(); i++)
 				if (Game::gColliding[i] != NULL)
 				{
@@ -183,7 +183,7 @@ void Enemy::tgApplyAI(void)
 					else if (tgSpeed < 0)
 						left = true;
 					// collided = true;
-					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgSpeed > 0 ? Game::Direction["right"] : Game::Direction["left"]));
+					Game::gColliding[i]->thing2->tgResolveCollision(tgThingsUnit /* this */, (tgSpeed > 0 ? Game::Direction["right"] : Game::Direction["left"]));
 					// }
 				}
 	}

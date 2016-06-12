@@ -230,7 +230,7 @@ public:
 	static void newThing(int = -1, int = -1, int = -1, int = -1, int = -1);
 	static void newParticle(SDL_Rect*, int, SDL_Point*, int = -1, int = -1, int = -1);
 	static void newProjectile(SDL_Rect*, int, int, int, int, int);
-	static void destroyThing(int);
+	static int destroyThing(int);
 	static void destroyParticle(int);
 	static void destroyProjectile(int);
 	static void changeGameState(int);

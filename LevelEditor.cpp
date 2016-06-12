@@ -188,9 +188,9 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 				}
 				else
 				{
-					Game::things[Game::gPlayer->tgLevelUnit] = NULL;
+					Game::things[Game::gPlayer->tgThingsUnit] = NULL;
 					Game::things[i] = Game::gPlayer;
-					Game::gPlayer->tgLevelUnit = i;
+					Game::gPlayer->tgThingsUnit = i;
 					Game::gPlayer->tgHitboxRect.x = mx / Game::DEFAULT_W * Game::DEFAULT_W;
 					Game::gPlayer->tgHitboxRect.y = my / Game::DEFAULT_H * Game::DEFAULT_H;
 				}
@@ -374,6 +374,51 @@ bool LevelEditor::leSave()
 	{
 		if (Game::things[i] != NULL)
 		{
+			for (int j = 0; j < Game::things[i]->tgLevelUnit - (i == 0 ? 0 : Game::things[i - 1]->tgLevelUnit); j++)
+			{
+				level << "0000";
+				if (++unit >= Level::LEVEL_W)
+				{
+					unit = 0;
+					level << std::endl;
+				}
+				else
+					level << " ";
+			}
+
+			if (Game::things[i]->tgType == Game::ThingType["player"])
+				value = Game::things[i]->tgType;
+			else if (Game::things[i]->tgType == Game::ThingType["tile"])
+				value = Game::things[i]->tgGetSubtype() + Game::OFFSET["TILE"];
+			else if (Game::things[i]->tgType == Game::ThingType["enemy"])
+				value = Game::things[i]->tgGetSubtype() + Game::OFFSET["ENEMY"];
+			else if (Game::things[i]->tgType == Game::ThingType["collectible"])
+				value = Game::things[i]->tgGetSubtype() + Game::OFFSET["COLLECTIBLE"];
+			if (value >= 0 && value <= 9)
+				prefix = "000";
+			else if (value >= 10 && value <= 99)
+				prefix = "00";
+			else if (value >= 100 && value <= 999)
+				prefix = "0";
+			else if (value >= 1000 && value <= 9999)
+				prefix = "";
+			else
+				prefix = "ERROR";
+			if (++unit >= Level::LEVEL_W)
+			{
+				unit = 0;
+				level << prefix << value << std::endl;
+			}
+			else
+				level << prefix << value << " ";
+		}
+	}
+
+	/*
+	for (int i = 0; i < Game::things.size(); i++)
+	{
+		if (Game::things[i] != NULL)
+		{
 			if (Game::things[i]->tgType == Game::ThingType["player"])
 				value = Game::things[i]->tgType;
 			else if (Game::things[i]->tgType == Game::ThingType["tile"])
@@ -403,6 +448,8 @@ bool LevelEditor::leSave()
 		else
 			level << prefix << value << " ";
 	}
+	*/
+
 	leMsgTimers[leMsgs["Save"]]++;
 
 	return true;
@@ -463,6 +510,27 @@ void LevelEditor::leChangeDimensions(int w, int h)
 {
 	if (w > Level::LEVEL_W)
 	{
+		for (int i = 0; i < Game::things.size() + 1;)
+			if (Game::things[i] != NULL)
+				if (Game::things[i]->tgLevelUnit >= Level::LEVEL_W)
+					Game::things[i]->tgLevelUnit += (Game::things[i]->tgLevelUnit / Level::LEVEL_W) * (w % Level::LEVEL_W);
+	}
+	else if (w < Level::LEVEL_W)
+	{
+		for (int i = 0; i < Game::things.size() + 1;)
+			if (Game::things[i] != NULL)
+				if (Game::things[i]->tgLevelUnit >= w)
+					Game::things[i]->tgLevelUnit -= (Game::things[i]->tgLevelUnit / Level::LEVEL_W) * (Level::LEVEL_W % w);
+	}
+	else if (h < Level::LEVEL_H)
+	{
+		for (int i = 0; i < Game::things.size(); i++)
+			if (Game::things[i]->tgLevelUnit >= h)
+				i = Game::destroyThing(i);
+	}
+	/*
+	if (w > Level::LEVEL_W)
+	{
 		for (int i = 0, irow = 0; i < Game::things.size() + 1; i++, irow++)
 		{
 			if (irow % Level::LEVEL_W == 0)
@@ -479,7 +547,7 @@ void LevelEditor::leChangeDimensions(int w, int h)
 		{
 			if (irow % w == 0)
 			{
-				for (; irow % Level::LEVEL_W != 0; /* i++, */ irow++)
+				for (; irow % Level::LEVEL_W != 0; /* i++,  irow++)
 					Game::things.erase(Game::things.begin() + i);
 				irow = 0;
 			}
@@ -498,14 +566,16 @@ void LevelEditor::leChangeDimensions(int w, int h)
 	for (int i = 0; i < Game::things.size(); i++)
 		if (Game::things[i] != NULL)
 			Game::things[i]->tgLevelUnit = (Game::things[i]->tgHitboxRect.y / Game::DEFAULT_H * w) + (Game::things[i]->tgHitboxRect.x / Game::DEFAULT_W);
+	*/
 	Level::LEVEL_W = w;
 	Level::LEVEL_H = h;
 	Level::LEVEL_W_PIXELS = Level::LEVEL_W * Game::DEFAULT_W;
 	Level::LEVEL_H_PIXELS = Level::LEVEL_H * Game::DEFAULT_H;
 	Level::LEVEL_UNITS = Level::LEVEL_W * Level::LEVEL_H;
 	Level::LEVEL_PIXELS = Level::LEVEL_UNITS * Game::DEFAULT_W;
-	//Game::things.resize(Level::LEVEL_UNITS);
-	Game::gColliding.resize(Level::LEVEL_UNITS);
+	// Game::things.resize(Level::LEVEL_UNITS);
+	// Game::gColliding.resize(Level::LEVEL_UNITS);
+	Game::gColliding.resize(Game::things.size());
 	level.w = Level::LEVEL_W_PIXELS;
 	level.h = Level::LEVEL_H_PIXELS;
 }

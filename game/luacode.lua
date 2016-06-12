@@ -408,7 +408,7 @@ function Particle:ptCycleFrames()
 	self.ptFrameInterval = self.ptFrameInterval + 1
 end
 
-Thing = { tgType, tgVerticals, tgSpeed, tgHitbox, tgLevelUnit, tgHealth, tgFrame, tgFrameInterval, tgMaxFrames, tgColliding, tgColDir }
+Thing = { tgType, tgVerticals, tgSpeed, tgHitbox, tgLevelUnit, tgThingsUnit, tgHealth, tgFrame, tgFrameInterval, tgMaxFrames, tgColliding, tgColDir }
 Thing.__index = Thing
 
 setmetatable(Thing, {
@@ -419,11 +419,12 @@ setmetatable(Thing, {
 	end
 })
 
-function Thing:new(levelUnit)
+function Thing:new(levelUnit, thingsUnit)
   self.tgType = 0
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
+  self.tgThingsUnit = thingsUnit
   self.tgHitbox = Rectangle(0, 0, 0, 0)
   self.tgFrame = 1
   self.tgFrameInterval = 0
@@ -454,12 +455,13 @@ setmetatable(Player, {
 	end
 })
 
-function Player:new(levelUnit)
+function Player:new(levelUnit, thingsUnit)
   --self.tgType = thingTypes["player"]
   self.tgType = "player"
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
+  self.tgThingsUnit = thingsUnit
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgHealth = 100
@@ -536,12 +538,13 @@ setmetatable(Tile, {
 	end
 })
 
-function Tile:new(levelUnit)
+function Tile:new(levelUnit, thingsUnit)
   --self.tgType = thingTypes["tile"]
   self.tgType = "tile"
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
+  self.tgThingsUnit = thingsUnit
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgHealth = 100
@@ -590,13 +593,14 @@ setmetatable(Enemy, {
 	end
 })
 
-function Enemy:new(levelUnit)
+function Enemy:new(levelUnit, thingsUnit)
   --self.tgType = thingTypes["enemy"]
   self.tgType = "enemy"
   self.tgVerticals = 0
   self.tgDashing = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
+  self.tgThingsUnit = thingsUnit
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgMaxFrames = #entityFrames
@@ -751,7 +755,7 @@ function Enemy:enResolveCollision(pDirection)
 		
 	end
 	if self.tgHealth <= 0 then
-		enDie(self.tgLevelUnit)
+		enDie(self.tgThingsUnit)
 	end
 end
 
@@ -858,11 +862,12 @@ setmetatable(Collectible, {
 	end
 })
 
-function Collectible:new(levelUnit)
+function Collectible:new(levelUnit, thingsUnit)
   self.tgType = "collectible"
   self.tgVerticals = 0
   self.tgSpeed = 0
   self.tgLevelUnit = levelUnit
+  self.tgThingsUnit = thingsUnit
   self.tgFrame = 1
   self.tgFrameInterval = 0
   self.tgHealth = 100
@@ -909,6 +914,7 @@ function Collectible:clCycleFrames()
 	end
 end
 
+totalThings = #things
 gBackground = Background()
 gPlayerUnit = 0
 gParticles = {}
@@ -967,15 +973,15 @@ function init()
   initFrames()
   for i = 1, #things do
     if things[i] ~= -1 then
-      if thingTypes[things[i]] == "player" then
-        things[i] = Player(i)
+      if thingTypes[things[i][1]] == "player" then
+        things[i] = Player(things[i][2], i)
 		gPlayerUnit = i
-      elseif thingTypes[things[i]] == "tile" then
-        things[i] = Tile(i)
-      elseif thingTypes[things[i]] == "enemy" then
-        things[i] = Enemy(i)
-      elseif thingTypes[things[i]] == "collectible" then
-        things[i] = Collectible(i)
+      elseif thingTypes[things[i][1]] == "tile" then
+        things[i] = Tile(things[i][2], i)
+      elseif thingTypes[things[i][1]] == "enemy" then
+        things[i] = Enemy(things[i][2], i)
+      elseif thingTypes[things[i][1]] == "collectible" then
+        things[i] = Collectible(things[i][2], i)
       --else
         --things[i] = nil
       end
@@ -1014,6 +1020,7 @@ function initThings()
 end
 
 function handleEnvironment()
+	totalThings = #things
 	totalParticles = #gParticles
 	totalProjectiles = #gProjectiles
 	
@@ -1207,6 +1214,19 @@ function deleteProjectile(which)
 	--	gProjectiles[which] = nil
 	if which <= #gProjectiles then
 		table.remove(gProjectiles, which)
+	end
+end
+
+function updateDeletedThings()
+	local i = 1
+	while i <= #things do
+		if things[i] == -1 then
+			table.remove(things, i)
+			i = i - 1
+		elseif things[i] ~= nil then
+			things[i].tgThingsUnit = i
+		end
+		i = i + 1
 	end
 end
 

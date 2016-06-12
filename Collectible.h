@@ -25,11 +25,11 @@ class Collectible : public Thing
 {
 public:
 
-	Collectible(SDL_Rect* = NULL, int = -1, int = -1);
+	Collectible(SDL_Rect* = NULL, int = -1, int = -1, int = -1);
 
 	void tgRender(void);
 	// void clCollect(void);
-	void tgResolveCollision(Thing*, int);
+	void tgResolveCollision(int, int);
 	void tgApplyAI(void);
 	void tgHandleVerticals(void);
 	int tgGetSubtype(void);

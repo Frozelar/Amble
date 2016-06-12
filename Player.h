@@ -25,7 +25,7 @@ class Player : public Thing
 {
 public:
 	// set properties
-	Player(SDL_Rect* = NULL, int = -1);
+	Player(SDL_Rect* = NULL, int = -1, int = -1);
 
 	// destroy texture
 	// ~Player();
@@ -42,7 +42,7 @@ public:
 
 	void plHandleDashing(void);
 
-	void tgResolveCollision(Thing*, int);
+	void tgResolveCollision(int, int);
 
 	int plJumps = 0;
 	int plActionCounter = 0;

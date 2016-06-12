@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "Thing.h"
 #include "Game.h"
 
-Thing::Thing(SDL_Rect* box, int type, int unit)
+Thing::Thing(SDL_Rect* box, int type, int lunit, int tunit)
 {
 	if (box != NULL)
 	{
@@ -42,7 +42,8 @@ Thing::Thing(SDL_Rect* box, int type, int unit)
 		tgColliding[i] = -1;
 
 	tgType = type;
-	tgLevelUnit = unit;
+	tgThingsUnit = tunit;
+	tgLevelUnit = lunit;
 	tgHealth = Game::DEFAULT_HEALTH;
 	tgSpeed = 0;
 	tgFrame = 0;
@@ -97,7 +98,7 @@ void Thing::tgRender(void)
 	std::cout << "Error: Executing the rendering of a Thing!" << std::endl;
 }
 
-void Thing::tgResolveCollision(Thing* thing, int dir)
+void Thing::tgResolveCollision(int thingsunit, int dir)
 {
 	if (dir == Game::Direction["left"] || dir == Game::Direction["right"])
 	{
@@ -106,13 +107,13 @@ void Thing::tgResolveCollision(Thing* thing, int dir)
 	}
 	else if (dir == Game::Direction["up"])
 	{
-		if (thing->tgVerticals < 0)
-			thing->tgVerticals = 1;
+		if (Game::things[thingsunit]->tgVerticals < 0)
+			Game::things[thingsunit]->tgVerticals = 1;
 	}
 	else if (dir == Game::Direction["down"])
 	{
-		if (thing->tgVerticals > 0)
-			thing->tgVerticals = 0;
+		if (Game::things[thingsunit]->tgVerticals > 0)
+			Game::things[thingsunit]->tgVerticals = 0;
 	}
 }
 

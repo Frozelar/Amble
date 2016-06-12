@@ -25,7 +25,7 @@ class Enemy : public Thing
 {
 public:
 	// initialize everything
-	Enemy(SDL_Rect* = NULL, int = -1, int = -1);
+	Enemy(SDL_Rect* = NULL, int = -1, int = -1, int = -1);
 
 	// apply AI to the enemy
 	void tgApplyAI(void);
@@ -33,8 +33,8 @@ public:
 	// render the enemy
 	void tgRender(void);
 
-	// Thing* = what it is colliding with, Direction = which side of the Thing* the collision occurred at
-	void tgResolveCollision(Thing*, int);
+	// int = things[] unit of thing being collided with, int = direction of collision relative to this thing (not the passed thing)
+	void tgResolveCollision(int, int);
 
 	int tgGetSubtype(void);
 	void tgSetSubtype(int);

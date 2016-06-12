@@ -92,8 +92,8 @@ bool Level::generateLevel(int whichLevel)
 	LEVEL_H_PIXELS = LEVEL_H * Game::DEFAULT_H;
 	LEVEL_UNITS = LEVEL_W * LEVEL_H;
 	LEVEL_PIXELS = LEVEL_UNITS * Game::DEFAULT_W;
-	Game::things.resize(LEVEL_UNITS);
-	Game::gColliding.resize(LEVEL_UNITS);
+	// Game::things.resize(LEVEL_UNITS);
+	// Game::gColliding.resize(LEVEL_UNITS);
 
 	levelMap >> unitType;
 	levelBG = unitType /* - Game::OFFSET["BACKGROUND"] */ - 1;
@@ -129,6 +129,7 @@ bool Level::generateLevel(int whichLevel)
 		}
 	}
 
+	Game::gColliding.resize(Game::things.size());
 	levelMap.close();
 	// Game::centerCamera();
 	Game::gScore = 0;
@@ -148,10 +149,6 @@ void Level::moveLevel(void)
 	{
 		if (Game::gCamera.x <= 0 || Game::gCamera.x + Game::gCamera.w >= Level::LEVEL_W_PIXELS)
 		{
-			if (Game::gCamera.x < 0)
-				Game::gCamera.x = 0;
-			else if (Game::gCamera.x + Game::gCamera.w > Level::LEVEL_W_PIXELS)
-				Game::gCamera.x = Level::LEVEL_W_PIXELS - Game::gCamera.w;
 			// Game::gPlayer->tgHitboxRect.x += movex;
 			if ((Game::gCamera.x == 0 && Game::gPlayer->tgHitboxRect.x + Game::gPlayer->tgHitboxRect.w / 2 > Game::WINDOW_W / 2) || 
 				(Game::gCamera.x == Level::LEVEL_W_PIXELS - Game::gCamera.w && Game::gPlayer->tgHitboxRect.x + Game::gPlayer->tgHitboxRect.w / 2 < Game::WINDOW_W / 2))
@@ -164,10 +161,6 @@ void Level::moveLevel(void)
 	{
 		if (Game::gCamera.y <= 0 || Game::gCamera.y + Game::gCamera.h >= Level::LEVEL_H_PIXELS)
 		{
-			if (Game::gCamera.y < 0)
-				Game::gCamera.y = 0;
-			else if (Game::gCamera.y + Game::gCamera.h > Level::LEVEL_H_PIXELS)
-				Game::gCamera.y = Level::LEVEL_H_PIXELS - Game::gCamera.h;
 			// Game::gPlayer->tgHitboxRect.y += movey;
 			if ((Game::gCamera.y == 0 && Game::gPlayer->tgHitboxRect.y + Game::gPlayer->tgHitboxRect.h / 2 > Game::WINDOW_H / 2) ||
 				(Game::gCamera.y == Level::LEVEL_H_PIXELS - Game::gCamera.h && Game::gPlayer->tgHitboxRect.y + Game::gPlayer->tgHitboxRect.h / 2 < Game::WINDOW_H / 2))
@@ -216,7 +209,18 @@ void Level::moveLevel(void)
 	*/
 	if (gLevelMovementsX != 0)
 	{
-		for (int i = 0; i < LEVEL_UNITS; i++)
+		Game::gCamera = { Game::gCamera.x - gLevelMovementsX, Game::gCamera.y, Game::WINDOW_W, Game::WINDOW_H };
+		if (Game::gCamera.x < 0)
+		{
+			gLevelMovementsX -= Game::gCamera.x;
+			Game::gCamera.x = 0;
+		}
+		else if (Game::gCamera.x + Game::gCamera.w >= Level::LEVEL_W_PIXELS)
+		{
+			gLevelMovementsX -= Level::LEVEL_W_PIXELS - (Game::gCamera.x + Game::gCamera.w);
+			Game::gCamera.x = Level::LEVEL_W_PIXELS - Game::gCamera.w;
+		}
+		for (int i = 0; i < Game::things.size(); i++)
 			if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
 				Game::things[i]->tgHitboxRect.x += gLevelMovementsX;
 		for (int i = 0; i < Game::gParticles.size(); i++)
@@ -225,7 +229,6 @@ void Level::moveLevel(void)
 		for (int i = 0; i < Game::gProjectiles.size(); i++)
 			if (Game::gProjectiles[i] != NULL)
 				Game::gProjectiles[i]->pjRect.x += gLevelMovementsX;
-		Game::gCamera = { Game::gCamera.x + gLevelMovementsX, Game::gCamera.y, Game::WINDOW_W, Game::WINDOW_H };
 		gLevelMovementsX = 0;
 		Game::gPlayer->tgHitboxRect.x = Game::gPlayer->plOldHitboxRect.x;
 	}
@@ -233,7 +236,18 @@ void Level::moveLevel(void)
 		Game::gPlayer->plOldHitboxRect.x = Game::gPlayer->tgHitboxRect.x;
 	if (gLevelMovementsY != 0)
 	{
-		for (int i = 0; i < LEVEL_UNITS; i++)
+		Game::gCamera = { Game::gCamera.x, Game::gCamera.y - gLevelMovementsY, Game::WINDOW_W, Game::WINDOW_H };
+		if (Game::gCamera.y < 0)
+		{
+			gLevelMovementsY -= Game::gCamera.y;
+			Game::gCamera.y = 0;
+		}
+		else if (Game::gCamera.y + Game::gCamera.h >= Level::LEVEL_H_PIXELS)
+		{
+			gLevelMovementsY -= Level::LEVEL_H_PIXELS - (Game::gCamera.y + Game::gCamera.h);
+			Game::gCamera.y = Level::LEVEL_H_PIXELS - Game::gCamera.h;
+		}
+		for (int i = 0; i < Game::things.size(); i++)
 			if (Game::things[i] != NULL && Game::things[i]->tgType != Game::ThingType["player"])
 				Game::things[i]->tgHitboxRect.y += gLevelMovementsY;
 		for (int i = 0; i < Game::gParticles.size(); i++)
@@ -242,7 +256,6 @@ void Level::moveLevel(void)
 		for (int i = 0; i < Game::gProjectiles.size(); i++)
 			if (Game::gProjectiles[i] != NULL)
 				Game::gProjectiles[i]->pjRect.y += gLevelMovementsY;
-		Game::gCamera = { Game::gCamera.x, Game::gCamera.y + gLevelMovementsY, Game::WINDOW_W, Game::WINDOW_H };
 		gLevelMovementsY = 0;
 		Game::gPlayer->tgHitboxRect.y = Game::gPlayer->plOldHitboxRect.y;
 	}
@@ -277,7 +290,14 @@ void Level::closeLevel()
 				delete Game::things[i];
 			Game::things[i] = NULL;
 		}
+		if (Game::gColliding[i] != NULL)
+		{
+			delete Game::gColliding[i];
+			Game::gColliding[i] = NULL;
+		}
 	}
+	Game::things.erase(Game::things.begin(), Game::things.end());
+	Game::gColliding.erase(Game::gColliding.begin(), Game::gColliding.end());
 	for (int i = 0; i < Game::gParticles.size(); i++)
 		if (Game::gParticles[i] != NULL)
 			Game::gParticles[i]->ptLife = 0; // Game::destroyParticle(i);

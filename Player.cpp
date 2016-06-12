@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Texture Graphics::playerTextures[TOTAL_ENTITY_FRAME_TYPES];
 Player* Game::gPlayer = NULL;
 
-Player::Player(SDL_Rect* box, int unit) : Thing(box, Game::ThingType["player"], unit)
+Player::Player(SDL_Rect* box, int lunit, int tunit) : Thing(box, Game::ThingType["player"], lunit, tunit)
 {
 	tgHitboxRect.w = Game::PLAYER_W;
 	tgHitboxRect.h = Game::PLAYER_H;
@@ -201,7 +201,7 @@ void Player::plMove(void)
 	if (tgVerticals == 0)
 	{
 		tgHitboxRect.y++;
-		if (!Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+		if (!Game::checkCollision(this, NULL, tgLevelUnit, true))
 			tgVerticals++;
 		else
 		{
@@ -209,7 +209,7 @@ void Player::plMove(void)
 			{
 				if (Game::gColliding[i] != NULL)
 				{
-					tgColliding[Game::Direction["down"]] = i;
+					tgColliding[Game::Direction["down"]] = Game::gColliding[i]->thing2->tgThingsUnit;
 					down = true;
 					// collided = true;
 					// break;
@@ -221,7 +221,7 @@ void Player::plMove(void)
 	if (tgVerticals != 0)
 	{
 		tgHitboxRect.y += (tgVerticals < 0 ? -Game::jumpArray[-tgVerticals] : Game::gravityArray[tgVerticals]);
-		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+		if (Game::checkCollision(this, NULL, tgLevelUnit, true))
 		{
 			for (int i = 0; i < Game::gColliding.size(); i++)
 			{
@@ -232,7 +232,7 @@ void Player::plMove(void)
 					else if (tgVerticals < 0)
 						up = true;
 					// collided = true;
-					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgVerticals > 0 ? Game::Direction["down"] : Game::Direction["up"]));
+					Game::gColliding[i]->thing2->tgResolveCollision(tgThingsUnit /* this */, (tgVerticals > 0 ? Game::Direction["down"] : Game::Direction["up"]));
 				}
 			}
 			plJumps = 0;
@@ -255,7 +255,7 @@ void Player::plMove(void)
 	if (tgSpeed != 0)
 	{
 		tgHitboxRect.x += tgSpeed;
-		if (Game::checkCollision(Game::things[tgLevelUnit], NULL, tgLevelUnit, true))
+		if (Game::checkCollision(this, NULL, tgLevelUnit, true))
 		{
 			for (int i = 0; i < Game::gColliding.size(); i++)
 			{
@@ -266,7 +266,7 @@ void Player::plMove(void)
 					else if (tgSpeed < 0)
 						left = true;
 					// collided = true;
-					Game::gColliding[i]->thing2->tgResolveCollision(Game::things[tgLevelUnit], (tgSpeed > 0 ? Game::Direction["right"] : Game::Direction["left"]));
+					Game::gColliding[i]->thing2->tgResolveCollision(tgThingsUnit /* this */, (tgSpeed > 0 ? Game::Direction["right"] : Game::Direction["left"]));
 				}
 			}
 		}
@@ -447,12 +447,12 @@ void Player::plMove(void)
 	*/
 }
 
-void Player::tgResolveCollision(Thing* thing, int dir)
+void Player::tgResolveCollision(int thingsunit, int dir)
 {
 	// int direction = dir;
 	// tgColliding[dir - 1] = thing->tgLevelUnit;
 	// direction = invertDir(dir);
-	thing->tgColliding[dir] = tgLevelUnit;
+	Game::things[thingsunit]->tgColliding[dir] = tgThingsUnit;
 }
 
 void Player::tgRender(void)

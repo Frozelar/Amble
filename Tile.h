@@ -25,12 +25,12 @@ class Tile : public Thing
 {
 public:
 	// initialize everything
-	Tile(SDL_Rect* = NULL, int = -1, int = -1);
+	Tile(SDL_Rect* = NULL, int = -1, int = -1, int = -1);
 
 	// destroy texture
 	// ~Tile();
 
-	void tgResolveCollision(Thing*, int);
+	void tgResolveCollision(int, int);
 	void tgRender(void);
 	void tgApplyAI(void);
 	int tgGetSubtype(void);

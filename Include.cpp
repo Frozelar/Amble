@@ -72,7 +72,7 @@ bool init(void)
 	}
 	*/
 
-	for (int i = 0; i < (int)Game::things.size(); i++)
+	for (int i = 0; i < Game::things.size(); i++)
 	{
 		Game::things[i] = NULL;
 		Game::gColliding[i] = NULL;
@@ -100,7 +100,7 @@ bool initFont(void)
 
 void close(void)
 {
-	for (int i = 0; i < (int)Game::things.size(); i++)
+	for (int i = 0; i < Game::things.size(); i++)
 	{
 		if (Game::things[i] != NULL)
 		{
