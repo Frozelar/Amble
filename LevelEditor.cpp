@@ -38,7 +38,7 @@ std::map< std::string, int > LevelEditor::leControls;
 Thing* LevelEditor::mouseThing;
 int LevelEditor::leLvlMoveX = 0, LevelEditor::leLvlMoveY = 0;
 int LevelEditor::leTotMoveX = 0, LevelEditor::leTotMoveY = 0;
-int LevelEditor::DEFAULT_LVL_MOVE = Game::DEFAULT_W * Game::DEFAULT_H / 2;
+int LevelEditor::DEFAULT_LVL_MOVE = Game::DEFAULT_W * Game::DEFAULT_H / 4;
 int LevelEditor::leTakingInput = 0;
 Texture* LevelEditor::leInputTexture = NULL;
 SDL_Rect LevelEditor::level = { 0, 0, 0, 0 };
@@ -175,41 +175,65 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 			mouseThing->tgHitboxRect.y = my;
 		}
 	}
+	if (e->type == SDL_MOUSEBUTTONUP)
+	{
+		if (isDragging > 0)
+			isDragging = 0;
+	}
 	if (e->type == SDL_MOUSEBUTTONDOWN || isDragging)
 	{
 		if (e->button.button == leControls["Place"] || isDragging == leControls["Place"])
 		{
 			if (mx >= 0 + leTotMoveX && my >= 0 + leTotMoveY && mx < Level::LEVEL_W_PIXELS + leTotMoveX && my < Level::LEVEL_H_PIXELS + leTotMoveY)
 			{
-				if (mouseThing != NULL)
-				{
-					if (Game::things[i] == NULL)
-						Game::newThing(mouseThing->tgType, i, mouseThing->tgHitboxRect.x, mouseThing->tgHitboxRect.y, mouseThing->tgGetSubtype());
-				}
-				else
-				{
-					Game::things[Game::gPlayer->tgThingsUnit] = NULL;
-					Game::things[i] = Game::gPlayer;
-					Game::gPlayer->tgThingsUnit = i;
-					Game::gPlayer->tgHitboxRect.x = mx / Game::DEFAULT_W * Game::DEFAULT_W;
-					Game::gPlayer->tgHitboxRect.y = my / Game::DEFAULT_H * Game::DEFAULT_H;
-				}
+				// if (mouseThing != NULL)
+				// {
+					bool makenew = true;
+					// if (Game::things[i] == NULL)
+					for (int j = 0; j < Game::things.size(); j++)
+						if (Game::things[j] != NULL)
+							if (/*Game::things[j]->tgType != Game::ThingType["player"] && */ Game::things[j]->tgLevelUnit == i)
+								makenew = false;
+					if (makenew)
+					{
+						if(mouseThing != NULL)
+							Game::newThing(mouseThing->tgType, i, mouseThing->tgHitboxRect.x, mouseThing->tgHitboxRect.y, mouseThing->tgGetSubtype());
+						else
+							Game::newThing(Game::ThingType["player"], i);
+					}
+				// }
+				// else
+				// {
+					// Game::things[Game::gPlayer->tgThingsUnit] = NULL;
+					// Game::things[i] = Game::gPlayer;
+					// Game::things.erase(Game::things.begin() + Game::gPlayer->tgThingsUnit);
+					// Game::things.resize(Game::things.size() + 1);
+					// Game::things[Game::things.size() - 1] = Game::gPlayer;
+					// Game::gPlayer->tgLevelUnit = i;
+					// Game::gPlayer->tgHitboxRect.x = mx / Game::DEFAULT_W * Game::DEFAULT_W;
+					// Game::gPlayer->tgHitboxRect.y = my / Game::DEFAULT_H * Game::DEFAULT_H;
+				// }
 			}
 			isDragging = leControls["Place"];
 		}
 		else if (e->button.button == leControls["Delete"] || isDragging == leControls["Delete"])
 		{
+			/*
 			if (mx >= 0 + leTotMoveX && my >= 0 + leTotMoveY && mx < Level::LEVEL_W_PIXELS + leTotMoveX && my < Level::LEVEL_H_PIXELS + leTotMoveY)
 				if (Game::things[i] != NULL)
 					if (Game::things[i]->tgType != Game::ThingType["player"])
 						Game::destroyThing(i);
+						*/
+			if (mx >= 0 + leTotMoveX && my >= 0 + leTotMoveY && mx < Level::LEVEL_W_PIXELS + leTotMoveX && my < Level::LEVEL_H_PIXELS + leTotMoveY)
+				for (int j = 0; j < Game::things.size(); j++)
+					if (Game::things[j] != NULL)
+						if (Game::things[j]->tgType != Game::ThingType["player"] && Game::things[j]->tgLevelUnit == i)
+						{
+							Game::destroyThing(j);
+							break;
+						}
 			isDragging = leControls["Delete"];
 		}
-	}
-	if (e->type == SDL_MOUSEBUTTONUP)
-	{
-		if (isDragging > 0)
-			isDragging = 0;
 	}
 	if (e->type == SDL_KEYDOWN)
 	{
@@ -362,7 +386,7 @@ bool LevelEditor::leSave()
 	std::string ext = ".map";
 	level.open(Game::rDir + "output" + ext);
 	int value = 0;
-	int unit = 0;
+	int unitx = 0;
 	std::string prefix = "";
 
 	level << Level::LEVEL_W << " ";
@@ -370,22 +394,10 @@ bool LevelEditor::leSave()
 	level << Level::levelBG /* + Game::OFFSET["BACKGROUND"] */ + 1 << " ";
 	level << Level::levelTrack /* + Game::OFFSET["MUSIC"] */ + 1 << std::endl;
 
-	for (int i = 0; i < Game::things.size(); i++)
+	for (int i = 0, u = 0; u < Level::LEVEL_W * Level::LEVEL_H; u++)
 	{
-		if (Game::things[i] != NULL)
+		if (i < Game::things.size() && u == Game::things[i]->tgLevelUnit)
 		{
-			for (int j = 0; j < Game::things[i]->tgLevelUnit - (i == 0 ? 0 : Game::things[i - 1]->tgLevelUnit); j++)
-			{
-				level << "0000";
-				if (++unit >= Level::LEVEL_W)
-				{
-					unit = 0;
-					level << std::endl;
-				}
-				else
-					level << " ";
-			}
-
 			if (Game::things[i]->tgType == Game::ThingType["player"])
 				value = Game::things[i]->tgType;
 			else if (Game::things[i]->tgType == Game::ThingType["tile"])
@@ -394,25 +406,83 @@ bool LevelEditor::leSave()
 				value = Game::things[i]->tgGetSubtype() + Game::OFFSET["ENEMY"];
 			else if (Game::things[i]->tgType == Game::ThingType["collectible"])
 				value = Game::things[i]->tgGetSubtype() + Game::OFFSET["COLLECTIBLE"];
-			if (value >= 0 && value <= 9)
-				prefix = "000";
-			else if (value >= 10 && value <= 99)
-				prefix = "00";
-			else if (value >= 100 && value <= 999)
-				prefix = "0";
-			else if (value >= 1000 && value <= 9999)
-				prefix = "";
-			else
-				prefix = "ERROR";
-			if (++unit >= Level::LEVEL_W)
+			i++;
+		}
+		else
+			value = 0;
+		if (value >= 0 && value <= 9)
+			prefix = "000";
+		else if (value >= 10 && value <= 99)
+			prefix = "00";
+		else if (value >= 100 && value <= 999)
+			prefix = "0";
+		else if (value >= 1000 && value <= 9999)
+			prefix = "";
+		else
+			prefix = "ERROR";
+		if (++unitx >= Level::LEVEL_W)
+		{
+			unitx = 0;
+			level << prefix << value << std::endl;
+		}
+		else
+			level << prefix << value << " ";
+	}
+
+	/*
+	for (int i = 0, u = 0; u < Level::LEVEL_W * Level::LEVEL_H; i++, u++)
+	{
+		// if (Game::things[i] != NULL)
+		// {
+		for (int j = 0, jlimit = 1; j < jlimit; j++, u++)
+		{
+			if (i == 0)
+				jlimit = Game::things[i]->tgLevelUnit;
+			else if (i > 0 && i < Game::things.size())
+				jlimit = Game::things[i]->tgLevelUnit - Game::things[i - 1]->tgLevelUnit;
+			else if (i >= Game::things.size())
+				jlimit = Level::LEVEL_W * Level::LEVEL_H - Game::things[i - 1]->tgLevelUnit;
+
+			level << "0000";
+			if (++unitx >= Level::LEVEL_W)
 			{
-				unit = 0;
-				level << prefix << value << std::endl;
+				unitx = 0;
+				level << std::endl;
 			}
 			else
-				level << prefix << value << " ";
+				level << " ";
 		}
+		if (u >= Level::LEVEL_W * Level::LEVEL_H)
+			break;
+
+		if (Game::things[i]->tgType == Game::ThingType["player"])
+			value = Game::things[i]->tgType;
+		else if (Game::things[i]->tgType == Game::ThingType["tile"])
+			value = Game::things[i]->tgGetSubtype() + Game::OFFSET["TILE"];
+		else if (Game::things[i]->tgType == Game::ThingType["enemy"])
+			value = Game::things[i]->tgGetSubtype() + Game::OFFSET["ENEMY"];
+		else if (Game::things[i]->tgType == Game::ThingType["collectible"])
+			value = Game::things[i]->tgGetSubtype() + Game::OFFSET["COLLECTIBLE"];
+		if (value >= 0 && value <= 9)
+			prefix = "000";
+		else if (value >= 10 && value <= 99)
+			prefix = "00";
+		else if (value >= 100 && value <= 999)
+			prefix = "0";
+		else if (value >= 1000 && value <= 9999)
+			prefix = "";
+		else
+			prefix = "ERROR";
+		if (++unitx >= Level::LEVEL_W)
+		{
+			unitx = 0;
+			level << prefix << value << std::endl;
+		}
+		else
+			level << prefix << value << " ";
+		// }
 	}
+	*/
 
 	/*
 	for (int i = 0; i < Game::things.size(); i++)
@@ -510,22 +580,27 @@ void LevelEditor::leChangeDimensions(int w, int h)
 {
 	if (w > Level::LEVEL_W)
 	{
-		for (int i = 0; i < Game::things.size() + 1;)
+		for (int i = 0; i < Game::things.size(); i++)
 			if (Game::things[i] != NULL)
 				if (Game::things[i]->tgLevelUnit >= Level::LEVEL_W)
 					Game::things[i]->tgLevelUnit += (Game::things[i]->tgLevelUnit / Level::LEVEL_W) * (w % Level::LEVEL_W);
 	}
 	else if (w < Level::LEVEL_W)
 	{
-		for (int i = 0; i < Game::things.size() + 1;)
+		for (int i = 0; i < Game::things.size(); i++)
 			if (Game::things[i] != NULL)
 				if (Game::things[i]->tgLevelUnit >= w)
-					Game::things[i]->tgLevelUnit -= (Game::things[i]->tgLevelUnit / Level::LEVEL_W) * (Level::LEVEL_W % w);
+				{
+					if (Game::things[i]->tgLevelUnit % Level::LEVEL_W >= w)
+						i = Game::destroyThing(i);
+					else
+						Game::things[i]->tgLevelUnit -= (Game::things[i]->tgLevelUnit / Level::LEVEL_W) * (Level::LEVEL_W % w);
+				}
 	}
 	else if (h < Level::LEVEL_H)
 	{
 		for (int i = 0; i < Game::things.size(); i++)
-			if (Game::things[i]->tgLevelUnit >= h)
+			if (Game::things[i]->tgLevelUnit >= w * h)
 				i = Game::destroyThing(i);
 	}
 	/*

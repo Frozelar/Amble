@@ -1230,6 +1230,10 @@ function updateDeletedThings()
 	end
 end
 
+function closeLevel()
+	things = {}
+end
+
 --[[
 function checkCollision(thing1, thing2)
 	if thing2 == nil then

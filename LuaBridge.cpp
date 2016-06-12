@@ -752,6 +752,23 @@ int LuaBridge::labChangeLevel()
 	//lua_pushnumber(L, Level::LEVEL_UNITS);											// handleLevelLoad(), LEVEL_UNITS
 	//lua_call(L, 1, 0);																//
 
+	/*
+	lua_getglobal(L, "totalThings");
+	for (int i = 0; i < lua_tonumber(L, -1); i++)
+	{
+		lua_getglobal(L, "things");
+		lua_pushnumber(L, i + 1);
+		lua_pushnumber(L, -1);
+		lua_settable(L, -3);
+		lua_pop(L, 3);
+	}
+	lua_pop(L, 1);
+	lua_getglobal(L, "updateDeletedThings");
+	lua_call(L, 0, 0);
+	*/
+	lua_getglobal(L, "closeLevel");
+	lua_call(L, 0, 0);
+
 	lua_getglobal(L, "things");															// things
 	for (int i = 0; i < Game::things.size() /* Level::LEVEL_UNITS */; i++)
 	{

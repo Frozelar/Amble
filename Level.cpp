@@ -133,6 +133,7 @@ bool Level::generateLevel(int whichLevel)
 	levelMap.close();
 	// Game::centerCamera();
 	Game::gScore = 0;
+	// if(Game::gState != Game::GameState["editor"])
 	LuaBridge::labChangeLevel();
 	playMusic();
 	// LuaBridge::labChangedLevel = true;
@@ -282,6 +283,7 @@ void Level::setBG(void)
 void Level::closeLevel()
 {
 	Game::gCamera = { 0, 0, 0, 0 };
+
 	for (int i = 0; i < Game::things.size(); i++)
 	{
 		if (Game::things[i] != NULL)
@@ -290,12 +292,13 @@ void Level::closeLevel()
 				delete Game::things[i];
 			Game::things[i] = NULL;
 		}
-		if (Game::gColliding[i] != NULL)
+		if (i < Game::gColliding.size() && Game::gColliding[i] != NULL)
 		{
 			delete Game::gColliding[i];
 			Game::gColliding[i] = NULL;
 		}
 	}
+	Game::gPlayer->tgThingsUnit = -1;
 	Game::things.erase(Game::things.begin(), Game::things.end());
 	Game::gColliding.erase(Game::gColliding.begin(), Game::gColliding.end());
 	for (int i = 0; i < Game::gParticles.size(); i++)

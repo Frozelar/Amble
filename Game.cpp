@@ -359,12 +359,19 @@ void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 	SDL_Rect trect = { x / DEFAULT_W * DEFAULT_W, y / DEFAULT_H * DEFAULT_H, 0, 0 };
 	int index = -1;
 	for (int i = 0; i < things.size(); i++)
+	{
 		if (things[i] != NULL)
+		{
 			if (things[i]->tgLevelUnit > levelunit)
+			{
 				index = i;
+				break;
+			}
+		}
+	}
+
 	if (index == -1)
 		index = things.size();
-
 	if (x == -1 || y == -1)
 	{
 		x = (levelunit - ((levelunit / Level::LEVEL_W) * Level::LEVEL_W)) * DEFAULT_W;
@@ -374,11 +381,17 @@ void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 	{
 		if (type == ThingType["player"])
 		{
+			if (gPlayer->tgThingsUnit >= 0 && gPlayer->tgThingsUnit < things.size())
+			{
+				things.erase(things.begin() + gPlayer->tgThingsUnit);
+				if (index > gPlayer->tgThingsUnit)
+					index--;
+			}
+			things.insert(things.begin() + index, gPlayer);
 			gPlayer->tgHitboxRect.x = x;
 			gPlayer->tgHitboxRect.y = y;
 			gPlayer->tgLevelUnit = levelunit;
 			gPlayer->tgThingsUnit = index;
-			things.insert(things.begin() + index, gPlayer);
 			// things[levelunit] = gPlayer;
 		}
 		else if (type > OFFSET["TILE"] && type < OFFSET["ENEMY"])
@@ -413,11 +426,17 @@ void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 		}
 		if (type == ThingType["player"])
 		{
+			if (gPlayer->tgThingsUnit >= 0 && gPlayer->tgThingsUnit < things.size())
+			{
+				things.erase(things.begin() + gPlayer->tgThingsUnit);
+				if (index > gPlayer->tgThingsUnit)
+					index--;
+			}
+			things.insert(things.begin() + index, gPlayer);
 			gPlayer->tgHitboxRect.x = x;
 			gPlayer->tgHitboxRect.y = y;
 			gPlayer->tgLevelUnit = levelunit;
 			gPlayer->tgThingsUnit = index;
-			things.insert(things.begin() + index, gPlayer);
 			// things[levelunit] = gPlayer;
 		}
 		else if (type == ThingType["tile"])
@@ -435,6 +454,9 @@ void Game::newThing(int type, int levelunit, int x, int y, int thingtype)
 			things[levelunit] = new Collectible(&trect, thingtype, levelunit);
 		*/
 	}
+	for (int i = index; i < things.size(); i++)
+		if (things[i] != NULL)
+			things[i]->tgThingsUnit = i;
 }
 
 void Game::newParticle(SDL_Rect* location, int type, SDL_Point* destination, int speedX, int speedY, int num)
@@ -469,6 +491,9 @@ int Game::destroyThing(int num)
 		things[num] = NULL;
 		things.erase(things.begin() + num);
 	}
+	for (int i = num; i < things.size(); i++)
+		if (things[i] != NULL)
+			things[i]->tgThingsUnit = i;
 	return num - 1;
 }
 
