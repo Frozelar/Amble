@@ -199,7 +199,7 @@ bool LevelEditor::leHandleEnvironment(SDL_Event* e)
 						if(mouseThing != NULL)
 							Game::newThing(mouseThing->tgType, i, mouseThing->tgHitboxRect.x, mouseThing->tgHitboxRect.y, mouseThing->tgGetSubtype());
 						else
-							Game::newThing(Game::ThingType["player"], i);
+							Game::newThing(Game::ThingType["player"], i, mx, my);
 					}
 				// }
 				// else

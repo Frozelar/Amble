@@ -332,25 +332,35 @@ bool Game::applyAI(void)
 void Game::centerCamera(void)
 {
 	int differenceX = 0;
-	int differenceY = 0;
-	if (gCamera.x > 0 && gCamera.x + gCamera.w < Level::LEVEL_W_PIXELS && gCamera.y > 0 && gCamera.y + gCamera.h < Level::LEVEL_H_PIXELS)
+	int differenceY = 0; 
+	if (gCamera.x >= 0 && gCamera.x + gCamera.w < Level::LEVEL_W_PIXELS && gCamera.y >= 0 && gCamera.y + gCamera.h < Level::LEVEL_H_PIXELS)
 	{
 		if (gPlayer->tgHitboxRect.x + gPlayer->tgHitboxRect.w / 2 != WINDOW_W / 2 ||
 			gPlayer->tgHitboxRect.y + gPlayer->tgHitboxRect.h / 2 != WINDOW_H / 2)
 		{
-			differenceX = WINDOW_W / 2 - (gPlayer->tgHitboxRect.x + gPlayer->tgHitboxRect.w / 2);
-			differenceY = WINDOW_H / 2 - (gPlayer->tgHitboxRect.y + gPlayer->tgHitboxRect.h / 2);
+			differenceX = (gPlayer->tgHitboxRect.x + gPlayer->tgHitboxRect.w / 2) - WINDOW_W / 2;
+			differenceY = (gPlayer->tgHitboxRect.y + gPlayer->tgHitboxRect.h / 2) - WINDOW_H / 2;
+
+			/*if (differenceX - WINDOW_W / 2 < 0)
+				differenceX += (differenceX - WINDOW_W / 2);
+			if (differenceX + WINDOW_W / 2 >= Level::LEVEL_W_PIXELS)
+				differenceX -= (differenceX + WINDOW_W / 2) - Level::LEVEL_W_PIXELS;
+			if (differenceY - WINDOW_H / 2 < 0)
+				differenceY += (differenceY - WINDOW_H / 2);
+			if (differenceY + WINDOW_H / 2 >= Level::LEVEL_H_PIXELS)
+				differenceY -= (differenceY + WINDOW_H / 2) - Level::LEVEL_H_PIXELS;*/
+				
 			for (int i = 0; i < things.size(); i++)
 			{
 				if (things[i] != NULL)
 				{
-					things[i]->tgHitboxRect.x += differenceX;
-					things[i]->tgHitboxRect.y += differenceY;
+					things[i]->tgHitboxRect.x -= differenceX;
+					things[i]->tgHitboxRect.y -= differenceY;
 				}
 			}
 		}
 	}
-	gCamera = { gCamera.x + differenceX, gCamera.y + differenceY, WINDOW_W, WINDOW_H }; // Level::LEVEL_W_PIXELS, Level::LEVEL_H_PIXELS };
+	gCamera = { gCamera.x - differenceX, gCamera.y - differenceY, WINDOW_W, WINDOW_H }; // Level::LEVEL_W_PIXELS, Level::LEVEL_H_PIXELS };
 }
 
 // if type has the offset built-in, then do NOT give the final thingtype argument; otherwise, give a thingtype

@@ -76,11 +76,11 @@ bool Level::generateLevel(int whichLevel)
 	// bool isCharacter = false;
 
 	closeLevel();
-	if (whichLevel > 0)
+	/*if (whichLevel > 0)
 		levelMap.open(Game::rDir + "level" + std::to_string(whichLevel) + ext);
 	else if (whichLevel == 0)
 		levelMap.open(Game::rDir + "title" + ext);
-	else if (whichLevel == -1)
+	else if (whichLevel == -1)*/
 		levelMap.open(Game::rDir + "output" + ext);
 	currentLevel = whichLevel;
 
